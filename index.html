@@ -194,6 +194,78 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .location-perks { grid-template-columns: 1fr; }
   .agrid2, .agrid3 { grid-template-columns: 1fr; }
 }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92); z-index: 300;
+  overflow-y: auto; padding: 2rem 1rem;
+}
+.modal-overlay.open { display: block; }
+.modal-box {
+  max-width: 900px; margin: 0 auto;
+  background: var(--dark2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  animation: modalIn 0.25s ease;
+}
+@keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.modal-gallery { position: relative; height: 420px; background: var(--dark3); }
+.modal-gallery img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 0.4s;
+}
+.modal-gallery img.active { opacity: 1; }
+.modal-gallery-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.6); border: none; color: white;
+  width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+  z-index: 10; transition: background 0.2s;
+}
+.modal-gallery-btn:hover { background: rgba(0,0,0,0.9); }
+.modal-gallery-btn.prev { left: 14px; }
+.modal-gallery-btn.next { right: 14px; }
+.modal-gallery-counter {
+  position: absolute; bottom: 14px; right: 16px;
+  background: rgba(0,0,0,0.6); color: white;
+  font-size: 0.78rem; padding: 4px 10px; border-radius: 20px; z-index: 10;
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(0,0,0,0.7); border: none; color: white;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+  z-index: 20; transition: background 0.2s;
+}
+.modal-close:hover { background: rgba(0,0,0,1); }
+.modal-body { padding: 2rem; }
+.modal-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+.modal-badge.frei { background: rgba(76,175,136,0.12); color: #6DCEAA; border: 1px solid rgba(76,175,136,0.3); }
+.modal-badge.vergeben { background: rgba(224,82,82,0.12); color: #E8837F; border: 1px solid rgba(224,82,82,0.3); }
+.modal-badge.demnachst { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
+.modal-address { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 1.2rem; }
+.modal-specs-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.modal-spec { text-align: center; }
+.modal-spec .val { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold); }
+.modal-spec .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 2px; }
+.modal-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+.modal-features { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1.5rem; }
+.modal-price-block { background: var(--dark3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.modal-price-block .kalt { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); }
+.modal-price-block .kalt span { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; color: var(--text-muted); margin-left: 4px; }
+.modal-price-breakdown { font-size: 0.82rem; color: var(--text-muted); line-height: 1.8; }
+.modal-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-thumbnails { display: flex; gap: 8px; overflow-x: auto; padding: 0 2rem 1.5rem; }
+.modal-thumb { width: 72px; height: 52px; border-radius: 6px; overflow: hidden; flex-shrink: 0; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+.modal-thumb.active { border-color: var(--gold); }
+.modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) {
+  .modal-gallery { height: 260px; }
+  .modal-body { padding: 1.2rem; }
+  .modal-title { font-size: 1.2rem; }
+}
+
 </style>
 </head>
 <body>
@@ -273,6 +345,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   Central City Apartment Dortmund &nbsp;·&nbsp; <a href="mailto:centralcitydo@gmail.com">centralcitydo@gmail.com</a> &nbsp;·&nbsp; <a href="tel:+4917826871170">+49 178 2687170</a>
 </footer>
 
+
+<!-- LISTING MODAL -->
+<div class="modal-overlay" id="listingModal" onclick="handleModalClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-gallery" id="modalGallery">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-gallery-btn prev" onclick="modalSlide(-1)">‹</button>
+      <button class="modal-gallery-btn next" onclick="modalSlide(1)">›</button>
+      <div class="modal-gallery-counter" id="modalCounter">1 / 1</div>
+    </div>
+    <div class="modal-thumbnails" id="modalThumbs"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <!-- ADMIN OVERLAY -->
 <div class="admin-overlay" id="adminOverlay">
   <div class="admin-panel">
@@ -304,166 +391,102 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 </div>
 
 <script>
+var SUPABASE_URL = 'https://mxgwmmitbuperbiozdtz.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
 var ADMIN_PW = 'CCA2024!';
 
-var DEFAULT_LISTINGS = [
-  {
-    id: 'p3',
-    title: '2-Zimmer-Wohnung, 2. OG rechts',
-    address: 'Herderstra\u00dfe 16, 2. OG rechts, 44147 Dortmund',
-    short: 'Herderstr. 16, 2. OG re.',
-    sqm: 49,
-    rooms: 2,
-    kalt: 580,
-    nebenkosten: 150,
-    heizung: 100,
-    desc: 'Gro\u00dfz\u00fcgige, voll m\u00f6blierte 2-Zimmer-Wohnung im 2. Obergeschoss. Zwei komfortable Doppelbetten, zwei Arbeitspl\u00e4tze, moderne K\u00fcche mit allen Ger\u00e4ten, Badewanne und Waschmaschine. Ideal f\u00fcr Paare, WG oder Monteure.',
-    features: ['Voll m\u00f6bliert','2 Doppelbetten','K\u00fcche kompl.','Waschmaschine','Badewanne','2 Arbeitspl\u00e4tze','Parkett'],
-    status: 'frei',
-    photos: [
-      'https://i.imgur.com/placeholder1.jpg',
-      'https://i.imgur.com/placeholder2.jpg'
-    ]
-  },
-  {
-    id: 'p4',
-    title: '1-Zimmer-Wohnung, EG rechts',
-    address: 'Herderstra\u00dfe 16, EG rechts, 44147 Dortmund',
-    short: 'Herderstr. 16, EG re.',
-    sqm: 39,
-    rooms: 1,
-    kalt: 530,
-    nebenkosten: 120,
-    heizung: 80,
-    desc: 'Kompakte, voll m\u00f6blierte 1-Zimmer-Wohnung im Erdgeschoss. Doppelbett, vollst\u00e4ndige K\u00fcche mit K\u00fchlschrank und Sp\u00fclmaschine, Arbeitsplatz, Tisch mit St\u00fchlen sowie Waschmaschine im Bad. Perfekt f\u00fcr Singles und Berufspendler.',
-    features: ['Voll m\u00f6bliert','Doppelbett','K\u00fcche kompl.','Sp\u00fclmaschine','Waschmaschine','Arbeitsplatz','Badewanne'],
-    status: 'frei',
-    photos: [
-      'https://i.imgur.com/placeholder3.jpg',
-      'https://i.imgur.com/placeholder4.jpg'
-    ]
-  },
-  {
-    id: 'p5',
-    title: '1-Zimmer-Wohnung, 1. OG links',
-    address: 'Herderstra\u00dfe 16, 1. OG links, 44147 Dortmund',
-    short: 'Herderstr. 16, 1. OG li.',
-    sqm: 34,
-    rooms: 1,
-    kalt: 0,
-    nebenkosten: 0,
-    heizung: 0,
-    desc: 'Gem\u00fctliche, voll m\u00f6blierte 1-Zimmer-Wohnung im 1. Obergeschoss. Doppelbett, K\u00fcche mit Waschmaschine. Geeignet f\u00fcr Singles, Studenten und Monteure. Preis auf Anfrage.',
-    features: ['Voll m\u00f6bliert','Doppelbett','K\u00fcche','Waschmaschine','Monteurgeeignet','Studentengeeignet'],
-    status: 'frei',
-    photos: [
-      'https://i.imgur.com/placeholder5.jpg'
-    ]
-  },
-  {
-    id: 'p1',
-    title: 'Wohnung Schelenbrink 30',
-    address: 'Schelenbrink 30, 44309 Dortmund',
-    short: 'Schelenbrink 30',
-    sqm: 0,
-    rooms: 0,
-    kalt: 0,
-    nebenkosten: 0,
-    heizung: 0,
-    desc: 'Details folgen in K\u00fcrze.',
-    features: [],
-    status: 'demnachst',
-    photos: []
-  },
-  {
-    id: 'p2',
-    title: 'Wohnung Schelenbrink 07',
-    address: 'Schelenbrink 07, 44309 Dortmund',
-    short: 'Schelenbrink 07',
-    sqm: 0,
-    rooms: 0,
-    kalt: 0,
-    nebenkosten: 0,
-    heizung: 0,
-    desc: 'Details folgen in K\u00fcrze.',
-    features: [],
-    status: 'demnachst',
-    photos: []
-  },
-  {
-    id: 'p6',
-    title: 'Wohnung EG links',
-    address: 'Herderstra\u00dfe 16, EG links, 44147 Dortmund',
-    short: 'Herderstr. 16, EG li.',
-    sqm: 0,
-    rooms: 0,
-    kalt: 0,
-    nebenkosten: 0,
-    heizung: 0,
-    desc: 'Details folgen in K\u00fcrze.',
-    features: [],
-    status: 'demnachst',
-    photos: []
-  }
-];
-
-function getListings() {
-  try {
-    var saved = localStorage.getItem('cca_listings');
-    return saved ? JSON.parse(saved) : DEFAULT_LISTINGS;
-  } catch(e) { return DEFAULT_LISTINGS; }
+async function sbFetch(path, options) {
+  options = options || {};
+  var res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    method: options.method || 'GET',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer !== undefined ? options.prefer : 'return=representation'
+    },
+    body: options.body || undefined
+  });
+  if (!res.ok) { var e = await res.text(); throw new Error(e); }
+  var text = await res.text();
+  return text ? JSON.parse(text) : [];
 }
 
-function saveListings(listings) {
-  localStorage.setItem('cca_listings', JSON.stringify(listings));
+async function fetchListings() {
+  return sbFetch('listings?order=sort_order.asc', { prefer: '' });
+}
+
+async function upsertListing(l) {
+  return sbFetch('listings?id=eq.' + l.id, {
+    method: 'PATCH',
+    body: JSON.stringify(l)
+  });
 }
 
 // RENDER LISTINGS
-function renderListings() {
-  var listings = getListings();
+async function renderListings() {
   var container = document.getElementById('listingsContainer');
-  container.innerHTML = listings.map(function(l) {
-    return buildListingCard(l);
-  }).join('');
-  initSliders();
+  container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1;">Lade Inserate...</div>';
+  try {
+    var listings = await fetchListings();
+    if (!listings.length) {
+      container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1;">Keine Inserate gefunden.</div>';
+      return;
+    }
+    container.innerHTML = listings.map(function(l) { return buildListingCard(l); }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;padding:3rem;color:#E8837F;grid-column:1/-1;">Fehler beim Laden: ' + e.message + '</div>';
+  }
+}
+
+function getPhotos(l) {
+  if (!l.photos || !l.photos.trim()) return [];
+  return l.photos.split(',').map(function(u) { return u.trim(); }).filter(Boolean);
+}
+
+function getFeatures(l) {
+  if (!l.features || !l.features.trim()) return [];
+  return l.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean);
 }
 
 function buildListingCard(l) {
   var warm = l.kalt + l.nebenkosten + l.heizung;
-  var badge = '';
-  if (l.status === 'vergeben') badge = '<div class="vergeben-badge">Vergeben</div>';
-  else if (l.status === 'demnachst') badge = '<div class="vergeben-badge" style="color:#C9A96E;border-color:rgba(201,169,110,0.4);">Demnächst</div>';
-  else badge = '<div class="frei-badge">Frei</div>';
+  var photos = getPhotos(l);
+  var badge = l.status === 'vergeben'
+    ? '<div class="vergeben-badge">Vergeben</div>'
+    : l.status === 'demnachst'
+    ? '<div class="vergeben-badge" style="color:#C9A96E;border-color:rgba(201,169,110,0.4);">Demnächst</div>'
+    : '<div class="frei-badge">Frei</div>';
 
-  var photos = l.photos && l.photos.length ? l.photos : ['https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'];
-
-  var imgs = photos.map(function(p, i) {
-    return '<img src="' + p + '" alt="Foto ' + (i+1) + '" class="' + (i===0?'active':'') + '" onerror="this.src=\'https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt\'">';
+  var displayPhotos = photos.length ? photos : ['https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'];
+  var imgs = displayPhotos.map(function(p, i) {
+    return '<img src="' + p + '" alt="Foto ' + (i+1) + '" class="' + (i===0?'active':'') + '" onerror="this.src='https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'">';
   }).join('');
-
-  var dots = photos.length > 1 ? '<div class="slider-dots">' + photos.map(function(_,i) {
-    return '<button class="slider-dot ' + (i===0?'active':'') + '" onclick="slideTo(this, ' + i + ')"></button>';
+  var dots = displayPhotos.length > 1 ? '<div class="slider-dots">' + displayPhotos.map(function(_,i) {
+    return '<button class="slider-dot ' + (i===0?'active':'') + '" onclick="slideTo(this,' + i + ')"></button>';
   }).join('') + '</div>' : '';
-
-  var btns = photos.length > 1
-    ? '<button class="slider-btn prev" onclick="slideDir(this,-1)">‹</button><button class="slider-btn next" onclick="slideDir(this,1)">›</button>'
+  var btns = displayPhotos.length > 1
+    ? '<button class="slider-btn prev" onclick="event.stopPropagation();slideDir(this,-1)">‹</button><button class="slider-btn next" onclick="event.stopPropagation();slideDir(this,1)">›</button>'
     : '';
 
   var specs = '';
   if (l.sqm > 0) specs += '<div class="listing-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>' + l.sqm + ' m²</div>';
   if (l.rooms > 0) specs += '<div class="listing-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>' + l.rooms + ' Zimmer</div>';
 
-  var tags = l.features.map(function(f) { return '<span class="feature-tag">' + f + '</span>'; }).join('');
+  var features = getFeatures(l);
+  var tags = features.map(function(f) { return '<span class="feature-tag">' + f + '</span>'; }).join('');
 
   var priceBlock = l.kalt > 0
     ? '<div class="price-block"><div class="kalt">' + l.kalt + ' €<span>/Monat kalt</span></div><div class="warm">Warmmiete ca. ' + warm + ' € · NK ' + l.nebenkosten + ' € · HK ' + l.heizung + ' €</div></div>'
     : '<div class="price-block"><div class="kalt" style="font-size:1rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
 
-  var anfragebtn = (l.status === 'frei')
-    ? '<a href="central-city-apartment.html?wohnung=' + encodeURIComponent(l.address) + '" class="btn-anfrage" onclick="preselectProperty(\'' + l.id + '\')">Besichtigung anfragen</a>'
+  var anfragebtn = l.status === 'frei'
+    ? '<a href="central-city-apartment.html" class="btn-anfrage" onclick="preselectProperty('' + l.id + '')">Besichtigung anfragen</a>'
     : '<span style="font-size:0.78rem;color:var(--text-muted);">Nicht verfügbar</span>';
 
-  return '<div class="listing-card' + (l.status !== 'frei' ? ' vergeben' : '') + '" data-id="' + l.id + '">'
+  var isDisabled = l.status !== 'frei';
+
+  return '<div class="listing-card' + (isDisabled ? ' vergeben' : '') + '" data-id="' + l.id + '" style="cursor:pointer;" onclick="openListingModal('' + l.id + '')">'
     + '<div class="photo-slider" data-current="0">'
     + badge + imgs + dots + btns
     + '</div>'
@@ -471,15 +494,13 @@ function buildListingCard(l) {
     + '<div class="listing-address">' + l.short + '</div>'
     + '<div class="listing-title">' + l.title + '</div>'
     + '<div class="listing-specs">' + specs + '</div>'
-    + '<div class="listing-desc">' + l.desc + '</div>'
+    + '<div class="listing-desc">' + (l.description||'') + '</div>'
     + (tags ? '<div class="listing-features">' + tags + '</div>' : '')
     + '<div class="listing-price-row">' + priceBlock + anfragebtn + '</div>'
     + '</div></div>';
 }
 
 // SLIDER
-function initSliders() {}
-
 function slideTo(dotEl, idx) {
   var slider = dotEl.closest('.photo-slider');
   var imgs = slider.querySelectorAll('img');
@@ -505,6 +526,109 @@ function preselectProperty(id) {
   localStorage.setItem('cca_preselect', id);
 }
 
+// MODAL
+var modalCurrentIdx = 0;
+var modalPhotos = [];
+var modalListings = [];
+
+async function openListingModal(id) {
+  var listings = await fetchListings();
+  modalListings = listings;
+  var l = listings.find(function(x) { return x.id === id; });
+  if (!l) return;
+
+  modalPhotos = getPhotos(l);
+  if (!modalPhotos.length) modalPhotos = ['https://via.placeholder.com/800x420/1E1E1E/C9A96E?text=Foto+folgt'];
+  modalCurrentIdx = 0;
+
+  var gallery = document.getElementById('modalGallery');
+  gallery.querySelectorAll('img').forEach(function(img) { img.remove(); });
+  modalPhotos.forEach(function(url, i) {
+    var img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Foto ' + (i+1);
+    if (i === 0) img.classList.add('active');
+    img.onerror = function() { this.src = 'https://via.placeholder.com/800x420/1E1E1E/C9A96E?text=Foto+folgt'; };
+    gallery.appendChild(img);
+  });
+  updateModalCounter();
+
+  var thumbs = document.getElementById('modalThumbs');
+  if (modalPhotos.length > 1) {
+    thumbs.style.display = 'flex';
+    thumbs.innerHTML = modalPhotos.map(function(url, i) {
+      return '<div class="modal-thumb' + (i===0?' active':'') + '" onclick="modalThumbClick(' + i + ')" id="mthumb_' + i + '"><img src="' + url + '" alt=""></div>';
+    }).join('');
+  } else {
+    thumbs.style.display = 'none';
+    thumbs.innerHTML = '';
+  }
+
+  var warm = l.kalt + l.nebenkosten + l.heizung;
+  var features = getFeatures(l);
+  var badgeCls = l.status === 'frei' ? 'frei' : l.status === 'vergeben' ? 'vergeben' : 'demnachst';
+  var badgeTxt = l.status === 'frei' ? 'Frei' : l.status === 'vergeben' ? 'Vergeben' : 'Demnächst';
+  var specs = '';
+  if (l.sqm > 0) specs += '<div class="modal-spec"><div class="val">' + l.sqm + '</div><div class="lbl">m²</div></div>';
+  if (l.rooms > 0) specs += '<div class="modal-spec"><div class="val">' + l.rooms + '</div><div class="lbl">Zimmer</div></div>';
+  if (l.kalt > 0) specs += '<div class="modal-spec"><div class="val">' + l.kalt + ' €</div><div class="lbl">Kaltmiete</div></div>';
+  if (warm > 0) specs += '<div class="modal-spec"><div class="val">' + warm + ' €</div><div class="lbl">Warmmiete</div></div>';
+  var tags = features.map(function(f) { return '<span class="feature-tag">' + f + '</span>'; }).join('');
+  var priceHtml = l.kalt > 0
+    ? '<div class="modal-price-block"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="modal-price-breakdown">Nebenkosten: ' + l.nebenkosten + ' €<br>Heizkosten: ' + l.heizung + ' €<br><strong style="color:var(--text);">Warmmiete gesamt: ' + warm + ' €</strong></div></div>'
+    : '<div class="modal-price-block"><div class="kalt" style="font-size:1.2rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
+  var ctaHtml = l.status === 'frei'
+    ? '<a href="central-city-apartment.html" class="btn-gold" onclick="preselectProperty('' + l.id + '')">Besichtigung anfragen</a><button onclick="closeModal()" class="btn-outline">Schließen</button>'
+    : '<button onclick="closeModal()" class="btn-outline">Schließen</button>';
+
+  document.getElementById('modalBody').innerHTML =
+    '<span class="modal-badge ' + badgeCls + '">' + badgeTxt + '</span>'
+    + '<div class="modal-address">' + l.address + '</div>'
+    + '<div class="modal-title">' + l.title + '</div>'
+    + (specs ? '<div class="modal-specs-row">' + specs + '</div>' : '')
+    + '<div class="modal-desc">' + (l.description||'') + '</div>'
+    + (tags ? '<div class="modal-features">' + tags + '</div>' : '')
+    + priceHtml
+    + '<div class="modal-cta">' + ctaHtml + '</div>';
+
+  document.getElementById('listingModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('listingModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleModalClick(e) {
+  if (e.target === document.getElementById('listingModal')) closeModal();
+}
+function modalSlide(dir) {
+  var imgs = document.getElementById('modalGallery').querySelectorAll('img');
+  imgs[modalCurrentIdx].classList.remove('active');
+  var t = document.getElementById('mthumb_' + modalCurrentIdx);
+  if (t) t.classList.remove('active');
+  modalCurrentIdx = (modalCurrentIdx + dir + modalPhotos.length) % modalPhotos.length;
+  imgs[modalCurrentIdx].classList.add('active');
+  var nt = document.getElementById('mthumb_' + modalCurrentIdx);
+  if (nt) nt.classList.add('active');
+  updateModalCounter();
+}
+function modalThumbClick(idx) {
+  var imgs = document.getElementById('modalGallery').querySelectorAll('img');
+  imgs[modalCurrentIdx].classList.remove('active');
+  var t = document.getElementById('mthumb_' + modalCurrentIdx);
+  if (t) t.classList.remove('active');
+  modalCurrentIdx = idx;
+  imgs[modalCurrentIdx].classList.add('active');
+  var nt = document.getElementById('mthumb_' + modalCurrentIdx);
+  if (nt) nt.classList.add('active');
+  updateModalCounter();
+}
+function updateModalCounter() {
+  document.getElementById('modalCounter').textContent = (modalCurrentIdx+1) + ' / ' + modalPhotos.length;
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
 // ADMIN
 function openAdmin() { document.getElementById('adminOverlay').classList.add('open'); }
 function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
@@ -519,125 +643,109 @@ function doAdminLogin() {
     document.getElementById('adminPw').value = '';
   }
 }
-
 function adminLogout() {
   document.getElementById('adminLoginBox').style.display = 'block';
   document.getElementById('adminEditor').style.display = 'none';
   document.getElementById('adminPw').value = '';
 }
 
+var adminListings = [];
 var adminActiveTab = 0;
 
-function buildAdminEditor() {
-  var listings = getListings();
+async function buildAdminEditor() {
   var tabs = document.getElementById('adminTabs');
   var forms = document.getElementById('adminForms');
+  tabs.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
+  forms.innerHTML = '';
+  try {
+    adminListings = await fetchListings();
+  } catch(e) {
+    tabs.innerHTML = '<div style="color:#E8837F;">Fehler: ' + e.message + '</div>';
+    return;
+  }
 
-  tabs.innerHTML = listings.map(function(l, i) {
+  tabs.innerHTML = adminListings.map(function(l, i) {
     return '<button class="admin-listing-tab' + (i===0?' active':'') + '" onclick="switchAdminTab(' + i + ')">' + l.short + '</button>';
   }).join('');
 
-  forms.innerHTML = listings.map(function(l, i) {
-    var photoInputs = (l.photos || []).map(function(url, pi) {
-      return '<div class="photo-url-item"><input type="text" value="' + url + '" placeholder="https://..." onchange="updatePhotoUrl(' + i + ',' + pi + ',this.value)"><button onclick="removePhoto(' + i + ',' + pi + ')">✕</button></div>';
-    }).join('');
-
+  forms.innerHTML = adminListings.map(function(l, i) {
     var statusOpts = ['frei','vergeben','demnachst'].map(function(s) {
       return '<option value="' + s + '"' + (l.status===s?' selected':'') + '>' + (s==='frei'?'Frei':s==='vergeben'?'Vergeben':'Demnächst') + '</option>';
     }).join('');
 
-    var featuresStr = (l.features || []).join(', ');
+    var photoUrls = (l.photos||'').split(',').map(function(u){return u.trim();}).filter(Boolean);
+    var photoInputs = photoUrls.map(function(url, pi) {
+      return '<div class="photo-url-item"><input type="text" value="' + url + '" placeholder="https://i.imgur.com/..." onchange="updateAdminPhoto(' + i + ',' + pi + ',this.value)"><button onclick="removeAdminPhoto(' + i + ',' + pi + ')">&#10005;</button></div>';
+    }).join('');
 
     return '<div class="admin-listing-form' + (i===0?' active':'') + '" id="adminForm_' + i + '">'
       + '<div class="agrid2">'
-      + '<div class="afield"><label>Titel</label><input type="text" value="' + l.title + '" onchange="updateField(' + i + ',\'title\',this.value)"></div>'
-      + '<div class="afield"><label>Status</label><select onchange="updateField(' + i + ',\'status\',this.value)">' + statusOpts + '</select></div>'
+      + '<div class="afield"><label>Titel</label><input type="text" value="' + (l.title||'') + '" onchange="adminListings[' + i + '].title=this.value"></div>'
+      + '<div class="afield"><label>Status</label><select onchange="adminListings[' + i + '].status=this.value">' + statusOpts + '</select></div>'
       + '</div>'
-      + '<div class="afield"><label>Adresse (vollst\u00e4ndig)</label><input type="text" value="' + l.address + '" onchange="updateField(' + i + ',\'address\',this.value)"></div>'
+      + '<div class="afield"><label>Adresse</label><input type="text" value="' + (l.address||'') + '" onchange="adminListings[' + i + '].address=this.value"></div>'
       + '<div class="agrid3">'
-      + '<div class="afield"><label>Gr\u00f6\u00dfe (m\u00b2)</label><input type="number" value="' + l.sqm + '" onchange="updateField(' + i + ',\'sqm\',parseInt(this.value)||0)"></div>'
-      + '<div class="afield"><label>Zimmer</label><input type="number" value="' + l.rooms + '" onchange="updateField(' + i + ',\'rooms\',parseInt(this.value)||0)"></div>'
-      + '<div class="afield"><label>Kaltmiete (€)</label><input type="number" value="' + l.kalt + '" onchange="updateField(' + i + ',\'kalt\',parseInt(this.value)||0)"></div>'
+      + '<div class="afield"><label>Größe (m²)</label><input type="number" value="' + l.sqm + '" onchange="adminListings[' + i + '].sqm=parseInt(this.value)||0"></div>'
+      + '<div class="afield"><label>Zimmer</label><input type="number" value="' + l.rooms + '" onchange="adminListings[' + i + '].rooms=parseInt(this.value)||0"></div>'
+      + '<div class="afield"><label>Kaltmiete (€)</label><input type="number" value="' + l.kalt + '" onchange="adminListings[' + i + '].kalt=parseInt(this.value)||0"></div>'
       + '</div>'
       + '<div class="agrid2">'
-      + '<div class="afield"><label>Nebenkosten (€)</label><input type="number" value="' + l.nebenkosten + '" onchange="updateField(' + i + ',\'nebenkosten\',parseInt(this.value)||0)"></div>'
-      + '<div class="afield"><label>Heizkosten (€)</label><input type="number" value="' + l.heizung + '" onchange="updateField(' + i + ',\'heizung\',parseInt(this.value)||0)"></div>'
+      + '<div class="afield"><label>Nebenkosten (€)</label><input type="number" value="' + l.nebenkosten + '" onchange="adminListings[' + i + '].nebenkosten=parseInt(this.value)||0"></div>'
+      + '<div class="afield"><label>Heizkosten (€)</label><input type="number" value="' + l.heizung + '" onchange="adminListings[' + i + '].heizung=parseInt(this.value)||0"></div>'
       + '</div>'
-      + '<div class="afield"><label>Beschreibung</label><textarea onchange="updateField(' + i + ',\'desc\',this.value)">' + l.desc + '</textarea></div>'
-      + '<div class="afield"><label>Ausstattungs-Tags (kommagetrennt)</label><input type="text" value="' + featuresStr + '" placeholder="M\u00f6bliert, K\u00fcche, WLAN, ..." onchange="updateFeatures(' + i + ',this.value)"></div>'
-      + '<div class="afield"><label>Fotos (direkte Bild-URLs, z.B. von Imgur)</label>'
+      + '<div class="afield"><label>Beschreibung</label><textarea onchange="adminListings[' + i + '].description=this.value">' + (l.description||'') + '</textarea></div>'
+      + '<div class="afield"><label>Ausstattungs-Tags (kommagetrennt)</label><input type="text" value="' + (l.features||'') + '" placeholder="Möbliert, Küche, WLAN, ..." onchange="adminListings[' + i + '].features=this.value"></div>'
+      + '<div class="afield"><label>Fotos (Imgur-Links, kommagetrennt oder einzeln)</label>'
       + '<div class="photo-url-list" id="photoList_' + i + '">' + photoInputs + '</div>'
-      + '<button class="add-photo-btn" onclick="addPhoto(' + i + ')">+ Foto-URL hinzuf\u00fcgen</button>'
-      + '<p style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">Fotos bei <a href="https://imgur.com" target="_blank" style="color:var(--gold);">imgur.com</a> hochladen → Rechtsklick auf Bild → "Bildadresse kopieren"</p>'
+      + '<button class="add-photo-btn" onclick="addAdminPhoto(' + i + ')">+ Foto-URL hinzufügen</button>'
+      + '<p style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">Fotos bei <a href="https://imgur.com" target="_blank" style="color:var(--gold);">imgur.com</a> hochladen → Rechtsklick → "Bildadresse kopieren"</p>'
       + '</div>'
       + '</div>';
   }).join('');
 }
 
-var editedListings = null;
-
-function getEditing() {
-  if (!editedListings) editedListings = JSON.parse(JSON.stringify(getListings()));
-  return editedListings;
-}
-
 function switchAdminTab(idx) {
   adminActiveTab = idx;
-  document.querySelectorAll('.admin-listing-tab').forEach(function(t, i) { t.classList.toggle('active', i===idx); });
-  document.querySelectorAll('.admin-listing-form').forEach(function(f, i) { f.classList.toggle('active', i===idx); });
+  document.querySelectorAll('.admin-listing-tab').forEach(function(t,i){t.classList.toggle('active',i===idx);});
+  document.querySelectorAll('.admin-listing-form').forEach(function(f,i){f.classList.toggle('active',i===idx);});
 }
 
-function updateField(idx, field, val) {
-  getEditing()[idx][field] = val;
+function updateAdminPhoto(li, pi, val) {
+  var urls = (adminListings[li].photos||'').split(',').map(function(u){return u.trim();}).filter(Boolean);
+  urls[pi] = val;
+  adminListings[li].photos = urls.join(',');
+}
+function removeAdminPhoto(li, pi) {
+  var urls = (adminListings[li].photos||'').split(',').map(function(u){return u.trim();}).filter(Boolean);
+  urls.splice(pi, 1);
+  adminListings[li].photos = urls.join(',');
+  buildAdminEditor().then(function(){ switchAdminTab(adminActiveTab); });
+}
+function addAdminPhoto(li) {
+  var urls = (adminListings[li].photos||'').split(',').map(function(u){return u.trim();}).filter(Boolean);
+  urls.push('');
+  adminListings[li].photos = urls.join(',');
+  buildAdminEditor().then(function(){ switchAdminTab(adminActiveTab); });
 }
 
-function updateFeatures(idx, val) {
-  getEditing()[idx].features = val.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
-}
-
-function updatePhotoUrl(idx, pi, val) {
-  getEditing()[idx].photos[pi] = val;
-}
-
-function removePhoto(idx, pi) {
-  getEditing()[idx].photos.splice(pi, 1);
-  buildAdminEditor();
-  switchAdminTab(adminActiveTab);
-}
-
-function addPhoto(idx) {
-  getEditing()[idx].photos.push('');
-  buildAdminEditor();
-  switchAdminTab(adminActiveTab);
-}
-
-function saveAllListings() {
-  if (editedListings) {
-    saveListings(editedListings);
-    editedListings = null;
+async function saveAllListings() {
+  var btn = document.querySelector('.save-btn');
+  btn.textContent = 'Speichere...';
+  btn.disabled = true;
+  try {
+    for (var i = 0; i < adminListings.length; i++) {
+      await upsertListing(adminListings[i]);
+    }
+    var fb = document.getElementById('saveFeedback');
+    fb.style.display = 'inline';
+    setTimeout(function(){ fb.style.display='none'; }, 2500);
+    renderListings();
+  } catch(e) {
+    alert('Fehler beim Speichern: ' + e.message);
+  } finally {
+    btn.textContent = 'Änderungen speichern';
+    btn.disabled = false;
   }
-  // HERO BG SLIDESHOW
-var heroBgIdx = 0;
-var heroBgs = document.querySelectorAll('.hero-bg img');
-if (heroBgs.length > 1) {
-  setInterval(function() {
-    heroBgs[heroBgIdx].classList.remove('active');
-    heroBgIdx = (heroBgIdx + 1) % heroBgs.length;
-    heroBgs[heroBgIdx].classList.add('active');
-  }, 5000);
-}
-
-renderListings();
-  var fb = document.getElementById('saveFeedback');
-  fb.style.display = 'inline';
-  setTimeout(function() { fb.style.display = 'none'; }, 2500);
-}
-
-// PRESELECT on form page
-if (window.location.search.indexOf('wohnung=') > -1) {
-  var params = new URLSearchParams(window.location.search);
-  var w = params.get('wohnung');
-  if (w) localStorage.setItem('cca_preselect_addr', w);
 }
 
 // HERO BG SLIDESHOW
@@ -653,5 +761,6 @@ if (heroBgs.length > 1) {
 
 renderListings();
 </script>
+
 </body>
 </html>
