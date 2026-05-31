@@ -1432,32 +1432,36 @@
 
       <!-- TAB: EINSTELLUNGEN -->
       <div id="tabContent-settings" style="display:none;">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
-            <div style="width:40px;height:40px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📧</div>
-            <div>
-              <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);">EmailJS Konfiguration</div>
-              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Public Key &amp; Service ID — einmalig einrichten</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.5rem;overflow:hidden;">
+          <div onclick="toggleEJSSection()" style="display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;">
+            <div style="width:36px;height:36px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;">📧</div>
+            <div style="flex:1;">
+              <div style="font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--gold);">EmailJS Konfiguration</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:1px;">Public Key &amp; Service ID — einmalig einrichten</div>
             </div>
-            <a href="https://emailjs.com" target="_blank" style="margin-left:auto;color:var(--gold);font-size:0.78rem;text-decoration:none;border:1px solid rgba(201,169,110,0.3);padding:5px 12px;border-radius:var(--radius);">emailjs.com ↗</a>
+            <span id="ejsChevron" style="color:var(--text-muted);font-size:0.85rem;">▾</span>
           </div>
-          <div class="grid-3">
-            <div class="field">
-              <label>Public Key</label>
-              <input type="text" id="ejsPublicKey" placeholder="abcXYZ123...">
+          <div id="ejsBody" style="display:none;padding:0 1.5rem 1.5rem;border-top:1px solid var(--border);">
+            <div style="height:1rem;"></div>
+            <div class="grid-3">
+              <div class="field">
+                <label>Public Key</label>
+                <input type="text" id="ejsPublicKey" placeholder="abcXYZ123...">
+              </div>
+              <div class="field">
+                <label>Service ID</label>
+                <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx">
+              </div>
+              <div class="field">
+                <label>Standard Template ID</label>
+                <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
+              </div>
             </div>
-            <div class="field">
-              <label>Service ID</label>
-              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx">
+            <div style="margin-top:1.2rem;display:flex;align-items:center;gap:12px;">
+              <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Speichern</button>
+              <a href="https://emailjs.com" target="_blank" style="color:var(--gold);font-size:0.78rem;text-decoration:none;">emailjs.com ↗</a>
+              <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
             </div>
-            <div class="field">
-              <label>Standard Template ID</label>
-              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
-            </div>
-          </div>
-          <div style="margin-top:1.2rem;display:flex;align-items:center;gap:12px;">
-            <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Speichern</button>
-            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
           </div>
         </div>
 
@@ -2670,6 +2674,20 @@ async function loadTemplatesFromSupabase() {
       renderTemplateList();
     }
   } catch(e) { console.log('Templates load error:', e); }
+}
+
+
+function toggleEJSSection() {
+  var body = document.getElementById('ejsBody');
+  var chevron = document.getElementById('ejsChevron');
+  if (!body) return;
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    if (chevron) chevron.textContent = '▴';
+  } else {
+    body.style.display = 'none';
+    if (chevron) chevron.textContent = '▾';
+  }
 }
 
 // INIT
