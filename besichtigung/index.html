@@ -1529,6 +1529,35 @@ async function sbFetch(path, options) {
   return text ? JSON.parse(text) : [];
 }
 
+
+async function insertApplicationProperties(appId, properties, viewingDate, viewingTime) {
+  var props = properties.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+  for (var i = 0; i < props.length; i++) {
+    await sbFetch('application_properties', {
+      method: 'POST',
+      body: JSON.stringify({
+        application_id: appId,
+        property: props[i],
+        status: 'pending',
+        viewing_date: viewingDate || '',
+        viewing_time: viewingTime || ''
+      })
+    });
+  }
+}
+
+async function fetchApplicationProperties(appId) {
+  return sbFetch('application_properties?application_id=eq.' + appId + '&order=created_at.asc', { prefer: '' });
+}
+
+async function updateApplicationProperty(id, updates) {
+  return sbFetch('application_properties?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
+}
+
+async function deleteApplicationProperties(appId) {
+  return sbFetch('application_properties?application_id=eq.' + appId, { method: 'DELETE', prefer: '' });
+}
+
 async function insertApplication(data) {
   return sbFetch('applications', { method: 'POST', body: JSON.stringify(data) });
 }
@@ -1859,14 +1888,9 @@ function buildAppCard(app) {
   var timeOpts = timeOptions.map(function(t) { return '<option' + (t === app.viewing_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
 
   var actionHtml = app.status === 'pending'
-    ? '<div class="action-row">'
-      + '<div class="field"><label>Best\u00e4tigter Termin (Datum)</label><input type="date" onclick="try{this.showPicker()}catch(e){}" id="confDate_' + app.id + '" value="' + (app.viewing_date||'') + '"></div>'
-      + '<div class="field"><label>Uhrzeit</label><select id="confTime_' + app.id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
-      + '<div class="field"><label>E-Mail Template</label><select id="confTemplate_' + app.id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;width:100%;"><option value="">Standard</option>' + emailTemplates.map(function(t){ return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('') + '</select></div>'
-      + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
-      + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
-      + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
-    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:sans-serif;font-size:0.75rem;">&#8635; Zur\u00fccksetzen</button></div>';
+    ? '<div class="action-row">' + buildPropertyActions(app) + '<div id="feedback_' + app.id + '" class="action-feedback"></div></div>'
+    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt' : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:0.75px;">&#8635; Zur\u00fccksetzen</button></div>';
+
 
   return '<div class="app-card" id="appcard_' + app.id + '">'
     + '<div class="app-card-head" onclick="toggleCard(\'' + app.id + '\')">'
@@ -2689,6 +2713,129 @@ function toggleEJSSection() {
     body.style.display = 'none';
     if (chevron) chevron.textContent = '▾';
   }
+}
+
+
+function buildPropertyActions(app) {
+  var props = app._properties && app._properties.length > 0
+    ? app._properties
+    : (app.property || '').split('|').map(function(p,i){ return { id: null, property: p.trim(), status: 'pending', viewing_date: app.viewing_date||'', viewing_time: app.viewing_time||'' }; }).filter(function(p){ return p.property; });
+
+  if (props.length === 0) {
+    return '<div style="color:var(--text-muted);font-size:0.82rem;">Keine Wohnungen gefunden</div>';
+  }
+
+  var timeOptions = ['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr','18:30 Uhr','19:00 Uhr'];
+
+  return props.map(function(p, idx) {
+    var pid = p.id || ('prop_' + app.id + '_' + idx);
+    var timeOpts = timeOptions.map(function(t){ return '<option' + (t === p.viewing_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+    var statusColor = p.status === 'confirmed' ? '#6DCEAA' : p.status === 'rejected' ? '#E8837F' : 'var(--gold)';
+    var statusLabel = p.status === 'confirmed' ? '\u2713 Best\u00e4tigt' : p.status === 'rejected' ? '\u2717 Abgelehnt' : 'Ausstehend';
+
+    var html = '<div style="background:rgba(201,169,110,0.05);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:0.8rem;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">'
+      + '<div style="font-size:0.85rem;color:var(--text);font-weight:500;">' + p.property + '</div>'
+      + '<span style="font-size:0.75rem;color:' + statusColor + ';border:1px solid ' + statusColor + ';padding:2px 10px;border-radius:20px;">' + statusLabel + '</span>'
+      + '</div>';
+
+    if (p.status === 'pending') {
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">'
+        + '<div class="field"><label>Datum</label><input type="date" onclick="try{this.showPicker()}catch(e){}" id="pDate_' + pid + '" value="' + (p.viewing_date||'') + '"></div>'
+        + '<div class="field"><label>Uhrzeit</label><select id="pTime_' + pid + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:8px;">'
+        + '<button data-appid="' + app.id + '" data-pid="' + pid + '" data-prop="' + p.property.replace(/"/g,'&quot;') + '" onclick="confirmProperty(this)" class="btn-confirm" style="font-size:0.8rem;padding:7px 14px;">\u2713 Best\u00e4tigen</button>'
+        + '<button data-appid="' + app.id + '" data-pid="' + pid + '" data-prop="' + p.property.replace(/"/g,'&quot;') + '" onclick="rejectProperty(this)" class="btn-reject" style="font-size:0.8rem;padding:7px 14px;">\u2717 Ablehnen</button>'
+        + '</div>';
+    } else {
+      html += '<div style="display:flex;gap:8px;">'
+        + '<button data-appid="' + app.id + '" data-pid="' + pid + '" onclick="resetProperty(this)" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;">\u21ba Zur\u00fccksetzen</button>'
+        + '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }).join('');
+}
+
+async function confirmProperty(btn) {
+  var appId = btn.dataset.appid;
+  var pid = btn.dataset.pid;
+  var prop = btn.dataset.prop;
+  var date = document.getElementById('pDate_' + pid) ? document.getElementById('pDate_' + pid).value : '';
+  var time = document.getElementById('pTime_' + pid) ? document.getElementById('pTime_' + pid).value : '';
+  if (!date) { alert('Bitte Datum ausw\u00e4hlen.'); return; }
+  if (!time) { alert('Bitte Uhrzeit ausw\u00e4hlen.'); return; }
+
+  try {
+    if (pid.startsWith('prop_')) {
+      // No DB entry yet - create one
+      await sbFetch('application_properties', { method: 'POST', body: JSON.stringify({ application_id: appId, property: prop, status: 'confirmed', viewing_date: date, viewing_time: time }) });
+    } else {
+      await updateApplicationProperty(pid, { status: 'confirmed', viewing_date: date, viewing_time: time });
+    }
+
+    // Check if all properties confirmed/rejected -> update main app status
+    var props = await fetchApplicationProperties(appId);
+    var allDone = props.every(function(p){ return p.status !== 'pending'; });
+    var anyConfirmed = props.some(function(p){ return p.status === 'confirmed'; });
+    if (allDone) await updateApplication(appId, { status: anyConfirmed ? 'confirmed' : 'rejected' });
+
+    // Send confirmation email
+    var app = allApps.find(function(a){ return a.id === appId; });
+    if (app) {
+      var cfg = getEJSConfig();
+      var fn = app.first_name||'', ln = app.last_name||'';
+      var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      var msg = 'Ihr Besichtigungstermin f\u00fcr ' + prop + ' am ' + dateFormatted + ' um ' + time + ' wurde best\u00e4tigt.\n\nBitte erscheinen Sie p\u00fcnktlich. Bei R\u00fcckfragen erreichen Sie uns unter info@centralcityapartments.de oder telefonisch unter +49 178 2687170.';
+      if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: prop, viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
+    }
+
+    renderDashboard();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function rejectProperty(btn) {
+  var appId = btn.dataset.appid;
+  var pid = btn.dataset.pid;
+  var prop = btn.dataset.prop;
+
+  try {
+    if (pid.startsWith('prop_')) {
+      await sbFetch('application_properties', { method: 'POST', body: JSON.stringify({ application_id: appId, property: prop, status: 'rejected' }) });
+    } else {
+      await updateApplicationProperty(pid, { status: 'rejected' });
+    }
+
+    var props = await fetchApplicationProperties(appId);
+    var allDone = props.every(function(p){ return p.status !== 'pending'; });
+    var anyConfirmed = props.some(function(p){ return p.status === 'confirmed'; });
+    if (allDone) await updateApplication(appId, { status: anyConfirmed ? 'confirmed' : 'rejected' });
+
+    // Send rejection email
+    var app = allApps.find(function(a){ return a.id === appId; });
+    if (app) {
+      var cfg = getEJSConfig();
+      var fn = app.first_name||'', ln = app.last_name||'';
+      var msg = 'Leider k\u00f6nnen wir Ihre Anfrage f\u00fcr ' + prop + ' nicht ber\u00fccksichtigen. Vielen Dank f\u00fcr Ihr Interesse.';
+      if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: prop, viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
+    }
+
+    renderDashboard();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function resetProperty(btn) {
+  var appId = btn.dataset.appid;
+  var pid = btn.dataset.pid;
+  try {
+    if (!pid.startsWith('prop_')) {
+      await updateApplicationProperty(pid, { status: 'pending', viewing_date: '', viewing_time: '' });
+    }
+    await updateApplication(appId, { status: 'pending' });
+    renderDashboard();
+  } catch(e) { alert('Fehler: ' + e.message); }
 }
 
 // INIT
