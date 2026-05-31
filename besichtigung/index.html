@@ -1751,6 +1751,7 @@ function adminLogin() {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
     loadEJSConfig();
+    loadTemplatesFromSupabase();
     renderDashboard();
   } else {
     document.getElementById('loginError').style.display = 'block';
