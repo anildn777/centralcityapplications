@@ -1917,8 +1917,115 @@ async function exportICS() {
   a2.click(); URL.revokeObjectURL(url);
 }
 
+
+// ============================================================
+// SHORT FORM
+// ============================================================
+function buildPropertyGridShort() {
+  var grid = document.getElementById('propertyGridShort');
+  if (!grid) return;
+  grid.innerHTML = PROPERTIES.map(function(p) {
+    return '<div class="property-card" id="cardS_' + p.id + '" onclick="togglePropertyShort(\'' + p.id + '\', this)">'
+      + '<div class="prop-check">✓</div>'
+      + '<div class="prop-street">' + p.street + '</div>'
+      + '<div class="prop-city">' + p.city + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function togglePropertyShort(id, el) {
+  el.classList.toggle('selected');
+  var selected = [];
+  PROPERTIES.forEach(function(p) {
+    var card = document.getElementById('cardS_' + p.id);
+    if (card && card.classList.contains('selected')) selected.push(p.street + ', ' + p.city);
+  });
+  document.getElementById('selectedPropertyShort').value = selected.join(' | ');
+}
+
+async function submitShortForm(e) {
+  e.preventDefault();
+  var form = e.target;
+  var fd = new FormData(form);
+  var raw = {};
+  for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
+
+  if (!raw.property) {
+    showAlert('shortFormAlert', 'error', 'Bitte wählen Sie mindestens eine Wohnung aus.');
+    document.getElementById('propertyGridShort').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  var btn = document.getElementById('shortSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Wird gesendet…';
+
+  var payload = {
+    status: 'pending',
+    first_name: raw.firstName || '',
+    last_name: raw.lastName || '',
+    email: raw.email || '',
+    phone: raw.phone || '',
+    property: raw.property || '',
+    employment_status: raw.employmentStatus || '',
+    net_income: raw.netIncome || '',
+    viewing_date: raw.viewingDate || '',
+    viewing_time: raw.viewingTime || '',
+    viewing_type: raw.viewingType || '',
+    remarks: raw.remarks || ''
+  };
+
+  try {
+    await insertApplication(payload);
+    showAlert('shortFormAlert', 'success', '✓ Vielen Dank, ' + (raw.firstName||'') + '! Ihre Anfrage ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
+    form.reset();
+    document.querySelectorAll('#propertyGridShort .property-card').forEach(function(c){ c.classList.remove('selected'); });
+    document.getElementById('selectedPropertyShort').value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var cfg = getEJSConfig();
+    if (cfg.publicKey && raw.email) {
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: (raw.firstName||'') + ' ' + (raw.lastName||''),
+        to_email: raw.email,
+        property: raw.property,
+        viewing_date: raw.viewingDate || 'wird noch mitgeteilt',
+        viewing_time: raw.viewingTime || '',
+        message: 'Vielen Dank für Ihre Besichtigungsanfrage. Wir haben Ihre Angaben erhalten und melden uns in Kürze bei Ihnen.'
+      }).catch(function(){});
+    }
+  } catch(err) {
+    showAlert('shortFormAlert', 'error', 'Fehler: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Besichtigung anfragen';
+  }
+}
+
+function toggleFullForm() {
+  var wrapper = document.getElementById('fullFormWrapper');
+  var btn = document.getElementById('toggleFullFormBtn');
+  if (!wrapper || !btn) return;
+  if (wrapper.style.display === 'none') {
+    wrapper.style.display = 'block';
+    btn.textContent = 'Vollständige Selbstauskunft ausblenden ▴';
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    wrapper.style.display = 'none';
+    btn.textContent = 'Optional: Vollständige Selbstauskunft ausfüllen ▾';
+  }
+}
+
 // INIT
 buildPropertyGrid();
+buildPropertyGridShort();
+
+var toggleBtn = document.getElementById('toggleFullFormBtn');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', toggleFullForm);
+  toggleBtn.addEventListener('mouseover', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; });
+  toggleBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'; });
+}
 </script>
 
 </body>
