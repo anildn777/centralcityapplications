@@ -679,92 +679,6 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
 // ADMIN
 function openAdmin() { document.getElementById('adminOverlay').classList.add('open'); }
 function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
-function doAdminLogin() {
-  if (document.getElementById('adminPw').value === ADMIN_PW) {
-    document.getElementById('adminLoginBox').style.display = 'none';
-    document.getElementById('adminEditor').style.display = 'block';
-    loadEJSConfig();
-    renderInserateAdmin();
-  } else { document.getElementById('adminLoginErr').style.display = 'block'; document.getElementById('adminPw').value = ''; }
-}
-function adminLogout() { document.getElementById('adminLoginBox').style.display = 'block'; document.getElementById('adminEditor').style.display = 'none'; document.getElementById('adminPw').value = ''; }
-
-var adminListings = [];
-var adminActiveTab = 0;
-
-function switchAdminTab(tab) {
-  ['inserate','settings'].forEach(function(t) {
-    var el = document.getElementById('tabContent-' + t);
-    var btn = document.getElementById('tab-' + t);
-    if (el) el.style.display = t === tab ? 'block' : 'none';
-    if (btn) btn.classList.toggle('active', t === tab);
-  });
-  if (tab === 'inserate') renderInserateAdmin();
-}
-
-
-var ejsConfigCache = {};
-
-function getEJSConfig() {
-  if (ejsConfigCache.publicKey) return ejsConfigCache;
-  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
-}
-
-async function loadEJSFromSupabase() {
-  try {
-    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
-    if (data && data[0] && data[0].value) {
-      var cfg = JSON.parse(data[0].value);
-      ejsConfigCache = cfg;
-      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
-      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
-      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
-      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
-    }
-  } catch(e) { console.log('EJS load error:', e); }
-}
-
-async function saveEmailJStoSupabase() {
-  var cfg = {
-    publicKey: document.getElementById('ejsPublicKey').value.trim(),
-    serviceId: document.getElementById('ejsServiceId').value.trim(),
-    templateId: document.getElementById('ejsTemplateId').value.trim()
-  };
-  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
-  ejsConfigCache = cfg;
-  try {
-    await sbFetch('settings?key=eq.emailjs', { method: 'PATCH', body: JSON.stringify({ value: JSON.stringify(cfg) }) });
-  } catch(e) {
-    try { await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) }) }); } catch(e2) {}
-  }
-  var fb = document.getElementById('ejsSaveFeedback');
-  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
-}
-
-function loadEJSConfig() {
-  loadEJSFromSupabase();
-}
-
-function switchAdminTab(idx) {
-  adminActiveTab = idx;
-  document.querySelectorAll('.admin-listing-tab').forEach(function(t,i){ t.classList.toggle('active',i===idx); });
-  document.querySelectorAll('.admin-listing-form').forEach(function(f,i){ f.classList.toggle('active',i===idx); });
-}
-function updatePhoto(li,pi,val){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u[pi]=val; adminListings[li].photos=u.join(','); }
-function removePhoto(li,pi){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.splice(pi,1); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
-function addPhoto(li){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.push(''); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
-
-async function saveAllListings() {
-  var btn = document.querySelector('.save-btn');
-  btn.textContent = 'Speichere...'; btn.disabled = true;
-  try {
-    for (var i = 0; i < adminListings.length; i++) await upsertListing(adminListings[i]);
-    var fb = document.getElementById('saveFeedback'); fb.style.display = 'inline';
-    setTimeout(function(){ fb.style.display='none'; }, 2500);
-    
-// ============================================================
-// INSERATE ADMIN
-// ============================================================
 async function renderInserateAdmin() {
   var list = document.getElementById('inserateList');
   list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
@@ -871,6 +785,92 @@ async function addNewListing() {
   } catch(e) { alert('Fehler: ' + e.message); }
 }
 
+function doAdminLogin() {
+  if (document.getElementById('adminPw').value === ADMIN_PW) {
+    document.getElementById('adminLoginBox').style.display = 'none';
+    document.getElementById('adminEditor').style.display = 'block';
+    loadEJSConfig();
+    renderInserateAdmin();
+  } else { document.getElementById('adminLoginErr').style.display = 'block'; document.getElementById('adminPw').value = ''; }
+}
+function adminLogout() { document.getElementById('adminLoginBox').style.display = 'block'; document.getElementById('adminEditor').style.display = 'none'; document.getElementById('adminPw').value = ''; }
+
+var adminListings = [];
+var adminActiveTab = 0;
+
+function switchAdminTab(tab) {
+  ['inserate','settings'].forEach(function(t) {
+    var el = document.getElementById('tabContent-' + t);
+    var btn = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'inserate') renderInserateAdmin();
+}
+
+
+var ejsConfigCache = {};
+
+function getEJSConfig() {
+  if (ejsConfigCache.publicKey) return ejsConfigCache;
+  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
+}
+
+async function loadEJSFromSupabase() {
+  try {
+    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
+    if (data && data[0] && data[0].value) {
+      var cfg = JSON.parse(data[0].value);
+      ejsConfigCache = cfg;
+      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
+      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
+      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
+    }
+  } catch(e) { console.log('EJS load error:', e); }
+}
+
+async function saveEmailJStoSupabase() {
+  var cfg = {
+    publicKey: document.getElementById('ejsPublicKey').value.trim(),
+    serviceId: document.getElementById('ejsServiceId').value.trim(),
+    templateId: document.getElementById('ejsTemplateId').value.trim()
+  };
+  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+  ejsConfigCache = cfg;
+  try {
+    await sbFetch('settings?key=eq.emailjs', { method: 'PATCH', body: JSON.stringify({ value: JSON.stringify(cfg) }) });
+  } catch(e) {
+    try { await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) }) }); } catch(e2) {}
+  }
+  var fb = document.getElementById('ejsSaveFeedback');
+  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
+}
+
+function loadEJSConfig() {
+  loadEJSFromSupabase();
+}
+
+function switchAdminTab(idx) {
+  adminActiveTab = idx;
+  document.querySelectorAll('.admin-listing-tab').forEach(function(t,i){ t.classList.toggle('active',i===idx); });
+  document.querySelectorAll('.admin-listing-form').forEach(function(f,i){ f.classList.toggle('active',i===idx); });
+}
+function updatePhoto(li,pi,val){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u[pi]=val; adminListings[li].photos=u.join(','); }
+function removePhoto(li,pi){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.splice(pi,1); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
+function addPhoto(li){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.push(''); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
+
+async function saveAllListings() {
+  var btn = document.querySelector('.save-btn');
+  btn.textContent = 'Speichere...'; btn.disabled = true;
+  try {
+    for (var i = 0; i < adminListings.length; i++) await upsertListing(adminListings[i]);
+    var fb = document.getElementById('saveFeedback'); fb.style.display = 'inline';
+    setTimeout(function(){ fb.style.display='none'; }, 2500);
+    
+// ============================================================
+// INSERATE ADMIN
+// ============================================================
 renderListings();
   } catch(e) { alert('Fehler: ' + e.message); }
   finally { btn.textContent = 'Änderungen speichern'; btn.disabled = false; }
