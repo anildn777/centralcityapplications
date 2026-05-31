@@ -460,7 +460,7 @@ function buildListingCard(l) {
 
   var displayPhotos = photos.length ? photos : ['https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'];
   var imgs = displayPhotos.map(function(p, i) {
-    return '<img src="' + p + '" alt="Foto ' + (i+1) + '" class="' + (i===0?'active':'') + '" onerror="this.src='https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'">';
+    return '<img src="' + p + '" alt="Foto ' + (i+1) + '" class="' + (i===0?'active':'') + '">';
   }).join('');
   var dots = displayPhotos.length > 1 ? '<div class="slider-dots">' + displayPhotos.map(function(_,i) {
     return '<button class="slider-dot ' + (i===0?'active':'') + '" onclick="slideTo(this,' + i + ')"></button>';
