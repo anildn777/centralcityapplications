@@ -266,6 +266,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .modal-title { font-size: 1.2rem; }
 }
 
+
+  .admin-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+  .admin-tab:hover { color: var(--text); }
+  .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 </style>
 </head>
 <body>
@@ -667,7 +683,8 @@ function doAdminLogin() {
   if (document.getElementById('adminPw').value === ADMIN_PW) {
     document.getElementById('adminLoginBox').style.display = 'none';
     document.getElementById('adminEditor').style.display = 'block';
-    buildAdminEditor();
+    loadEJSConfig();
+    renderInserateAdmin();
   } else { document.getElementById('adminLoginErr').style.display = 'block'; document.getElementById('adminPw').value = ''; }
 }
 function adminLogout() { document.getElementById('adminLoginBox').style.display = 'block'; document.getElementById('adminEditor').style.display = 'none'; document.getElementById('adminPw').value = ''; }
@@ -695,8 +712,8 @@ function switchAdminTab(idx) {
   document.querySelectorAll('.admin-listing-form').forEach(function(f,i){ f.classList.toggle('active',i===idx); });
 }
 function updatePhoto(li,pi,val){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u[pi]=val; adminListings[li].photos=u.join(','); }
-function removePhoto(li,pi){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.splice(pi,1); adminListings[li].photos=u.join(','); buildAdminEditor().then(function(){switchAdminTab(adminActiveTab);}); }
-function addPhoto(li){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.push(''); adminListings[li].photos=u.join(','); buildAdminEditor().then(function(){switchAdminTab(adminActiveTab);}); }
+function removePhoto(li,pi){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.splice(pi,1); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
+function addPhoto(li){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.push(''); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
 
 async function saveAllListings() {
   var btn = document.querySelector('.save-btn');
