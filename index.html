@@ -684,6 +684,12 @@ async function renderInserateAdmin() {
   list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
   try {
     var listings = await fetchListings();
+    // Sort: demnachst/new listings (sort_order=99) first, then by sort_order
+    listings.sort(function(a, b) {
+      if (a.sort_order === 99 && b.sort_order !== 99) return -1;
+      if (b.sort_order === 99 && a.sort_order !== 99) return 1;
+      return a.sort_order - b.sort_order;
+    });
     list.innerHTML = '';
     listings.forEach(function(l) {
       var card = buildInseratAdminCard(l);
@@ -781,7 +787,9 @@ async function addNewListing() {
   };
   try {
     await sbFetch('listings', { method: 'POST', body: JSON.stringify(newListing) });
-    renderInserateAdmin();
+    await renderInserateAdmin();
+    var list = document.getElementById('inserateList');
+    if (list) list.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch(e) { alert('Fehler: ' + e.message); }
 }
 
