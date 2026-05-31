@@ -1398,13 +1398,19 @@
 
       <!-- TAB: EINSTELLUNGEN -->
       <div id="tabContent-settings" style="display:none;">
-        <div class="form-section">
-          <h2 class="section-title">EmailJS Konfiguration</h2>
-          <p class="section-sub">Einmalig einrichten für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a> → kostenloses Konto → Service + Template erstellen</p>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
+            <div style="width:40px;height:40px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📧</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);">EmailJS Konfiguration</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Für automatischen E-Mail-Versand bei Terminbestätigung &amp; Absagen</div>
+            </div>
+            <a href="https://emailjs.com" target="_blank" style="margin-left:auto;color:var(--gold);font-size:0.78rem;text-decoration:none;border:1px solid rgba(201,169,110,0.3);padding:5px 12px;border-radius:var(--radius);">emailjs.com ↗</a>
+          </div>
           <div class="grid-3">
             <div class="field">
               <label>Public Key</label>
-              <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123...">
+              <input type="text" id="ejsPublicKey" placeholder="abcXYZ123...">
             </div>
             <div class="field">
               <label>Service ID</label>
@@ -1415,10 +1421,12 @@
               <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
             </div>
           </div>
-          <p class="small mt-1">💡 Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
-          <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;">
-            <button onclick="saveEmailJStoSupabase()" class="save-btn">Einstellungen dauerhaft speichern</button>
-            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
+          <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.15);border-radius:var(--radius);padding:10px 14px;margin-top:1rem;font-size:0.78rem;color:var(--text-muted);">
+            💡 Template-Variablen: <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_name}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_email}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{property}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{viewing_date}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{message}}</code>
+          </div>
+          <div style="margin-top:1.2rem;display:flex;align-items:center;gap:12px;">
+            <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Einstellungen speichern</button>
+            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Dauerhaft gespeichert!</span>
           </div>
         </div>
       </div>
@@ -2435,27 +2443,30 @@ function showAddApplicationModal() {
   var box = document.createElement('div');
   box.style.cssText = 'max-width:700px;margin:0 auto;background:#1A1A1A;border:1px solid rgba(201,169,110,0.3);border-radius:14px;padding:2rem;';
   box.innerHTML = [
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">',
-      '<span style="font-size:1.1rem;color:var(--gold);">Neue Bewerbung hinzuf\u00fcgen</span>',
-      '<button id="closeAddModal" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;">\u2715</button>',
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">',
+      '<div>',
+        '<div style="font-family:Playfair Display,serif;font-size:1.2rem;color:var(--gold);">Neue Bewerbung</div>',
+        '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Manuelle Erfassung eines Interessenten</div>',
+      '</div>',
+      '<button id="closeAddModal" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">\u2715</button>',
     '</div>',
     '<div class="agrid2">',
-      '<div class="afield"><label>Vorname</label><input type="text" id="aa_fn" placeholder="Max"></div>',
-      '<div class="afield"><label>Nachname</label><input type="text" id="aa_ln" placeholder="Mustermann"></div>',
-      '<div class="afield"><label>E-Mail</label><input type="email" id="aa_email" placeholder="max@beispiel.de"></div>',
+      '<div class="afield"><label>Vorname <span style="color:var(--gold)">*</span></label><input type="text" id="aa_fn" placeholder="Max"></div>',
+      '<div class="afield"><label>Nachname <span style="color:var(--gold)">*</span></label><input type="text" id="aa_ln" placeholder="Mustermann"></div>',
+      '<div class="afield"><label>E-Mail <span style="color:var(--gold)">*</span></label><input type="email" id="aa_email" placeholder="max@beispiel.de"></div>',
       '<div class="afield"><label>Telefon</label><input type="tel" id="aa_phone" placeholder="+49 231..."></div>',
     '</div>',
-    '<div class="afield"><label>Immobilie</label><input type="text" id="aa_prop" placeholder="Herderstra\u00dfe 16, EG rechts..."></div>',
-    '<div class="agrid2">',
-      '<div class="afield"><label>Besch\u00e4ftigung</label><input type="text" id="aa_emp" placeholder="Festangestellt"></div>',
-      '<div class="afield"><label>Nettoeinkommen (\u20ac)</label><input type="number" id="aa_income" placeholder="2000"></div>',
-      '<div class="afield"><label>Wunschbesichtigung</label><input type="date" id="aa_date"></div>',
+    '<div class="afield" style="margin-top:0.5rem;"><label>Immobilie</label><select id="aa_prop"><option value="">– bitte w\u00e4hlen –</option>' + PROPERTIES.map(function(p){ return '<option value="' + p.street + ', ' + p.city + '">' + p.street + '</option>'; }).join('') + '</select></div>',
+    '<div class="agrid2" style="margin-top:0.5rem;">',
+      '<div class="afield"><label>Besch\u00e4ftigungsart</label><select id="aa_emp"><option value="">–</option><option>Festangestellt (unbefristet)</option><option>Selbst\u00e4ndig</option><option>Student/in</option><option>Auszubildende/r</option><option>Rentner/in</option><option>B\u00fcrgergeld</option></select></div>',
+      '<div class="afield"><label>Nettoeinkommen (\u20ac)</label><input type="number" id="aa_income" placeholder="2000" min="0"></div>',
+      '<div class="afield"><label>Wunschbesichtigung</label><input type="date" id="aa_date" onclick="try{this.showPicker()}catch(e){}"></div>',
       '<div class="afield"><label>Status</label><select id="aa_status"><option value="pending">Ausstehend</option><option value="confirmed">Best\u00e4tigt</option><option value="rejected">Abgelehnt</option></select></div>',
     '</div>',
-    '<div class="afield"><label>Bemerkungen</label><textarea id="aa_remarks" placeholder="Notizen..."></textarea></div>',
-    '<div style="margin-top:1rem;display:flex;gap:10px;">',
-      '<button id="submitAddApp" class="save-btn">Hinzuf\u00fcgen</button>',
-      '<button id="cancelAddApp" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:var(--radius);cursor:pointer;font-size:0.88rem;">Abbrechen</button>',
+    '<div class="afield" style="margin-top:0.5rem;"><label>Bemerkungen</label><textarea id="aa_remarks" placeholder="Notizen, besondere Hinweise..."></textarea></div>',
+    '<div style="margin-top:1.2rem;display:flex;gap:10px;padding-top:1rem;border-top:1px solid var(--border);">',
+      '<button id="submitAddApp" class="btn-primary" style="flex:1;">Bewerbung hinzuf\u00fcgen</button>',
+      '<button id="cancelAddApp" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:var(--radius);cursor:pointer;font-size:0.88rem;font-family:DM Sans,sans-serif;">Abbrechen</button>',
     '</div>'
   ].join('');
   overlay.appendChild(box);
