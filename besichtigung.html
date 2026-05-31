@@ -894,6 +894,7 @@
         <button type="submit" class="btn-primary" id="shortSubmitBtn" style="margin-top:1.5rem;">
           Besichtigung anfragen
         </button>
+        <div id="shortFormAlertBottom" class="alert" style="margin-top:1rem;"></div>
       </form>
     </div>
 
@@ -1895,7 +1896,7 @@ async function confirmApp(id) {
     var fn = app.first_name || '';
     var ln = app.last_name || '';
     var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nwir freuen uns, Ihnen Ihren Besichtigungstermin bestaetigen zu koennen.\n\n---\nBESICHTIGUNGSTERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\nBitte erscheinen Sie puenktlich.\nBei Aenderungen melden Sie sich bitte:\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    var msg = '';
     if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
     setTimeout(function() { renderDashboard(); }, 1500);
@@ -2255,6 +2256,7 @@ async function submitShortForm(e) {
     }
   } catch(err) {
     showAlert('shortFormAlert', 'error', 'Fehler: ' + err.message);
+    showAlert('shortFormAlertBottom', 'error', 'Fehler: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Besichtigung anfragen';
