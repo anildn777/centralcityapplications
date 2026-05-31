@@ -328,7 +328,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
     <div class="map-placeholder">
       <div style="font-size:2rem;">📍</div>
       <div>Dortmund, NRW</div>
-      <div style="font-size:0.75rem; margin-top:4px;">Herderstraße 16, 44147 Dortmund</div>
+      <div style="font-size:0.75rem; margin-top:4px;">Herderstraße 16 & Schelenbrink</div>
     </div>
   </div>
 </section>
@@ -683,7 +683,117 @@ async function saveAllListings() {
     for (var i = 0; i < adminListings.length; i++) await upsertListing(adminListings[i]);
     var fb = document.getElementById('saveFeedback'); fb.style.display = 'inline';
     setTimeout(function(){ fb.style.display='none'; }, 2500);
+    
+// ============================================================
+// INSERATE ADMIN
+// ============================================================
+async function renderInserateAdmin() {
+  var list = document.getElementById('inserateList');
+  list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
+  try {
+    var listings = await fetchListings();
+    list.innerHTML = '';
+    listings.forEach(function(l) {
+      var card = buildInseratAdminCard(l);
+      var tmp = document.createElement('div');
+      tmp.innerHTML = card;
+      list.appendChild(tmp.firstChild);
+    });
+  } catch(e) {
+    list.innerHTML = '<div style="color:#E8837F;">Fehler: ' + e.message + '</div>';
+  }
+}
+
+function buildInseratAdminCard(l) {
+  var statusOpts = ['frei','vergeben','demnachst'].map(function(s){
+    var label = s==='frei'?'Frei':s==='vergeben'?'Vergeben':'Demn\u00e4chst';
+    return '<option value="' + s + '"' + (l.status===s?' selected':'') + '>' + label + '</option>';
+  }).join('');
+  var id = l.id;
+  var div = document.createElement('div');
+  div.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;';
+  div.id = 'ins_' + id;
+  div.innerHTML = [
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">',
+      '<span style="font-size:0.95rem;color:var(--gold);">' + (l.title||id) + '</span>',
+      '<button data-dlid="' + id + '" onclick="deleteListing(this.dataset.dlid)" style="background:transparent;border:1px solid rgba(224,82,82,0.4);color:#E8837F;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.78rem;">L\u00f6schen</button>',
+    '</div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Titel</label><input type="text" id="ins_title_' + id + '" value="' + (l.title||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Status</label><select id="ins_status_' + id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;">' + statusOpts + '</select></div>',
+    '</div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Adresse</label><input type="text" id="ins_address_' + id + '" value="' + (l.address||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kurzname</label><input type="text" id="ins_short_' + id + '" value="' + (l.short||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.8rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">m\u00b2</label><input type="number" id="ins_sqm_' + id + '" value="' + (l.sqm||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Zimmer</label><input type="number" id="ins_rooms_' + id + '" value="' + (l.rooms||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kaltmiete (\u20ac)</label><input type="number" id="ins_kalt_' + id + '" value="' + (l.kalt||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '</div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.8rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Nebenkosten (\u20ac)</label><input type="number" id="ins_nk_' + id + '" value="' + (l.nebenkosten||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Heizkosten (\u20ac)</label><input type="number" id="ins_hk_' + id + '" value="' + (l.heizung||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kaution (\u20ac)</label><input type="number" id="ins_kaution_' + id + '" value="' + (l.kaution||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '</div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Beschreibung</label><textarea id="ins_desc_' + id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;min-height:80px;resize:vertical;">' + (l.description||'') + '</textarea></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Tags (kommagetrennt)</label><input type="text" id="ins_features_' + id + '" value="' + (l.features||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Fotos (Imgur-Links, kommagetrennt)</label><input type="text" id="ins_photos_' + id + '" value="' + (l.photos||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Video-URL (YouTube/Vimeo)</label><input type="text" id="ins_video_' + id + '" value="' + (l.video_url||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="margin-top:1rem;display:flex;align-items:center;gap:10px;">',
+      '<button data-slid="' + id + '" onclick="saveListingById(this.dataset.slid)" style="background:var(--gold);border:none;color:var(--dark);padding:10px 24px;border-radius:8px;font-size:0.88rem;font-weight:500;cursor:pointer;">Speichern</button>',
+      '<span id="ins_fb_' + id + '" style="font-size:0.82rem;color:#6DCEAA;display:none;">\u2713 Gespeichert!</span>',
+    '</div>'
+  ].join('');
+  return div.outerHTML;
+}
+
+async function saveListingById(id) {
+  var g = function(field) { var el = document.getElementById('ins_' + field + '_' + id); return el ? el.value : null; };
+  var updates = {};
+  var title = g('title'); if (title !== null) updates.title = title;
+  var address = g('address'); if (address !== null) updates.address = address;
+  var short = g('short'); if (short !== null) updates.short = short;
+  var status = g('status'); if (status !== null) updates.status = status;
+  var sqm = g('sqm'); if (sqm !== null) updates.sqm = parseInt(sqm)||0;
+  var rooms = g('rooms'); if (rooms !== null) updates.rooms = parseInt(rooms)||0;
+  var kalt = g('kalt'); if (kalt !== null) updates.kalt = parseInt(kalt)||0;
+  var nk = g('nk'); if (nk !== null) updates.nebenkosten = parseInt(nk)||0;
+  var hk = g('hk'); if (hk !== null) updates.heizung = parseInt(hk)||0;
+  var kaution = g('kaution'); if (kaution !== null) updates.kaution = parseInt(kaution)||0;
+  var desc = g('desc'); if (desc !== null) updates.description = desc;
+  var features = g('features'); if (features !== null) updates.features = features;
+  var photos = g('photos'); if (photos !== null) updates.photos = photos;
+  var video = g('video'); if (video !== null) updates.video_url = video;
+  try {
+    await sbFetch('listings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
+    var fb = document.getElementById('ins_fb_' + id);
+    if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2000); }
     renderListings();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function deleteListing(id) {
+  if (!confirm('Inserat wirklich l\u00f6schen?')) return;
+  try {
+    await sbFetch('listings?id=eq.' + id, { method: 'DELETE', prefer: '' });
+    renderInserateAdmin();
+    renderListings();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function addNewListing() {
+  var newId = 'p' + Date.now();
+  var newListing = {
+    id: newId, title: 'Neue Wohnung', address: '', short: 'Neue Wohnung',
+    sqm: 0, rooms: 0, kalt: 0, nebenkosten: 0, heizung: 0, kaution: 0,
+    description: '', features: '', photos: '', video_url: '', status: 'demnachst', sort_order: 99
+  };
+  try {
+    await sbFetch('listings', { method: 'POST', body: JSON.stringify(newListing) });
+    renderInserateAdmin();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+renderListings();
   } catch(e) { alert('Fehler: ' + e.message); }
   finally { btn.textContent = 'Änderungen speichern'; btn.disabled = false; }
 }
