@@ -463,7 +463,7 @@ function buildCard(l) {
   var tags = features.map(function(f){ return '<span class="feature-tag">' + f + '</span>'; }).join('');
 
   var priceHtml = l.kalt > 0
-    ? '<div class="price-block"><div class="kalt">' + l.kalt + ' €<span style="font-size:0.75rem;color:var(--text-muted);margin-left:2px;">/Monat kalt</span></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Warmmiete ca. ' + warm + ' €</div></div>'
+    ? '<div class="price-block"><div class="kalt">' + l.kalt + ' €<span style="font-size:0.75rem;color:var(--text-muted);margin-left:2px;">/Monat kalt</span></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Warmmiete ca. ' + warm + ' € &nbsp;·&nbsp; Kaution ' + (l.kaution||0) + ' €</div></div>'
     : '<div class="price-block"><div class="kalt" style="font-size:1rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
 
   var ctaHtml = isFrei
@@ -565,7 +565,7 @@ async function openModal(id) {
   var badgeTxt = l.status === 'frei' ? 'Frei' : l.status === 'vergeben' ? 'Vergeben' : 'Demnächst';
 
   var priceHtml = l.kalt > 0
-    ? '<div class="modal-price-block"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="modal-price-breakdown">Nebenkosten: ' + (l.nebenkosten||0) + ' €<br>Heizkosten: ' + (l.heizung||0) + ' €<br><strong style="color:var(--text);">Warmmiete: ' + warm + ' €</strong></div></div>'
+    ? '<div class="modal-price-block"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="modal-price-breakdown">Nebenkosten: ' + (l.nebenkosten||0) + ' €<br>Heizkosten: ' + (l.heizung||0) + ' €<br><strong style="color:var(--text);">Warmmiete: ' + warm + ' €</strong><br>Kaution: <strong style="color:var(--gold);">' + (l.kaution||0) + ' €</strong></div></div>'
     : '<div class="modal-price-block"><div style="font-size:1.1rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
 
   var ctaHtml = l.status === 'frei'
@@ -641,8 +641,9 @@ async function buildAdminEditor() {
       + '<div class="agrid3"><div class="afield"><label>m²</label><input type="number" value="' + (l.sqm||0) + '" onchange="adminListings[' + i + '].sqm=parseInt(this.value)||0"></div>'
       + '<div class="afield"><label>Zimmer</label><input type="number" value="' + (l.rooms||0) + '" onchange="adminListings[' + i + '].rooms=parseInt(this.value)||0"></div>'
       + '<div class="afield"><label>Kaltmiete (€)</label><input type="number" value="' + (l.kalt||0) + '" onchange="adminListings[' + i + '].kalt=parseInt(this.value)||0"></div></div>'
-      + '<div class="agrid2"><div class="afield"><label>Nebenkosten (€)</label><input type="number" value="' + (l.nebenkosten||0) + '" onchange="adminListings[' + i + '].nebenkosten=parseInt(this.value)||0"></div>'
-      + '<div class="afield"><label>Heizkosten (€)</label><input type="number" value="' + (l.heizung||0) + '" onchange="adminListings[' + i + '].heizung=parseInt(this.value)||0"></div></div>'
+      + '<div class="agrid3"><div class="afield"><label>Nebenkosten (€)</label><input type="number" value="' + (l.nebenkosten||0) + '" onchange="adminListings[' + i + '].nebenkosten=parseInt(this.value)||0"></div>'
+      + '<div class="afield"><label>Heizkosten (€)</label><input type="number" value="' + (l.heizung||0) + '" onchange="adminListings[' + i + '].heizung=parseInt(this.value)||0"></div>'
+      + '<div class="afield"><label>Kaution (€)</label><input type="number" value="' + (l.kaution||0) + '" onchange="adminListings[' + i + '].kaution=parseInt(this.value)||0"></div></div>'
       + '<div class="afield"><label>Beschreibung</label><textarea onchange="adminListings[' + i + '].description=this.value">' + (l.description||'') + '</textarea></div>'
       + '<div class="afield"><label>Ausstattungs-Tags (kommagetrennt)</label><input type="text" value="' + (l.features||'') + '" onchange="adminListings[' + i + '].features=this.value"></div>'
       + '<div class="afield"><label>Fotos (Imgur-Links)</label><div class="photo-url-list" id="photoList_' + i + '">' + photoInputs + '</div>'
