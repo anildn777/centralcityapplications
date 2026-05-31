@@ -541,6 +541,98 @@
   .mt-3 { margin-top: 1.5rem; }
   .small { font-size: 0.78rem; color: var(--text-muted); }
   .tag { display: inline-block; background: rgba(201,169,110,0.1); color: var(--gold); border: 1px solid rgba(201,169,110,0.25); border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
+
+  /* ===== ADMIN TABS ===== */
+  .admin-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+  .admin-tab:hover { color: var(--text); }
+  .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ===== CALENDAR ===== */
+  .cal-header-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-header-cell {
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .cal-grid-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-grid-week:last-child { border-bottom: none; }
+  .cal-day {
+    min-height: 90px;
+    padding: 8px;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .cal-day:last-child { border-right: none; }
+  .cal-day:hover { background: rgba(201,169,110,0.05); }
+  .cal-day.other-month { opacity: 0.3; }
+  .cal-day.today .cal-day-num {
+    background: var(--gold);
+    color: var(--dark);
+    border-radius: 50%;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cal-day-num {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+  }
+  .cal-event {
+    background: rgba(201,169,110,0.15);
+    border-left: 2px solid var(--gold);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-bottom: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s;
+  }
+  .cal-event:hover { background: rgba(201,169,110,0.3); }
+  .cal-event.rejected { border-color: #E8837F; color: #E8837F; background: rgba(224,82,82,0.1); }
+
+  /* Edit form in modal */
+  .edit-field { display:flex; flex-direction:column; gap:4px; }
+  .edit-field label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); }
+  .edit-field input, .edit-field select {
+    background: var(--dark); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size:0.88rem;
+    padding: 8px 12px; outline: none;
+  }
+  .edit-field input:focus, .edit-field select:focus { border-color: var(--gold); }
+
 </style>
 </head>
 <body>
@@ -1016,40 +1108,77 @@
           <h2>Bewerbungseingang</h2>
           <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
         </div>
-        <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button onclick="exportCSV()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ CSV Export</button>
+          <button onclick="exportICS()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ Kalender (.ics)</button>
+          <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
+        </div>
       </div>
 
       <div class="stats-row" id="statsRow"></div>
 
-      <!-- EmailJS Config -->
-      <div class="form-section" style="margin-bottom:1.5rem;">
-        <h2 class="section-title">EmailJS Konfiguration</h2>
-        <p class="section-sub">Einmalig einrichten für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a> → kostenloses Konto → Service + Template erstellen</p>
-        <div class="grid-3">
-          <div class="field">
-            <label>Public Key</label>
-            <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123..." oninput="saveEmailJSConfig()">
-          </div>
-          <div class="field">
-            <label>Service ID</label>
-            <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" oninput="saveEmailJSConfig()">
-          </div>
-          <div class="field">
-            <label>Template ID</label>
-            <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" oninput="saveEmailJSConfig()">
-          </div>
+      <!-- ADMIN TABS -->
+      <div style="display:flex; gap:0; margin-bottom:1.5rem; border-bottom:1px solid var(--border);">
+        <button class="admin-tab active" id="tab-bewerbungen" onclick="switchAdminTab('bewerbungen')">Bewerbungen</button>
+        <button class="admin-tab" id="tab-kalender" onclick="switchAdminTab('kalender')">Terminkalender</button>
+        <button class="admin-tab" id="tab-settings" onclick="switchAdminTab('settings')">Einstellungen</button>
+      </div>
+
+      <!-- TAB: BEWERBUNGEN -->
+      <div id="tabContent-bewerbungen">
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setFilter('all', this)">Alle</button>
+          <button class="filter-btn" onclick="setFilter('pending', this)">Ausstehend</button>
+          <button class="filter-btn" onclick="setFilter('confirmed', this)">Bestätigt</button>
+          <button class="filter-btn" onclick="setFilter('rejected', this)">Abgelehnt</button>
         </div>
-        <p class="small mt-1">💡 Einstellungen werden im Browser gespeichert. Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
+        <div class="app-list" id="appList"></div>
       </div>
 
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="setFilter('all', this)">Alle</button>
-        <button class="filter-btn" onclick="setFilter('pending', this)">Ausstehend</button>
-        <button class="filter-btn" onclick="setFilter('confirmed', this)">Bestätigt</button>
-        <button class="filter-btn" onclick="setFilter('rejected', this)">Abgelehnt</button>
+      <!-- TAB: KALENDER -->
+      <div id="tabContent-kalender" style="display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <button onclick="calPrev()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">‹</button>
+            <span id="calMonthLabel" style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold); min-width:200px; text-align:center;"></span>
+            <button onclick="calNext()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">›</button>
+          </div>
+          <button onclick="goToday()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:6px 16px; border-radius:var(--radius); cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif;">Heute</button>
+        </div>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+          <div id="calGrid"></div>
+        </div>
+        <div id="calModal" style="display:none; margin-top:1.5rem; background:var(--surface); border:1px solid var(--gold); border-radius:var(--radius-lg); padding:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-family:'Playfair Display',serif; color:var(--gold); font-size:1rem;" id="modalTitle">Termin</h3>
+            <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.3rem; line-height:1;">✕</button>
+          </div>
+          <div id="modalContent"></div>
+        </div>
       </div>
 
-      <div class="app-list" id="appList"></div>
+      <!-- TAB: EINSTELLUNGEN -->
+      <div id="tabContent-settings" style="display:none;">
+        <div class="form-section">
+          <h2 class="section-title">EmailJS Konfiguration</h2>
+          <p class="section-sub">Einmalig einrichten für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a> → kostenloses Konto → Service + Template erstellen</p>
+          <div class="grid-3">
+            <div class="field">
+              <label>Public Key</label>
+              <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123..." oninput="saveEmailJSConfig()">
+            </div>
+            <div class="field">
+              <label>Service ID</label>
+              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" oninput="saveEmailJSConfig()">
+            </div>
+            <div class="field">
+              <label>Template ID</label>
+              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" oninput="saveEmailJSConfig()">
+            </div>
+          </div>
+          <p class="small mt-1">💡 Einstellungen werden im Browser gespeichert. Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -1474,6 +1603,393 @@ function showFeedback(id, type, msg) {
   if (!el) return;
   el.className = 'action-feedback show ' + type;
   el.textContent = msg;
+}
+
+
+
+// ============================================================
+// ADMIN TABS
+// ============================================================
+function switchAdminTab(tab) {
+  ['bewerbungen','kalender','settings'].forEach(t => {
+    document.getElementById('tabContent-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'kalender') renderCalendar();
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calApps = [];
+
+function goToday() {
+  calYear = new Date().getFullYear();
+  calMonth = new Date().getMonth();
+  renderCalendar();
+}
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+async function renderCalendar() {
+  const label = document.getElementById('calMonthLabel');
+  const grid = document.getElementById('calGrid');
+  const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  label.textContent = months[calMonth] + ' ' + calYear;
+
+  // Fetch confirmed apps
+  try {
+    const all = await fetchApplications('all');
+    calApps = all.filter(a => a.confirmed_date);
+  } catch(e) { calApps = []; }
+
+  // Build grid
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const startOffset = (firstDay === 0) ? 6 : firstDay - 1; // Mon=0
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  const today = new Date();
+
+  let html = '<div class="cal-header-row">';
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d => {
+    html += `<div class="cal-header-cell">${d}</div>`;
+  });
+  html += '</div>';
+
+  let day = 1;
+  let nextDay = 1;
+  let totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i += 7) {
+    html += '<div class="cal-grid-week">';
+    for (let j = 0; j < 7; j++) {
+      const cell = i + j;
+      let displayDay, isOther = false, fullDate = '';
+      if (cell < startOffset) {
+        displayDay = daysInPrev - startOffset + cell + 1;
+        isOther = true;
+        const m = calMonth === 0 ? 11 : calMonth - 1;
+        const y = calMonth === 0 ? calYear - 1 : calYear;
+        fullDate = `${y}-${String(m+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
+      } else if (day > daysInMonth) {
+        displayDay = nextDay++;
+        isOther = true;
+        const m = calMonth === 11 ? 0 : calMonth + 1;
+        const y = calMonth === 11 ? calYear + 1 : calYear;
+        fullDate = `${y}-${String(m+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
+      } else {
+        displayDay = day++;
+        fullDate = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
+        isOther = false;
+      }
+      const isToday = !isOther && displayDay === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+      const dayApps = calApps.filter(a => a.confirmed_date === fullDate);
+
+      html += `<div class="cal-day${isOther?' other-month':''}${isToday?' today':''}" onclick="calDayClick('${fullDate}')">`;
+      html += `<div class="cal-day-num">${displayDay}</div>`;
+      dayApps.forEach(a => {
+        const name = (a.first_name||'') + ' ' + (a.last_name||'');
+        const time = a.confirmed_time || '';
+        const cls = a.status === 'rejected' ? ' rejected' : '';
+        html += `<div class="cal-event${cls}" onclick="event.stopPropagation(); openTermin('${a.id}')" title="${name} – ${a.property||''}">${time} ${name}</div>`;
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+}
+
+function calDayClick(dateStr) {
+  const dayApps = calApps.filter(a => a.confirmed_date === dateStr);
+  if (dayApps.length === 0) return;
+  if (dayApps.length === 1) { openTermin(dayApps[0].id); return; }
+  // Multiple — show list
+  const modal = document.getElementById('calModal');
+  document.getElementById('modalTitle').textContent = 'Termine am ' + new Date(dateStr + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long'});
+  document.getElementById('modalContent').innerHTML = dayApps.map(a =>
+    `<div style="padding:10px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div style="font-weight:500;">${(a.first_name||'')} ${(a.last_name||'')} <span style="font-size:0.78rem; color:var(--text-muted);">${a.confirmed_time||''}</span></div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">${a.property||''}</div>
+      </div>
+      <button onclick="openTermin('${a.id}')" style="background:transparent; border:1px solid var(--border); color:var(--gold); padding:5px 12px; border-radius:var(--radius); cursor:pointer; font-size:0.78rem; font-family:'DM Sans',sans-serif;">Details</button>
+    </div>`
+  ).join('');
+  modal.style.display = 'block';
+}
+
+function openTermin(id) {
+  const app = calApps.find(a => a.id === id);
+  if (!app) return;
+  const modal = document.getElementById('calModal');
+  const dateFormatted = app.confirmed_date ? new Date(app.confirmed_date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) : '';
+  document.getElementById('modalTitle').textContent = (app.first_name||'') + ' ' + (app.last_name||'');
+
+  document.getElementById('modalContent').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.2rem;">
+      <div class="detail-item"><div class="dl">Immobilie</div><div class="dv">${app.property||'–'}</div></div>
+      <div class="detail-item"><div class="dl">E-Mail</div><div class="dv">${app.email||'–'}</div></div>
+      <div class="detail-item"><div class="dl">Telefon</div><div class="dv">${app.phone||'–'}</div></div>
+      <div class="detail-item"><div class="dl">Status</div><div class="dv">${app.status==='confirmed'?'✓ Bestätigt':'Ausstehend'}</div></div>
+    </div>
+    <div style="background:rgba(201,169,110,0.08); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem;">
+      <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:6px;">Aktueller Termin</div>
+      <div style="font-size:1rem; color:var(--gold); font-weight:500;">${dateFormatted} · ${app.confirmed_time||'–'}</div>
+    </div>
+    <div style="border-top:1px solid var(--border); padding-top:1rem;">
+      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.08em;">Termin ändern</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem;">
+        <div class="edit-field">
+          <label>Neues Datum</label>
+          <input type="date" id="editDate_${id}" value="${app.confirmed_date||''}">
+        </div>
+        <div class="edit-field">
+          <label>Neue Uhrzeit</label>
+          <select id="editTime_${id}">
+            ${['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'].map(t => `<option${t===app.confirmed_time?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button onclick="saveTerminEdit('${id}','${app.first_name||''}','${app.last_name||''}','${app.email||''}','${app.property||''}')" class="btn-confirm">Termin speichern & E-Mail senden</button>
+        <button onclick="cancelTermin('${id}','${app.first_name||''}','${app.last_name||''}','${app.email||''}','${app.property||''}')" class="btn-reject">Termin absagen</button>
+      </div>
+      <div id="modalFeedback" style="margin-top:10px; font-size:0.82rem;"></div>
+    </div>
+  `;
+  modal.style.display = 'block';
+  modal.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function saveTerminEdit(id, fn, ln, email, property) {
+  const date = document.getElementById('editDate_' + id).value;
+  const time = document.getElementById('editTime_' + id).value;
+  if (!date) { showModalFeedback('Bitte Datum auswählen.', 'err'); return; }
+
+  try {
+    await updateApplication(id, { confirmed_date: date, confirmed_time: time });
+    const dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+
+    const cfg = getEJSConfig();
+    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: fn + ' ' + ln, to_email: email, property: property,
+        viewing_date: dateFormatted, viewing_time: time,
+        message: `Sehr geehrte/r ${fn} ${ln},
+
+Ihr Besichtigungstermin wurde geändert.
+
+────────────────────────
+NEUER BESICHTIGUNGSTERMIN
+────────────────────────
+Objekt:   ${property}
+Datum:    ${dateFormatted}
+Uhrzeit:  ${time}
+────────────────────────
+
+Bei Fragen erreichen Sie uns:
+📧  centralcitydo@gmail.com
+📞  +49 178 2687170
+
+Mit freundlichen Grüßen
+Central City Apartment Dortmund`
+      }).catch(()=>{});
+    }
+    showModalFeedback('✓ Termin gespeichert und E-Mail gesendet.', 'ok');
+    renderCalendar();
+  } catch(e) {
+    showModalFeedback('Fehler: ' + e.message, 'err');
+  }
+}
+
+async function cancelTermin(id, fn, ln, email, property) {
+  if (!confirm('Termin wirklich absagen? Der Interessent wird per E-Mail informiert.')) return;
+  try {
+    await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
+    const cfg = getEJSConfig();
+    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: fn + ' ' + ln, to_email: email, property: property,
+        viewing_date: '', viewing_time: '',
+        message: `Sehr geehrte/r ${fn} ${ln},
+
+leider müssen wir Ihren Besichtigungstermin für ${property} absagen.
+
+Wir werden uns in Kürze mit einem neuen Terminvorschlag bei Ihnen melden.
+
+Bei Fragen erreichen Sie uns:
+📧  centralcitydo@gmail.com
+📞  +49 178 2687170
+
+Wir bitten um Entschuldigung für die Unannehmlichkeiten.
+
+Mit freundlichen Grüßen
+Central City Apartment Dortmund`
+      }).catch(()=>{});
+    }
+    showModalFeedback('✓ Termin abgesagt.', 'ok');
+    closeModal();
+    renderCalendar();
+  } catch(e) {
+    showModalFeedback('Fehler: ' + e.message, 'err');
+  }
+}
+
+function showModalFeedback(msg, type) {
+  const el = document.getElementById('modalFeedback');
+  if (!el) return;
+  el.style.color = type === 'ok' ? '#6DCEAA' : '#E8837F';
+  el.textContent = msg;
+}
+
+function closeModal() {
+  document.getElementById('calModal').style.display = 'none';
+}
+
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+async function exportCSV() {
+  let apps;
+  try { apps = await fetchApplications('all'); } catch(e) { alert('Fehler: ' + e.message); return; }
+  if (!apps.length) { alert('Keine Bewerbungen vorhanden.'); return; }
+
+  const cols = [
+    ['Status','status'],['Eingegangen','created_at'],['Vorname','first_name'],['Nachname','last_name'],
+    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Staatsangehörigkeit','nationality'],
+    ['Straße','street'],['PLZ','zip'],['Ort','city'],['Immobilie','property'],
+    ['Beruf','occupation'],['Beschäftigung','employment_status'],['Arbeitgeber','employer'],
+    ['Nettoeinkommen','net_income'],['Bürgergeld','welfare'],
+    ['Personen','total_persons'],['Kinder','children'],['Haustiere','pets'],['Raucher','smoker'],
+    ['Schufa','schufa_available'],['Schufa-Score','schufa_score'],['Schulden','debts'],
+    ['Bürge','guarantor_name'],['Wunscheinzug','move_in_date'],
+    ['Bestätigter Termin','confirmed_date'],['Bestätigte Uhrzeit','confirmed_time'],
+    ['Bemerkungen','remarks']
+  ];
+
+  const escape = v => {
+    if (v === null || v === undefined) return '';
+    const s = String(v).replace(/"/g, '""');
+    return s.includes(',') || s.includes('"') || s.includes('
+') ? `"${s}"` : s;
+  };
+
+  const header = cols.map(([l]) => escape(l)).join(',');
+  const rows = apps.map(a => cols.map(([,k]) => {
+    if (k === 'created_at' && a[k]) return escape(new Date(a[k]).toLocaleDateString('de-DE'));
+    if (k === 'status') {
+      const m = {pending:'Ausstehend', confirmed:'Bestätigt', rejected:'Abgelehnt'};
+      return escape(m[a[k]] || a[k]);
+    }
+    return escape(a[k]);
+  }).join(','));
+
+  const bom = '﻿'; // UTF-8 BOM for Excel
+  const csv = bom + [header, ...rows].join('
+');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CCA_Bewerbungen_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// ICS CALENDAR EXPORT
+// ============================================================
+async function exportICS() {
+  let apps;
+  try { apps = await fetchApplications('all'); } catch(e) { alert('Fehler: ' + e.message); return; }
+
+  const confirmed = apps.filter(a => a.confirmed_date && a.status === 'confirmed');
+  if (!confirmed.length) { alert('Keine bestätigten Termine vorhanden.'); return; }
+
+  const pad = n => String(n).padStart(2,'0');
+  const toICSDate = (dateStr, timeStr) => {
+    // dateStr: YYYY-MM-DD, timeStr: "10:00 Uhr"
+    const [y,m,d] = dateStr.split('-');
+    const timeParts = timeStr ? timeStr.replace(' Uhr','').split(':') : ['10','00'];
+    const h = timeParts[0] || '10';
+    const min = timeParts[1] || '00';
+    return `${y}${m}${d}T${pad(h)}${pad(min)}00`;
+  };
+  const toICSDateEnd = (dateStr, timeStr) => {
+    const [y,m,d] = dateStr.split('-');
+    const timeParts = timeStr ? timeStr.replace(' Uhr','').split(':') : ['10','00'];
+    let h = parseInt(timeParts[0] || '10');
+    const min = timeParts[1] || '00';
+    h += 1; // 1 hour duration
+    return `${y}${m}${d}T${pad(h)}${pad(min)}00`;
+  };
+
+  let ics = 'BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Central City Apartment Dortmund//DE
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+';
+
+  confirmed.forEach(a => {
+    const name = ((a.first_name||'') + ' ' + (a.last_name||'')).trim();
+    const dtstart = toICSDate(a.confirmed_date, a.confirmed_time);
+    const dtend = toICSDateEnd(a.confirmed_date, a.confirmed_time);
+    const uid = a.id + '@centralcityapartment.de';
+    const now = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    const desc = [
+      'Mieter: ' + name,
+      'Objekt: ' + (a.property||''),
+      'Tel: ' + (a.phone||''),
+      'E-Mail: ' + (a.email||''),
+      'Einkommen: ' + (a.net_income||'') + ' EUR',
+      'Personen: ' + (a.total_persons||''),
+    ].join('\n');
+
+    ics += 'BEGIN:VEVENT
+';
+    ics += `UID:${uid}
+`;
+    ics += `DTSTAMP:${now}
+`;
+    ics += `DTSTART:${dtstart}
+`;
+    ics += `DTEND:${dtend}
+`;
+    ics += `SUMMARY:Besichtigung – ${name} – ${(a.property||'').split(',')[0]}
+`;
+    ics += `DESCRIPTION:${desc}
+`;
+    ics += `LOCATION:${(a.property||'').replace(',', '\,')}, Dortmund
+`;
+    ics += 'END:VEVENT
+';
+  });
+
+  ics += 'END:VCALENDAR';
+
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CCA_Besichtigungstermine_' + new Date().toISOString().slice(0,10) + '.ics';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ============================================================
