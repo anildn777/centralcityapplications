@@ -652,13 +652,125 @@
     <p class="hero-eyebrow">Mietinteressen</p>
     <h1>Ihr Traumzuhause<br>in Dortmund</h1>
     <div class="hero-divider"></div>
-    <p>Füllen Sie das folgende Formular vollständig aus. Wir prüfen Ihre Anfrage und melden uns zeitnah mit einem Besichtigungstermin.</p>
+    <p>Füllen Sie das kurze Formular aus – wir melden uns zeitnah bei Ihnen.</p>
   </div>
 
+  <!-- ===== KURZES KONTAKTFORMULAR ===== -->
   <div class="form-container">
-    <div id="formAlert" class="alert"></div>
+    <div id="shortFormAlert" class="alert"></div>
 
-    <form id="applicationForm" onsubmit="submitForm(event)">
+    <div class="form-section" style="border:1px solid rgba(201,169,110,0.5);">
+      <h2 class="section-title" style="color:var(--gold);">Besichtigung anfragen</h2>
+      <p class="section-sub">Das reicht uns für den ersten Schritt – wir melden uns bei Ihnen.</p>
+
+      <form id="shortForm" onsubmit="submitShortForm(event)">
+
+        <div class="form-section" style="border:none;padding:0;background:transparent;">
+          <h2 class="section-title">Gewünschte Wohnung</h2>
+          <p class="section-sub">Sie können auch mehrere auswählen</p>
+          <div class="property-grid" id="propertyGridShort"></div>
+          <input type="hidden" id="selectedPropertyShort" name="property" required>
+        </div>
+
+        <div class="grid-2" style="margin-top:1.5rem;">
+          <div class="field">
+            <label>Vorname <span class="req">*</span></label>
+            <input type="text" name="firstName" required placeholder="Max">
+          </div>
+          <div class="field">
+            <label>Nachname <span class="req">*</span></label>
+            <input type="text" name="lastName" required placeholder="Mustermann">
+          </div>
+          <div class="field">
+            <label>E-Mail <span class="req">*</span></label>
+            <input type="email" name="email" required placeholder="max@beispiel.de">
+          </div>
+          <div class="field">
+            <label>Telefon <span class="req">*</span></label>
+            <input type="tel" name="phone" required placeholder="+49 231 123456">
+          </div>
+          <div class="field">
+            <label>Beschäftigungsart <span class="req">*</span></label>
+            <select name="employmentStatus" required>
+              <option value="">– bitte wählen –</option>
+              <option>Festangestellt (unbefristet)</option>
+              <option>Festangestellt (befristet)</option>
+              <option>Selbstständig / Freiberuflich</option>
+              <option>Beamter/in</option>
+              <option>Student/in</option>
+              <option>Auszubildende/r</option>
+              <option>Rentner/in</option>
+              <option>Arbeitslos / Bürgergeld</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Nettoeinkommen / Monat (€) <span class="req">*</span></label>
+            <input type="number" name="netIncome" required placeholder="2200" min="0">
+          </div>
+          <div class="field">
+            <label>Wunschbesichtigung <span class="req">*</span></label>
+            <input type="date" name="viewingDate" required>
+          </div>
+          <div class="field">
+            <label>Bevorzugte Uhrzeit</label>
+            <select name="viewingTime">
+              <option value="">– bitte wählen –</option>
+              <option>09:00–11:00 Uhr</option>
+              <option>11:00–13:00 Uhr</option>
+              <option>13:00–15:00 Uhr</option>
+              <option>15:00–17:00 Uhr</option>
+              <option>17:00–19:00 Uhr</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:8px;">Besichtigungsart</label>
+          <div class="toggle-group">
+            <label class="radio-label"><input type="radio" name="viewingType" value="Vor Ort"><span>Vor Ort</span></label>
+            <label class="radio-label"><input type="radio" name="viewingType" value="Online (Video-Call)"><span>Online (Video-Call)</span></label>
+            <label class="radio-label"><input type="radio" name="viewingType" value="Beides möglich"><span>Beides möglich</span></label>
+          </div>
+        </div>
+
+        <div class="field mt-2">
+          <label>Dokumente anhängen (Schufa, Einkommensnachweis etc.)</label>
+          <input type="file" name="shortDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
+          <p class="upload-hint">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>
+        </div>
+
+        <div class="field mt-2">
+          <label>Sonstige Bemerkungen</label>
+          <textarea name="remarks" placeholder="Besondere Wünsche, Fragen oder Anmerkungen…" style="min-height:100px;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-top:1.5rem;">
+          <input type="checkbox" id="shortPrivacy" required style="margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;">
+          <label for="shortPrivacy" style="font-size:0.85rem;color:var(--text-muted);cursor:pointer;">
+            Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden. <span class="req">*</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" id="shortSubmitBtn" style="margin-top:1.5rem;">
+          Besichtigung anfragen
+        </button>
+      </form>
+    </div>
+
+    <!-- VOLLSTÄNDIGE SELBSTAUSKUNFT -->
+    <div style="text-align:center;margin:2rem 0 1rem;">
+      <button id="toggleFullFormBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:12px 28px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;">
+        Optional: Vollständige Selbstauskunft ausfüllen ▾
+      </button>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">Beschleunigt den Prozess – erhöht Ihre Chancen bei mehreren Interessenten</p>
+    </div>
+
+    <div id="fullFormWrapper" style="display:none;">
+      <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-muted);">
+        💡 Die vollständige Selbstauskunft ist <strong style="color:var(--text);">freiwillig</strong>. Sie können sie jetzt ausfüllen oder auch später nachreichen.
+      </div>
+<form id="applicationForm" onsubmit="submitForm(event)">
 
       <!-- IMMOBILIE -->
       <div class="form-section">
@@ -1093,7 +1205,9 @@
       </button>
 
     </form>
-  </div>
+
+    </div><!-- end fullFormWrapper -->
+  </div><!-- end form-container -->
 </div>
 
 <!-- ===== VIEW: ADMIN ===== -->
