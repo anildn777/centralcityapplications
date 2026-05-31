@@ -497,8 +497,13 @@ function buildCard(l) {
   var badgeBorder = l.status === 'vergeben' ? 'rgba(224,82,82,0.4)' : l.status === 'demnachst' ? 'rgba(201,169,110,0.4)' : 'rgba(76,175,136,0.4)';
 
   var imgHtml = imgs.map(function(p, i) {
-    return '<img src="' + p + '" alt="Foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:' + (i===0?'1':'0') + ';transition:opacity 0.5s;" class="' + (i===0?'active':'') + '">';
+    return '<img src="' + p + '" alt="Foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:' + (i===0?'1':'0') + ';transition:opacity 0.5s;' + (l.status !== 'frei' ? 'filter:grayscale(40%);' : '') + '" class="' + (i===0?'active':'') + '">';
   }).join('');
+  var unavailableBanner = l.status === 'demnachst'
+    ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:#C9A96E;text-align:center;padding:8px;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;z-index:10;">Noch nicht verfügbar – bald frei</div>'
+    : l.status === 'vergeben'
+    ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:#E8837F;text-align:center;padding:8px;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;z-index:10;">Bereits vergeben</div>'
+    : '';
 
   var dots = imgs.length > 1 ? '<div class="slider-dots">' + imgs.map(function(_, i) {
     return '<button class="slider-dot ' + (i===0?'active':'') + '" data-idx="' + i + '" onclick="event.stopPropagation();slideTo(this,' + i + ')"></button>';
@@ -521,12 +526,14 @@ function buildCard(l) {
 
   var ctaHtml = isFrei
     ? '<a href="central-city-apartment.html" class="btn-anfrage" data-lid="' + l.id + '">Besichtigung anfragen</a>'
-    : '<span style="font-size:0.78rem;color:var(--text-muted);">Nicht verfügbar</span>';
+    : l.status === 'demnachst'
+    ? '<span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">Demnächst verfügbar</span>'
+    : '<span style="font-size:0.78rem;color:#E8837F;">Bereits vergeben</span>';
 
   return '<div class="listing-card' + (isFrei ? '' : ' vergeben') + '" style="cursor:pointer;" data-lid="' + l.id + '">'
     + '<div class="photo-slider" style="position:relative;height:240px;overflow:hidden;background:var(--dark3);" data-current="0">'
     + '<div style="position:absolute;top:14px;left:14px;background:rgba(0,0,0,0.8);color:' + badgeColor + ';border:1px solid ' + badgeBorder + ';padding:4px 12px;border-radius:20px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;z-index:10;">' + badgeTxt + '</div>'
-    + imgHtml + dots + sliderBtns
+    + imgHtml + unavailableBanner + dots + sliderBtns
     + '</div>'
     + '<div class="listing-body">'
     + '<div class="listing-address">' + (l.short||'') + '</div>'
