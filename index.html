@@ -283,6 +283,49 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   }
   .admin-tab:hover { color: var(--text); }
   .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+@media (max-width: 768px) {
+  /* HEADER */
+  .site-header { padding: 0.8rem 1rem; }
+  .header-nav { gap: 6px; }
+  .header-nav .btn-outline { padding: 6px 10px; font-size: 0.75rem; }
+  .header-nav .btn-gold { padding: 6px 12px; font-size: 0.75rem; }
+
+  /* HERO */
+  .hero { padding: 5rem 1rem 3rem; }
+  .hero h1 { font-size: 2.2rem; line-height: 1.2; }
+  .hero-stats { gap: 1rem; flex-wrap: wrap; }
+  .hero-stat .num { font-size: 1.8rem; }
+
+  /* LISTINGS */
+  .listings-section { padding: 3rem 1rem; }
+  .listings { grid-template-columns: 1fr; gap: 1.2rem; }
+  .listing-card { border-radius: 10px; }
+
+  /* LOCATION */
+  .location-section { padding: 3rem 1rem; }
+  .location-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .location-perks { grid-template-columns: 1fr 1fr; }
+
+  /* CTA */
+  .cta-section { padding: 3rem 1rem; }
+  .cta-section h2 { font-size: 1.8rem; }
+
+  /* FOOTER */
+  .footer { padding: 2rem 1rem; flex-direction: column; gap: 1rem; text-align: center; }
+
+  /* ADMIN MODAL */
+  .admin-overlay .admin-box { padding: 1.2rem; border-radius: 10px; }
+  .admin-tabs { gap: 0; overflow-x: auto; }
+  .admin-tab { padding: 8px 12px; font-size: 0.75rem; white-space: nowrap; }
+  .agrid2, .agrid3 { grid-template-columns: 1fr; }
+
+  /* LISTING MODAL */
+  .modal-gallery { height: 220px; }
+  .modal-specs { gap: 1rem; }
+  .modal-price-block { flex-direction: column; gap: 0.5rem; }
+}
+
 </style>
 </head>
 <body>
