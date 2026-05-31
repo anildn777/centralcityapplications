@@ -193,6 +193,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .listings { grid-template-columns: 1fr; }
   .location-inner { grid-template-columns: 1fr; }
   .location-perks { grid-template-columns: 1fr; }
+  .location-inner { grid-template-columns: 1fr; }
+  .location-perks { grid-template-columns: 1fr; }
   .agrid2, .agrid3 { grid-template-columns: 1fr; }
 }
 
@@ -284,9 +286,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .admin-tab:hover { color: var(--text); }
   .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 
-  .header-nav { gap: 6px; }
-  .header-nav .btn-outline { padding: 6px 10px; font-size: 0.75rem; }
-  .header-nav .btn-gold { padding: 6px 12px; font-size: 0.75rem; }
 
   /* HERO */
   .hero { padding: 5rem 1rem 3rem; }
@@ -327,9 +326,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 
   .logo, .logo a, a.logo { font-size: 0.78rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
   .logo span, a.logo span { display: none; }
-  .header-nav { flex-shrink: 0; gap: 4px; }
-  .header-nav .btn-outline { padding: 5px 7px; font-size: 0.7rem; }
-  .header-nav .btn-gold { padding: 5px 8px; font-size: 0.7rem; }
 
   /* ADMIN tabs fix */
   .admin-tabs, [id^="tab-"] { font-size: 0.72rem !important; padding: 6px 8px !important; }
@@ -344,15 +340,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .logo, a.logo {
     font-size: 0.85rem !important;
   }
-  .header-nav {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .header-nav .btn-outline { padding: 5px 10px; font-size: 0.72rem; }
-  .header-nav .btn-gold { padding: 5px 10px; font-size: 0.72rem; }
-  .nav-btn { padding: 5px 10px !important; font-size: 0.72rem !important; }
+    .nav-btn { padding: 5px 10px !important; font-size: 0.72rem !important; }
 
   /* ADMIN tabs */
   .filter-row { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
@@ -361,61 +349,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 }
 
 
-  .header-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--dark2);
-    border-bottom: 1px solid var(--border);
-    flex-direction: column;
-    padding: 1rem;
-    gap: 8px;
-    z-index: 200;
-  }
-  .header-nav.open { display: flex; }
-  .header-nav .btn-outline,
-  .header-nav .btn-gold,
-  .header-nav button { width: 100%; text-align: center; }
+  
 
-/* ===== MOBILE HAMBURGER ===== */
-@media (max-width: 768px) {
-  .hamburger-btn {
-    display: flex !important;
-  }
-  .header-nav {
-    display: none;
-    position: fixed;
-    top: 68px;
-    left: 0;
-    right: 0;
-    background: rgba(20,20,20,0.98);
-    border-bottom: 1px solid var(--border);
-    flex-direction: column;
-    padding: 1rem;
-    gap: 8px;
-    z-index: 199;
-  }
-  .header-nav.mob-open {
-    display: flex;
-  }
-  .header-nav .btn-outline,
-  .header-nav .btn-gold,
-  .header-nav button {
-    width: 100%;
-    text-align: center;
-    padding: 10px 16px;
-  }
-  .hero h1 { font-size: 2rem; }
-  .listings { grid-template-columns: 1fr; }
-  .location-inner { grid-template-columns: 1fr; }
-  .location-perks { grid-template-columns: 1fr 1fr; }
-  .agrid2, .agrid3 { grid-template-columns: 1fr; }
-  .footer { flex-direction: column; gap: 1rem; text-align: center; }
-}
+
+
+/* HAMBURGER - mobile only */
 .hamburger-btn {
-  display: none;
   flex-direction: column;
   gap: 5px;
   cursor: pointer;
@@ -435,22 +374,47 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .hamburger-btn.open span:nth-child(2) { opacity: 0; }
 .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mob-dropdown {
+  display: none;
+  position: fixed;
+  top: 68px;
+  left: 0;
+  right: 0;
+  background: rgba(20,20,20,0.98);
+  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  padding: 1rem;
+  gap: 8px;
+  z-index: 199;
+}
+.mob-dropdown.open { display: flex; }
+.mob-dropdown a, .mob-dropdown button {
+  width: 100%;
+  text-align: center;
+  padding: 10px 16px;
+}
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex !important; }
+  .header-nav { display: none !important; }
+  .hero h1 { font-size: 2rem; }
+  .footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
 
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <a href="#" class="logo">Central City Apartments<span>Dortmund</span></a>
-  <button class="hamburger-btn" id="hambBtn" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+  <a href="#" class="logo" style="display:flex;align-items:center;gap:10px;"><svg viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg" width="32" height="36" style="flex-shrink:0;"><text x="40" y="68" text-anchor="middle" font-family="Georgia,serif" font-size="72" font-weight="400" fill="#C9A96E">C</text><line x1="8" y1="78" x2="72" y2="78" stroke="#C9A96E" stroke-width="1.5"/></svg><div>Central City Apartments<span>Dortmund</span></div></a>
   <nav class="header-nav" id="mainNav">
     <a href="#wohnungen" class="btn-outline">Wohnungen</a>
     <a href="#lage" class="btn-outline">Lage</a>
     <a href="https://centralcityapartments.de/besichtigung" class="btn-gold">Besichtigung anfragen</a>
     <button class="btn-outline" onclick="openAdmin()">Admin</button>
   </nav>
+  <button class="hamburger-btn" id="hambBtn" aria-label="Menu" style="display:none;">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <!-- HERO -->
@@ -1062,31 +1026,42 @@ if (heroBgs.length > 1) {
 
 renderListings();
 
+
+
+
+// HAMBURGER MOBILE
+function closeMobMenu() {
+  document.getElementById('mobDropdown').classList.remove('open');
+  document.getElementById('hambBtn').classList.remove('open');
+}
+document.getElementById('hambBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  this.classList.toggle('open');
+  document.getElementById('mobDropdown').classList.toggle('open');
+});
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('mobDropdown');
+  var btn = document.getElementById('hambBtn');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target) && e.target !== btn) {
+    closeMobMenu();
+  }
+});
+document.querySelectorAll('#mobDropdown a').forEach(function(a) {
+  a.addEventListener('click', closeMobMenu);
+});
+
 </script>
 
-// HAMBURGER
-(function() {
-  var btn = document.getElementById('hambBtn');
-  var nav = document.getElementById('mainNav');
-  if (!btn || !nav) return;
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    nav.classList.toggle('mob-open');
-  });
-  document.addEventListener('click', function(e) {
-    if (nav.classList.contains('mob-open') && !nav.contains(e.target) && e.target !== btn) {
-      nav.classList.remove('mob-open');
-      btn.classList.remove('open');
-    }
-  });
-  nav.querySelectorAll('a, button').forEach(function(el) {
-    el.addEventListener('click', function() {
-      nav.classList.remove('mob-open');
-      btn.classList.remove('open');
-    });
-  });
-})();
+
+
+
+<div class="mob-dropdown" id="mobDropdown">
+  <a href="#wohnungen" class="btn-outline">Wohnungen</a>
+  <a href="#lage" class="btn-outline">Lage</a>
+  <a href="https://centralcityapartments.de/besichtigung" class="btn-gold">Besichtigung anfragen</a>
+  <button class="btn-outline" onclick="openAdmin();closeMobMenu();">Admin</button>
+</div>
+
 
 </body>
 </html>
