@@ -725,16 +725,16 @@
 .ins-badge.vergeben { background:rgba(224,82,82,0.12); color:#E8837F; border:1px solid rgba(224,82,82,0.3); }
 .ins-badge.demnachst { background:rgba(201,169,110,0.12); color:#C9A96E; border:1px solid rgba(201,169,110,0.3); }
 .ins-addr { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:#C9A96E; margin-bottom:0.4rem; }
-.ins-title { font-family:'Playfair Display',serif; font-size:1.4rem; margin-bottom:1rem; color:#E8E0D0; }
+.ins-title { font-family:serif; font-size:1.4rem; margin-bottom:1rem; color:#E8E0D0; }
 .ins-specs { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid rgba(201,169,110,0.2); }
-.ins-spec .val { font-family:'Playfair Display',serif; font-size:1.2rem; color:#C9A96E; }
+.ins-spec .val { font-family:serif; font-size:1.2rem; color:#C9A96E; }
 .ins-spec .lbl { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#9A9080; margin-top:2px; }
 .ins-desc { font-size:0.88rem; color:#9A9080; line-height:1.7; margin-bottom:1rem; }
 .ins-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1rem; }
 .ins-tag { background:rgba(201,169,110,0.08); border:1px solid rgba(201,169,110,0.2); color:#9A9080; padding:3px 10px; border-radius:20px; font-size:0.7rem; }
 .ins-price { background:#282828; border:1px solid rgba(201,169,110,0.2); border-radius:8px; padding:1rem 1.2rem; margin-bottom:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-.ins-price .kalt { font-family:'Playfair Display',serif; font-size:1.6rem; color:#C9A96E; }
-.ins-price .kalt span { font-family:'DM Sans',sans-serif; font-size:0.78rem; color:#9A9080; margin-left:4px; }
+.ins-price .kalt { font-family:serif; font-size:1.6rem; color:#C9A96E; }
+.ins-price .kalt span { font-family:sans-serif; font-size:0.78rem; color:#9A9080; margin-left:4px; }
 .ins-price .breakdown { font-size:0.8rem; color:#9A9080; line-height:1.8; }
 @media(max-width:640px){ .ins-gallery{height:240px;} .ins-body{padding:1rem;} }
 
@@ -866,7 +866,7 @@
 
     <!-- VOLLSTÄNDIGE SELBSTAUSKUNFT -->
     <div style="text-align:center;margin:2rem 0 1rem;">
-      <button id="toggleFullFormBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:12px 28px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;">
+      <button id="toggleFullFormBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:12px 28px;border-radius:var(--radius);font-family:sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;">
         Optional: Vollständige Selbstauskunft ausfüllen ▾
       </button>
       <p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">Beschleunigt den Prozess – erhöht Ihre Chancen bei mehreren Interessenten</p>
@@ -1337,8 +1337,8 @@
           <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <button onclick="exportCSV()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ CSV Export</button>
-          <button onclick="exportICS()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ Kalender (.ics)</button>
+          <button onclick="exportCSV()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ CSV Export</button>
+          <button onclick="exportICS()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ Kalender (.ics)</button>
           <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
         </div>
       </div>
@@ -1369,21 +1369,30 @@
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:12px;">
             <button onclick="calPrev()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">‹</button>
-            <span id="calMonthLabel" style="font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold); min-width:200px; text-align:center;"></span>
+            <span id="calMonthLabel" style="font-family:serif; font-size:1.2rem; color:var(--gold); min-width:200px; text-align:center;"></span>
             <button onclick="calNext()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">›</button>
           </div>
-          <button onclick="goToday()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:6px 16px; border-radius:var(--radius); cursor:pointer; font-size:0.8rem; font-family:'DM Sans',sans-serif;">Heute</button>
+          <button onclick="goToday()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:6px 16px; border-radius:var(--radius); cursor:pointer; font-size:0.8rem; font-family:sans-serif;">Heute</button>
         </div>
         <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
           <div id="calGrid"></div>
         </div>
         <div id="calModal" style="display:none; margin-top:1.5rem; background:var(--surface); border:1px solid var(--gold); border-radius:var(--radius-lg); padding:1.5rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h3 style="font-family:'Playfair Display',serif; color:var(--gold); font-size:1rem;" id="modalTitle">Termin</h3>
+            <h3 style="font-family:serif; color:var(--gold); font-size:1rem;" id="modalTitle">Termin</h3>
             <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.3rem; line-height:1;">✕</button>
           </div>
           <div id="modalContent"></div>
         </div>
+      </div>
+
+      <!-- TAB: INSERATE -->
+      <div id="tabContent-inserate" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+          <div style="font-size:0.85rem;color:var(--text-muted);">Inserate verwalten — Änderungen werden live auf der Webseite angezeigt</div>
+          <button onclick="addNewListing()" style="background:var(--gold);border:none;color:var(--dark);padding:8px 18px;border-radius:var(--radius);cursor:pointer;font-family:sans-serif;font-size:0.82rem;font-weight:500;">+ Neues Inserat</button>
+        </div>
+        <div id="inserateList"></div>
       </div>
 
       <!-- TAB: EINSTELLUNGEN -->
@@ -1789,7 +1798,7 @@ function buildAppCard(app) {
       + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
       + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
       + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
-    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:0.75rem;">&#8635; Zur\u00fccksetzen</button></div>';
+    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:sans-serif;font-size:0.75rem;">&#8635; Zur\u00fccksetzen</button></div>';
 
   return '<div class="app-card" id="appcard_' + app.id + '">'
     + '<div class="app-card-head" onclick="toggleCard(\'' + app.id + '\')">'
@@ -1802,6 +1811,7 @@ function buildAppCard(app) {
     + '<div class="app-card-body">'
     + '<div class="detail-grid">' + fields.map(function(f) { return '<div class="detail-item"><div class="dl">' + f[0] + '</div><div class="dv">' + f[1] + '</div></div>'; }).join('') + '</div>'
     + actionHtml
+    + '<div style="padding:0.5rem 0 0;border-top:1px solid var(--border);margin-top:0.8rem;"><button data-appid="' + app.id + '" onclick="deleteApplication(this.dataset.appid)" style="background:transparent;border:none;color:rgba(224,82,82,0.6);font-size:0.75rem;cursor:pointer;padding:0;font-family:sans-serif;">&#128465; Bewerbung l\u00f6schen</button></div>'
     + '</div></div>';
 }
 
@@ -2297,6 +2307,180 @@ async function toggleFavorite(id) {
     await updateApplication(id, { favorite: newVal });
     app.favorite = newVal;
     renderAppList();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+
+// ============================================================
+// INSERATE ADMIN (add/edit/delete)
+// ============================================================
+async function renderInserateAdmin() {
+  var list = document.getElementById('inserateList');
+  list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
+  try {
+    var listings = await sbFetch('listings?order=sort_order.asc', { prefer: '' });
+    list.innerHTML = listings.map(function(l) { return buildInseratAdminCard(l); }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:#E8837F;">Fehler: ' + e.message + '</div>';
+  }
+}
+
+function buildInseratAdminCard(l) {
+  var statusOpts = ['frei','vergeben','demnachst'].map(function(s){
+    var label = s==='frei'?'Frei':s==='vergeben'?'Vergeben':'Demn\u00e4chst';
+    return '<option value="' + s + '"' + (l.status===s?' selected':'') + '>' + label + '</option>';
+  }).join('');
+  var id = l.id;
+  var div = document.createElement('div');
+  div.className = 'form-section';
+  div.id = 'ins_' + id;
+  div.style.marginBottom = '1rem';
+  div.innerHTML = [
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">',
+      '<span style="font-size:0.95rem;color:var(--gold);">' + (l.title||id) + '</span>',
+      '<button data-dlid="' + id + '" style="background:transparent;border:1px solid rgba(224,82,82,0.4);color:#E8837F;padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;" onclick="deleteListing(this.dataset.dlid)">L\u00f6schen</button>',
+    '</div>',
+    '<div class="agrid2">',
+      '<div class="afield"><label>Titel</label><input type="text" id="ins_title_' + id + '" value="' + (l.title||'').replace(/"/g,'&quot;') + '"></div>',
+      '<div class="afield"><label>Status</label><select id="ins_status_' + id + '">' + statusOpts + '</select></div>',
+    '</div>',
+    '<div class="afield"><label>Adresse</label><input type="text" id="ins_address_' + id + '" value="' + (l.address||'').replace(/"/g,'&quot;') + '"></div>',
+    '<div class="afield"><label>Kurzname</label><input type="text" id="ins_short_' + id + '" value="' + (l.short||'').replace(/"/g,'&quot;') + '"></div>',
+    '<div class="agrid3">',
+      '<div class="afield"><label>m\u00b2</label><input type="number" id="ins_sqm_' + id + '" value="' + (l.sqm||0) + '"></div>',
+      '<div class="afield"><label>Zimmer</label><input type="number" id="ins_rooms_' + id + '" value="' + (l.rooms||0) + '"></div>',
+      '<div class="afield"><label>Kaltmiete (\u20ac)</label><input type="number" id="ins_kalt_' + id + '" value="' + (l.kalt||0) + '"></div>',
+    '</div>',
+    '<div class="agrid3">',
+      '<div class="afield"><label>Nebenkosten (\u20ac)</label><input type="number" id="ins_nk_' + id + '" value="' + (l.nebenkosten||0) + '"></div>',
+      '<div class="afield"><label>Heizkosten (\u20ac)</label><input type="number" id="ins_hk_' + id + '" value="' + (l.heizung||0) + '"></div>',
+      '<div class="afield"><label>Kaution (\u20ac)</label><input type="number" id="ins_kaution_' + id + '" value="' + (l.kaution||0) + '"></div>',
+    '</div>',
+    '<div class="afield"><label>Beschreibung</label><textarea id="ins_desc_' + id + '">' + (l.description||'') + '</textarea></div>',
+    '<div class="afield"><label>Tags (kommagetrennt)</label><input type="text" id="ins_features_' + id + '" value="' + (l.features||'') + '"></div>',
+    '<div class="afield"><label>Fotos (Imgur-Links, kommagetrennt)</label><input type="text" id="ins_photos_' + id + '" value="' + (l.photos||'') + '"></div>',
+    '<div class="afield"><label>Video-URL</label><input type="text" id="ins_video_' + id + '" value="' + (l.video_url||'') + '"></div>',
+    '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;">',
+      '<button data-slid="' + id + '" onclick="saveListingById(this.dataset.slid)" class="save-btn">Speichern</button>',
+      '<span id="ins_fb_' + id + '" style="font-size:0.82rem;color:#6DCEAA;display:none;">\u2713 Gespeichert!</span>',
+    '</div>'
+  ].join('');
+  return div.outerHTML;
+}
+
+async function saveListingById(id) {
+  var g = function(field) { var el = document.getElementById('ins_' + field + '_' + id); return el ? el.value : null; };
+  var updates = {};
+  var title = g('title'); if (title !== null) updates.title = title;
+  var address = g('address'); if (address !== null) updates.address = address;
+  var short = g('short'); if (short !== null) updates.short = short;
+  var status = g('status'); if (status !== null) updates.status = status;
+  var sqm = g('sqm'); if (sqm !== null) updates.sqm = parseInt(sqm)||0;
+  var rooms = g('rooms'); if (rooms !== null) updates.rooms = parseInt(rooms)||0;
+  var kalt = g('kalt'); if (kalt !== null) updates.kalt = parseInt(kalt)||0;
+  var nk = g('nk'); if (nk !== null) updates.nebenkosten = parseInt(nk)||0;
+  var hk = g('hk'); if (hk !== null) updates.heizung = parseInt(hk)||0;
+  var kaution = g('kaution'); if (kaution !== null) updates.kaution = parseInt(kaution)||0;
+  var desc = g('desc'); if (desc !== null) updates.description = desc;
+  var features = g('features'); if (features !== null) updates.features = features;
+  var photos = g('photos'); if (photos !== null) updates.photos = photos;
+  var video = g('video'); if (video !== null) updates.video_url = video;
+  try {
+    await sbFetch('listings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
+    var fb = document.getElementById('ins_fb_' + id);
+    if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2000); }
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function deleteListing(id) {
+  if (!confirm('Inserat wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return;
+  try {
+    await sbFetch('listings?id=eq.' + id, { method: 'DELETE', prefer: '' });
+    renderInserateAdmin();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function addNewListing() {
+  var newId = 'p' + Date.now();
+  var newListing = {
+    id: newId, title: 'Neue Wohnung', address: '', short: 'Neue Wohnung',
+    sqm: 0, rooms: 0, kalt: 0, nebenkosten: 0, heizung: 0, kaution: 0,
+    description: '', features: '', photos: '', video_url: '', status: 'demnachst',
+    sort_order: 99
+  };
+  try {
+    await sbFetch('listings', { method: 'POST', body: JSON.stringify(newListing) });
+    renderInserateAdmin();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+// ============================================================
+// BEWERBUNGEN: DELETE + ADD
+// ============================================================
+async function deleteApplication(id) {
+  if (!confirm('Bewerbung wirklich löschen?')) return;
+  try {
+    await sbFetch('applications?id=eq.' + id, { method: 'DELETE', prefer: '' });
+    renderDashboard();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+function showAddApplicationModal() {
+  var existing = document.getElementById('addAppModal');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'addAppModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;overflow-y:auto;padding:2rem 1rem;';
+  var box = document.createElement('div');
+  box.style.cssText = 'max-width:700px;margin:0 auto;background:#1A1A1A;border:1px solid rgba(201,169,110,0.3);border-radius:14px;padding:2rem;';
+  box.innerHTML = [
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">',
+      '<span style="font-size:1.1rem;color:var(--gold);">Neue Bewerbung hinzuf\u00fcgen</span>',
+      '<button id="closeAddModal" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;">\u2715</button>',
+    '</div>',
+    '<div class="agrid2">',
+      '<div class="afield"><label>Vorname</label><input type="text" id="aa_fn" placeholder="Max"></div>',
+      '<div class="afield"><label>Nachname</label><input type="text" id="aa_ln" placeholder="Mustermann"></div>',
+      '<div class="afield"><label>E-Mail</label><input type="email" id="aa_email" placeholder="max@beispiel.de"></div>',
+      '<div class="afield"><label>Telefon</label><input type="tel" id="aa_phone" placeholder="+49 231..."></div>',
+    '</div>',
+    '<div class="afield"><label>Immobilie</label><input type="text" id="aa_prop" placeholder="Herderstra\u00dfe 16, EG rechts..."></div>',
+    '<div class="agrid2">',
+      '<div class="afield"><label>Besch\u00e4ftigung</label><input type="text" id="aa_emp" placeholder="Festangestellt"></div>',
+      '<div class="afield"><label>Nettoeinkommen (\u20ac)</label><input type="number" id="aa_income" placeholder="2000"></div>',
+      '<div class="afield"><label>Wunschbesichtigung</label><input type="date" id="aa_date"></div>',
+      '<div class="afield"><label>Status</label><select id="aa_status"><option value="pending">Ausstehend</option><option value="confirmed">Best\u00e4tigt</option><option value="rejected">Abgelehnt</option></select></div>',
+    '</div>',
+    '<div class="afield"><label>Bemerkungen</label><textarea id="aa_remarks" placeholder="Notizen..."></textarea></div>',
+    '<div style="margin-top:1rem;display:flex;gap:10px;">',
+      '<button id="submitAddApp" class="save-btn">Hinzuf\u00fcgen</button>',
+      '<button id="cancelAddApp" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:var(--radius);cursor:pointer;font-size:0.88rem;">Abbrechen</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('closeAddModal').onclick = function(){ overlay.remove(); };
+  document.getElementById('cancelAddApp').onclick = function(){ overlay.remove(); };
+  document.getElementById('submitAddApp').onclick = submitAddApplication;
+}
+
+async function submitAddApplication() {
+  var payload = {
+    status: document.getElementById('aa_status').value,
+    first_name: document.getElementById('aa_fn').value,
+    last_name: document.getElementById('aa_ln').value,
+    email: document.getElementById('aa_email').value,
+    phone: document.getElementById('aa_phone').value,
+    property: document.getElementById('aa_prop').value,
+    employment_status: document.getElementById('aa_emp').value,
+    net_income: document.getElementById('aa_income').value,
+    viewing_date: document.getElementById('aa_date').value,
+    remarks: document.getElementById('aa_remarks').value
+  };
+  try {
+    await insertApplication(payload);
+    document.getElementById('addAppModal').remove();
+    renderDashboard();
   } catch(e) { alert('Fehler: ' + e.message); }
 }
 
