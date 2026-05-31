@@ -782,6 +782,14 @@
               <option>17:00–19:00 Uhr</option>
             </select>
           </div>
+          <div class="field span-2">
+            <label>Besichtigungsart <span class="req">*</span></label>
+            <div class="toggle-group" id="viewingTypeGroup">
+              <label class="radio-label"><input type="radio" name="viewingType" value="Vor Ort"><span>Vor Ort</span></label>
+              <label class="radio-label"><input type="radio" name="viewingType" value="Online (Video-Call)"><span>Online (Video-Call)</span></label>
+              <label class="radio-label"><input type="radio" name="viewingType" value="Beides möglich"><span>Beides möglich</span></label>
+            </div>
+          </div>
           <div class="field">
             <label>Alternativtermin Besichtigung</label>
             <input type="date" name="viewingDateAlt">
@@ -1327,7 +1335,7 @@ async function submitForm(e) {
     property: raw.property || '',
     current_landlord: raw.currentLandlord || '', current_rent: raw.currentRent || '',
     rent_since: raw.rentSince || '', notice_period: raw.noticeperiod || '', move_reason: raw.moveReason || '',
-    move_in_date: raw.moveInDate || '', viewing_date: raw.viewingDate || '',
+    move_in_date: raw.moveInDate || '', viewing_date: raw.viewingDate || '', viewing_type: raw.viewingType || '',
     viewing_time: raw.viewingTime || '', viewing_date_alt: raw.viewingDateAlt || '',
     total_persons: raw.totalPersons || '', children: raw.children || '',
     children_ages: raw.childrenAges || '', co_residents: raw.coResidents || '',
