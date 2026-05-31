@@ -2138,15 +2138,33 @@ async function exportICS() {
 // ============================================================
 // SHORT FORM
 // ============================================================
-function buildPropertyGridShort() {
+async function buildPropertyGridShort() {
   var grid = document.getElementById('propertyGridShort');
   if (!grid) return;
+  grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:1rem 0;">Lade...</div>';
+  var statusMap = {};
+  try {
+    var listings = await fetch(SUPABASE_URL + '/rest/v1/listings?select=id,status', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    }).then(function(r){ return r.json(); });
+    listings.forEach(function(l){ statusMap[l.id] = l.status; });
+  } catch(e) {}
   grid.innerHTML = PROPERTIES.map(function(p) {
-    return '<div class="property-card" id="cardS_' + p.id + '" onclick="togglePropertyShort(\'' + p.id + '\', this)">'
+    var status = statusMap[p.id] || 'frei';
+    var isDemnachst = status === 'demnachst';
+    var isVergeben = status === 'vergeben';
+    var isUnavailable = isDemnachst || isVergeben;
+    var cardStyle = isUnavailable ? 'opacity:0.5;pointer-events:none;' : '';
+    var statusBadge = isDemnachst
+      ? '<div style="margin-top:6px;font-size:0.7rem;color:#C9A96E;letter-spacing:0.05em;">Demnächst verfügbar</div>'
+      : isVergeben
+      ? '<div style="margin-top:6px;font-size:0.7rem;color:#E8837F;letter-spacing:0.05em;">Bereits vergeben</div>'
+      : '<a href="#" onclick="event.stopPropagation();openInsModal(\'' + p.id + '\');return false;" style="display:block;margin-top:6px;font-size:0.7rem;color:var(--gold);text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">Inserat ansehen ↗</a>';
+    return '<div class="property-card" id="cardS_' + p.id + '" style="' + cardStyle + '" onclick="togglePropertyShort(\'' + p.id + '\', this)">'
       + '<div class="prop-check">✓</div>'
       + '<div class="prop-street">' + p.street + '</div>'
       + '<div class="prop-city">' + p.city + '</div>'
-      + '<a href="#" onclick="event.stopPropagation();openInsModal(\'' + p.id + '\');return false;" style="display:block;margin-top:6px;font-size:0.7rem;color:var(--gold);text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;" onmouseover="this.style.textDecoration=\'underline\';this.style.letterSpacing=\'0.1em\'" onmouseout="this.style.textDecoration=\'none\';this.style.letterSpacing=\'0.05em\'">Inserat ansehen ↗</a>'
+      + statusBadge
       + '</div>';
   }).join('');
 }
