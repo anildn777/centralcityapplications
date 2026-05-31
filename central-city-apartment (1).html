@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central City Apartment Dortmund – Mietinteressen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+  :root {
+    --gold: #C9A96E;
+    --gold-light: #F0DEB8;
+    --gold-dark: #8B6914;
+    --dark: #1A1A1A;
+    --dark2: #2A2A2A;
+    --dark3: #3A3A3A;
+    --text: #E8E0D0;
+    --text-muted: #9A9080;
+    --surface: #222222;
+    --surface2: #2E2E2E;
+    --border: rgba(201,169,110,0.25);
+    --border-hover: rgba(201,169,110,0.6);
+    --success: #4CAF88;
+    --danger: #E05252;
+    --radius: 6px;
+    --radius-lg: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    background: var(--dark2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+  .logo span { color: var(--text-muted); font-size: 0.75rem; display: block; font-family: 'DM Sans', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ===== VIEWS ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #1E1A14 0%, var(--dark) 100%);
+  }
+  .hero-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .hero p {
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    font-size: 0.95rem;
+  }
+  .hero-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 2.5rem;
+    opacity: 0.5;
+  }
+
+  /* ===== FORM CONTAINER ===== */
+  .form-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* ===== SECTIONS ===== */
+  .form-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ===== GRID ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .span-2 { grid-column: span 2; }
+  .span-3 { grid-column: span 3; }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .span-2, .span-3 { grid-column: span 1; }
+  }
+
+  /* ===== FORM ELEMENTS ===== */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .field label .req { color: var(--gold); margin-left: 2px; }
+  .field input,
+  .field select,
+  .field textarea {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus { border-color: var(--gold); }
+  .field select option { background: var(--dark2); }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field input[type="file"] {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .field input[type="file"]::file-selector-button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--gold);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    padding: 4px 12px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: border-color 0.2s;
+  }
+  .field input[type="file"]::file-selector-button:hover { border-color: var(--gold); }
+
+  /* ===== RADIO / CHECKBOX GROUPS ===== */
+  .toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toggle-group label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  .toggle-group input { display: none; }
+  .toggle-group label:hover { border-color: var(--gold); color: var(--text); }
+  .toggle-group input:checked + span,
+  .toggle-group label:has(input:checked) {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201,169,110,0.08) !important;
+  }
+
+  .radio-label { cursor: pointer; }
+  .radio-label input[type="radio"],
+  .radio-label input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+
+  /* ===== UPLOAD HINTS ===== */
+  .upload-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* ===== SUBMIT BUTTON ===== */
+  .btn-primary {
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    padding: 14px 40px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .btn-primary:hover { background: #D4B07A; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== SUCCESS / ERROR ===== */
+  .alert {
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  .alert.success { background: rgba(76,175,136,0.12); border: 1px solid rgba(76,175,136,0.4); color: #6DCEAA; }
+  .alert.error { background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.4); color: #E8837F; }
+  .alert.show { display: block; }
+
+  /* ===== IMMOBILIEN CARDS ===== */
+  .property-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .property-card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .property-card:hover { border-color: var(--gold); }
+  .property-card.selected {
+    border-color: var(--gold);
+    background: rgba(201,169,110,0.08);
+  }
+  .property-card input[type="radio"] { position: absolute; opacity: 0; }
+  .property-card .prop-street {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .property-card .prop-city {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .property-card .prop-check {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+  }
+  .property-card.selected .prop-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark);
+  }
+
+  /* ===== ADMIN LOGIN ===== */
+  .admin-login {
+    max-width: 380px;
+    margin: 8rem auto;
+    padding: 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+  .admin-login h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+  .admin-login p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .admin-login input {
+    width: 100%;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .admin-login input:focus { border-color: var(--gold); }
+  .admin-login .error-msg { color: var(--danger); font-size: 0.8rem; margin-bottom: 8px; display: none; }
+
+  /* ===== ADMIN DASHBOARD ===== */
+  .admin-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem;
+  }
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .admin-header h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+  }
+  .stat-card .num { font-size: 1.8rem; font-weight: 300; color: var(--gold); font-family: 'Playfair Display', serif; }
+  .stat-card .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== APPLICATION CARDS ===== */
+  .app-list { display: flex; flex-direction: column; gap: 12px; }
+  .app-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .app-card-head {
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .app-card-head:hover { background: rgba(255,255,255,0.03); }
+  .app-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(201,169,110,0.15);
+    border: 1px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .app-name { font-weight: 500; font-size: 0.95rem; }
+  .app-meta { font-size: 0.78rem; color: var(--text-muted); }
+  .app-status {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .status-pending { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
+  .status-confirmed { background: rgba(76,175,136,0.12); color: #6DCEAA; border: 1px solid rgba(76,175,136,0.3); }
+  .status-rejected { background: rgba(224,82,82,0.12); color: #E8837F; border: 1px solid rgba(224,82,82,0.3); }
+  .app-chevron { color: var(--text-muted); font-size: 1rem; transition: transform 0.2s; }
+  .app-card.expanded .app-chevron { transform: rotate(180deg); }
+
+  .app-card-body {
+    display: none;
+    padding: 0 1.4rem 1.4rem;
+    border-top: 1px solid var(--border);
+  }
+  .app-card.expanded .app-card-body { display: block; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+  .detail-item .dl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 3px; }
+  .detail-item .dv { font-size: 0.88rem; color: var(--text); }
+
+  .action-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .action-row .field { flex: 1; min-width: 200px; }
+  .btn-confirm {
+    background: rgba(76,175,136,0.15);
+    border: 1px solid rgba(76,175,136,0.5);
+    color: #6DCEAA;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-confirm:hover { background: rgba(76,175,136,0.25); }
+  .btn-reject {
+    background: rgba(224,82,82,0.1);
+    border: 1px solid rgba(224,82,82,0.4);
+    color: #E8837F;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .btn-reject:hover { background: rgba(224,82,82,0.2); }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+  }
+  .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  .empty-state .big { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.3; }
+
+  .action-feedback {
+    font-size: 0.82rem;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: none;
+  }
+  .action-feedback.show { display: block; }
+  .action-feedback.ok { background: rgba(76,175,136,0.12); color: #6DCEAA; }
+  .action-feedback.err { background: rgba(224,82,82,0.12); color: #E8837F; }
+
+  /* ===== FOOTER ===== */
+  .site-footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ===== UTIL ===== */
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+  .small { font-size: 0.78rem; color: var(--text-muted); }
+  .tag { display: inline-block; background: rgba(201,169,110,0.1); color: var(--gold); border: 1px solid rgba(201,169,110,0.25); border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    Central City Apartment
+    <span>Dortmund</span>
+  </div>
+  <button class="nav-btn" id="adminToggleBtn" onclick="toggleAdminView()">Admin-Bereich</button>
+</header>
+
+<!-- ===== VIEW: FORM ===== -->
+<div id="viewForm" class="view active">
+  <div class="hero">
+    <p class="hero-eyebrow">Mietinteressen</p>
+    <h1>Ihr Traumzuhause<br>in Dortmund</h1>
+    <div class="hero-divider"></div>
+    <p>Füllen Sie das folgende Formular vollständig aus. Wir prüfen Ihre Anfrage und melden uns zeitnah mit einem Besichtigungstermin.</p>
+  </div>
+
+  <div class="form-container">
+    <div id="formAlert" class="alert"></div>
+
+    <form id="applicationForm" onsubmit="submitForm(event)">
+
+      <!-- IMMOBILIE -->
+      <div class="form-section">
+        <h2 class="section-title">Gewünschte Immobilie</h2>
+        <p class="section-sub">Wählen Sie die Wohneinheit, für die Sie sich interessieren</p>
+        <div class="property-grid" id="propertyGrid">
+          <!-- generated by JS -->
+        </div>
+        <input type="hidden" id="selectedProperty" name="property" required>
+      </div>
+
+      <!-- PERSÖNLICHE DATEN -->
+      <div class="form-section">
+        <h2 class="section-title">Persönliche Daten</h2>
+        <p class="section-sub">Angaben zur Hauptmietperson</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Vorname <span class="req">*</span></label>
+            <input type="text" name="firstName" required placeholder="Max">
+          </div>
+          <div class="field">
+            <label>Nachname <span class="req">*</span></label>
+            <input type="text" name="lastName" required placeholder="Mustermann">
+          </div>
+          <div class="field">
+            <label>Geburtsdatum <span class="req">*</span></label>
+            <input type="date" name="birthdate" required>
+          </div>
+          <div class="field">
+            <label>Geburtsort</label>
+            <input type="text" name="birthplace" placeholder="Dortmund">
+          </div>
+          <div class="field">
+            <label>Staatsangehörigkeit <span class="req">*</span></label>
+            <input type="text" name="nationality" required placeholder="Deutsch">
+          </div>
+          <div class="field">
+            <label>Ausweisnummer / Personalausweis</label>
+            <input type="text" name="idNumber" placeholder="L01X00T47">
+          </div>
+        </div>
+      </div>
+
+      <!-- KONTAKT -->
+      <div class="form-section">
+        <h2 class="section-title">Kontaktdaten</h2>
+        <p class="section-sub">Ihre aktuelle Wohnanschrift und Erreichbarkeit</p>
+        <div class="grid-2">
+          <div class="field span-2">
+            <label>Straße und Hausnummer <span class="req">*</span></label>
+            <input type="text" name="street" required placeholder="Musterstraße 12">
+          </div>
+          <div class="field">
+            <label>PLZ <span class="req">*</span></label>
+            <input type="text" name="zip" required placeholder="44135">
+          </div>
+          <div class="field">
+            <label>Ort <span class="req">*</span></label>
+            <input type="text" name="city" required placeholder="Dortmund">
+          </div>
+          <div class="field">
+            <label>Telefon <span class="req">*</span></label>
+            <input type="tel" name="phone" required placeholder="+49 231 123456">
+          </div>
+          <div class="field">
+            <label>E-Mail-Adresse <span class="req">*</span></label>
+            <input type="email" name="email" required placeholder="max@beispiel.de">
+          </div>
+        </div>
+      </div>
+
+      <!-- WOHNVERHÄLTNIS -->
+      <div class="form-section">
+        <h2 class="section-title">Aktuelle Wohnsituation</h2>
+        <p class="section-sub">Informationen zu Ihrer bisherigen Unterkunft</p>
+        <div class="grid-2">
+          <div class="field span-2">
+            <label>Derzeitiger Vermieter / Vermieterinfo</label>
+            <input type="text" name="currentLandlord" placeholder="Name und Kontakt des aktuellen Vermieters">
+          </div>
+          <div class="field">
+            <label>Aktuelle Monatsmiete (€)</label>
+            <input type="number" name="currentRent" placeholder="650" min="0">
+          </div>
+          <div class="field">
+            <label>Mietdauer dort (seit)</label>
+            <input type="month" name="rentSince">
+          </div>
+          <div class="field">
+            <label>Kündigungsfrist / Auszugsdatum</label>
+            <input type="text" name="noticeperiod" placeholder="3 Monate / 01.09.2025">
+          </div>
+          <div class="field">
+            <label>Grund für den Umzug</label>
+            <input type="text" name="moveReason" placeholder="Beruflich, Vergrößerung, …">
+          </div>
+        </div>
+      </div>
+
+      <!-- EINZUG & TERMINE -->
+      <div class="form-section">
+        <h2 class="section-title">Einzug & Besichtigung</h2>
+        <p class="section-sub">Wunschtermine – wir versuchen, diese zu berücksichtigen</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Wunscheinzugstermin <span class="req">*</span></label>
+            <input type="date" name="moveInDate" required>
+          </div>
+          <div class="field">
+            <label>Wunschtermin Besichtigung <span class="req">*</span></label>
+            <input type="date" name="viewingDate" required>
+          </div>
+          <div class="field">
+            <label>Bevorzugte Uhrzeit Besichtigung</label>
+            <select name="viewingTime">
+              <option value="">– bitte wählen –</option>
+              <option>09:00–11:00 Uhr</option>
+              <option>11:00–13:00 Uhr</option>
+              <option>13:00–15:00 Uhr</option>
+              <option>15:00–17:00 Uhr</option>
+              <option>17:00–19:00 Uhr</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Alternativtermin Besichtigung</label>
+            <input type="date" name="viewingDateAlt">
+          </div>
+        </div>
+      </div>
+
+      <!-- HAUSHALT -->
+      <div class="form-section">
+        <h2 class="section-title">Haushalt & Mitbewohner</h2>
+        <p class="section-sub">Angaben zu allen einziehenden Personen</p>
+        <div class="grid-3">
+          <div class="field">
+            <label>Anzahl Personen gesamt <span class="req">*</span></label>
+            <select name="totalPersons" required>
+              <option value="">–</option>
+              <option value="1">1 Person</option>
+              <option value="2">2 Personen</option>
+              <option value="3">3 Personen</option>
+              <option value="4">4 Personen</option>
+              <option value="5+">5 oder mehr</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Davon Kinder</label>
+            <select name="children">
+              <option value="0">Keine</option>
+              <option value="1">1 Kind</option>
+              <option value="2">2 Kinder</option>
+              <option value="3+">3 oder mehr</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Alter der Kinder</label>
+            <input type="text" name="childrenAges" placeholder="z.B. 3, 7, 12 Jahre">
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="field">
+            <label>Namen & Geburtsdaten weiterer einziehender Personen (Erwachsene)</label>
+            <textarea name="coResidents" placeholder="z.B. Anna Mustermann, 12.05.1990&#10;Weitere Personen..."></textarea>
+          </div>
+        </div>
+        <div class="mt-2 grid-2">
+          <div class="field">
+            <label>Haustiere <span class="req">*</span></label>
+            <select name="pets" required>
+              <option value="Keine">Keine Haustiere</option>
+              <option value="Hund">Hund</option>
+              <option value="Katze">Katze</option>
+              <option value="Kleintiere">Kleintiere (Hamster, Vögel, etc.)</option>
+              <option value="Mehrere">Mehrere Tiere</option>
+              <option value="Sonstige">Sonstige</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Art / Rasse (bei Haustieren)</label>
+            <input type="text" name="petDetails" placeholder="z.B. Labrador, kastriert">
+          </div>
+        </div>
+        <div class="mt-2">
+          <label style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display:block; margin-bottom:8px;">Raucher?</label>
+          <div class="toggle-group" id="smokerGroup">
+            <label class="radio-label"><input type="radio" name="smoker" value="Nichtraucher" required><span>Nichtraucher</span></label>
+            <label class="radio-label"><input type="radio" name="smoker" value="Raucher (draußen)"><span>Raucher (nur draußen)</span></label>
+            <label class="radio-label"><input type="radio" name="smoker" value="Raucher"><span>Raucher (in der Wohnung)</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BERUF & EINKOMMEN -->
+      <div class="form-section">
+        <h2 class="section-title">Beruf & Einkommen</h2>
+        <p class="section-sub">Angaben zur finanziellen Situation</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Beruf / Tätigkeit <span class="req">*</span></label>
+            <input type="text" name="occupation" required placeholder="Softwareentwickler, Krankenpfleger, …">
+          </div>
+          <div class="field">
+            <label>Beschäftigungsstatus <span class="req">*</span></label>
+            <select name="employmentStatus" required>
+              <option value="">– bitte wählen –</option>
+              <option>Festangestellt (unbefristet)</option>
+              <option>Festangestellt (befristet)</option>
+              <option>Selbstständig / Freiberuflich</option>
+              <option>Beamter/in</option>
+              <option>Student/in</option>
+              <option>Auszubildende/r</option>
+              <option>Rentner/in</option>
+              <option>Arbeitslos / Bürgergeld</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Arbeitgeber / Unternehmen</label>
+            <input type="text" name="employer" placeholder="Name des Arbeitgebers">
+          </div>
+          <div class="field">
+            <label>Beschäftigt seit</label>
+            <input type="month" name="employedSince">
+          </div>
+          <div class="field">
+            <label>Nettoeinkommen pro Monat (€) <span class="req">*</span></label>
+            <input type="number" name="netIncome" required placeholder="2200" min="0">
+          </div>
+          <div class="field">
+            <label>Zusätzliche Einnahmen (€/Monat)</label>
+            <input type="number" name="additionalIncome" placeholder="0" min="0">
+          </div>
+          <div class="field span-2">
+            <label>Art der zusätzlichen Einnahmen</label>
+            <input type="text" name="additionalIncomeType" placeholder="Kindergeld, Unterhalt, Vermietung, Nebenjob, …">
+          </div>
+        </div>
+        <div class="mt-2">
+          <label style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display:block; margin-bottom:8px;">Bürgergeld / Transferleistungen?</label>
+          <div class="toggle-group">
+            <label class="radio-label"><input type="radio" name="welfare" value="Nein" required><span>Nein</span></label>
+            <label class="radio-label"><input type="radio" name="welfare" value="Ja (teilweise)"><span>Ja (teilweise)</span></label>
+            <label class="radio-label"><input type="radio" name="welfare" value="Ja (vollständig)"><span>Ja (vollständig)</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- BONITÄT -->
+      <div class="form-section">
+        <h2 class="section-title">Bonität & Schufa</h2>
+        <p class="section-sub">Angaben zu Ihrer finanziellen Zuverlässigkeit</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Schufa-Auskunft vorhanden?</label>
+            <select name="schufaAvailable">
+              <option value="Nein">Nein, noch nicht</option>
+              <option value="Ja">Ja, wird hochgeladen</option>
+              <option value="Angefordert">Gerade angefordert</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Schufa-Score (falls bekannt)</label>
+            <input type="text" name="schufaScore" placeholder="z.B. 97,5% oder 452 Punkte">
+          </div>
+          <div class="field">
+            <label>Offene Schulden / Insolvenz?</label>
+            <select name="debts">
+              <option value="Nein">Nein</option>
+              <option value="Ja (wird erläutert)">Ja (wird erläutert)</option>
+              <option value="Privatinsolvenz laufend">Privatinsolvenz laufend</option>
+              <option value="Privatinsolvenz abgeschlossen">Privatinsolvenz abgeschlossen</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Bisherige Mietschulden?</label>
+            <select name="rentDebts">
+              <option value="Nein">Nein</option>
+              <option value="Ja (wird erläutert)">Ja (wird erläutert)</option>
+            </select>
+          </div>
+          <div class="field span-2">
+            <label>Ergänzende Erläuterungen zur Bonität</label>
+            <textarea name="creditExplanation" placeholder="Erklärung zu Einträgen, besonderen Umständen, etc."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- BÜRGSCHAFT -->
+      <div class="form-section">
+        <h2 class="section-title">Bürgschaft</h2>
+        <p class="section-sub">Falls vorhanden – freiwillige Angabe</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Bürge vorhanden?</label>
+            <select name="guarantor">
+              <option value="Nein">Nein</option>
+              <option value="Ja">Ja</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Name des Bürgen</label>
+            <input type="text" name="guarantorName" placeholder="Max Bürge">
+          </div>
+          <div class="field">
+            <label>Kontakt Bürge (Telefon/E-Mail)</label>
+            <input type="text" name="guarantorContact" placeholder="+49 231 …">
+          </div>
+          <div class="field">
+            <label>Nettoeinkommen Bürge (€/Monat)</label>
+            <input type="number" name="guarantorIncome" placeholder="2000" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- DOKUMENTE HOCHLADEN -->
+      <div class="form-section">
+        <h2 class="section-title">Dokumente & Nachweise</h2>
+        <p class="section-sub">Bitte laden Sie die relevanten Dokumente hoch (PDF, JPG, PNG – max. 10 MB je Datei)</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Einkommensnachweise (letzte 3 Monate)</label>
+            <input type="file" name="incomeProof" accept=".pdf,.jpg,.jpeg,.png" multiple>
+            <p class="upload-hint">Gehaltsabrechnungen, Rentenbescheid, etc.</p>
+          </div>
+          <div class="field">
+            <label>Schufa-Auskunft</label>
+            <input type="file" name="schufaDoc" accept=".pdf,.jpg,.jpeg,.png">
+            <p class="upload-hint">Nicht älter als 3 Monate</p>
+          </div>
+          <div class="field">
+            <label>Personalausweis / Reisepass (Vorder- & Rückseite)</label>
+            <input type="file" name="idDoc" accept=".pdf,.jpg,.jpeg,.png" multiple>
+          </div>
+          <div class="field">
+            <label>Bürgschaftserklärung</label>
+            <input type="file" name="guarantorDoc" accept=".pdf,.jpg,.jpeg,.png">
+            <p class="upload-hint">Nur falls Bürge vorhanden</p>
+          </div>
+          <div class="field">
+            <label>Jobcenter-Bescheid / Bürgergeld-Bewilligung</label>
+            <input type="file" name="welfareLetter" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+          <div class="field">
+            <label>Mietschuldenfreiheitsbescheinigung</label>
+            <input type="file" name="noDebtCert" accept=".pdf,.jpg,.jpeg,.png">
+            <p class="upload-hint">Vom aktuellen Vermieter ausgestellt</p>
+          </div>
+          <div class="field">
+            <label>Sonstige Unterlagen</label>
+            <input type="file" name="otherDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
+          </div>
+        </div>
+        <p class="small mt-2">⚠ Die Datei-Anhänge werden nur lokal gespeichert und nicht auf externe Server übertragen. Für die spätere Weiterleitung per E-Mail empfehlen wir, Dokumente bei Bedarf nachzureichen.</p>
+      </div>
+
+      <!-- SONSTIGES -->
+      <div class="form-section">
+        <h2 class="section-title">Sonstige Angaben</h2>
+        <p class="section-sub">Ergänzende Informationen zu Ihrer Bewerbung</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Fahrzeug vorhanden (Stellplatz erwünscht)?</label>
+            <select name="parkingNeeded">
+              <option value="Nein">Nein</option>
+              <option value="Ja, 1 PKW">Ja, 1 PKW</option>
+              <option value="Ja, 2 PKW">Ja, 2 PKW</option>
+              <option value="Motorrad">Motorrad</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Heimarbeit / Homeoffice?</label>
+            <select name="homeOffice">
+              <option value="Nein">Nein</option>
+              <option value="Teilweise">Teilweise</option>
+              <option value="Vollzeit Homeoffice">Vollzeit Homeoffice</option>
+              <option value="Gewerbliche Nutzung">Gewerbliche Nutzung geplant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Musikinstrument(e)?</label>
+            <input type="text" name="instrument" placeholder="z.B. Klavier, Gitarre – oder: Nein">
+          </div>
+          <div class="field">
+            <label>Wie sind Sie auf uns aufmerksam geworden?</label>
+            <select name="heardFrom">
+              <option value="">– bitte wählen –</option>
+              <option>ImmoScout24</option>
+              <option>Immowelt</option>
+              <option>Kleinanzeigen (eBay)</option>
+              <option>Instagram / Social Media</option>
+              <option>Empfehlung</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="field">
+            <label>Sonstige Bemerkungen / Nachricht an uns</label>
+            <textarea name="remarks" placeholder="Besondere Wünsche, Fragen, Anmerkungen zu Ihrer Situation…" style="min-height:120px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATENSCHUTZ -->
+      <div class="form-section">
+        <h2 class="section-title">Datenschutz & Einwilligung</h2>
+        <div style="display:flex; gap:10px; align-items:flex-start; margin-top:0.5rem;">
+          <input type="checkbox" id="privacy" name="privacy" required style="margin-top:3px; accent-color: var(--gold); width:16px; height:16px; flex-shrink:0;">
+          <label for="privacy" style="font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
+            Ich stimme zu, dass meine Angaben zum Zweck der Wohnungsbewerbung gespeichert und verarbeitet werden. Die Daten werden ausschließlich von Central City Apartment Dortmund genutzt und nicht an Dritte weitergegeben. <span class="req">*</span>
+          </label>
+        </div>
+        <div style="display:flex; gap:10px; align-items:flex-start; margin-top:1rem;">
+          <input type="checkbox" id="accuracy" name="accuracy" required style="margin-top:3px; accent-color: var(--gold); width:16px; height:16px; flex-shrink:0;">
+          <label for="accuracy" style="font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
+            Ich bestätige, dass alle gemachten Angaben der Wahrheit entsprechen. Mir ist bekannt, dass falsche Angaben zur sofortigen Ablehnung oder Kündigung des Mietvertrages führen können. <span class="req">*</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submitBtn">
+        Bewerbung absenden
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<!-- ===== VIEW: ADMIN ===== -->
+<div id="viewAdmin" class="view">
+
+  <!-- LOGIN -->
+  <div id="adminLogin" class="admin-login">
+    <h2>Admin-Bereich</h2>
+    <p>Central City Apartment Dortmund</p>
+    <div id="loginError" class="error-msg">Falsches Passwort.</div>
+    <input type="password" id="adminPass" placeholder="Passwort" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn-primary" onclick="adminLogin()">Einloggen</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="adminDashboard" style="display:none;">
+    <div class="admin-container">
+      <div class="admin-header">
+        <div>
+          <h2>Bewerbungseingang</h2>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
+        </div>
+        <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
+      </div>
+
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- EmailJS Config -->
+      <div class="form-section" style="margin-bottom:1.5rem;">
+        <h2 class="section-title">EmailJS Konfiguration</h2>
+        <p class="section-sub">Einmalig einrichten für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a> → kostenloses Konto → Service + Template erstellen</p>
+        <div class="grid-3">
+          <div class="field">
+            <label>Public Key</label>
+            <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123..." oninput="saveEmailJSConfig()">
+          </div>
+          <div class="field">
+            <label>Service ID</label>
+            <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" oninput="saveEmailJSConfig()">
+          </div>
+          <div class="field">
+            <label>Template ID</label>
+            <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" oninput="saveEmailJSConfig()">
+          </div>
+        </div>
+        <p class="small mt-1">💡 Einstellungen werden im Browser gespeichert. Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all', this)">Alle</button>
+        <button class="filter-btn" onclick="setFilter('pending', this)">Ausstehend</button>
+        <button class="filter-btn" onclick="setFilter('confirmed', this)">Bestätigt</button>
+        <button class="filter-btn" onclick="setFilter('rejected', this)">Abgelehnt</button>
+      </div>
+
+      <div class="app-list" id="appList"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  Central City Apartment Dortmund · <a href="mailto:centralcitydo@gmail.com" style="color:var(--gold);">centralcitydo@gmail.com</a>
+</footer>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const ADMIN_PASSWORD = 'CCA2024!'; // ← Passwort hier ändern
+const SUPABASE_URL = 'https://mxgwmmitbuperbiozdtz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
+
+const PROPERTIES = [
+  { id: 'p1', street: 'Schelenbrink 30', city: '44309 Dortmund' },
+  { id: 'p2', street: 'Schelenbrink 07', city: '44309 Dortmund' },
+  { id: 'p3', street: 'Herderstraße 16, EG rechts', city: '44147 Dortmund' },
+  { id: 'p4', street: 'Herderstraße 16, 1. OG links', city: '44147 Dortmund' },
+  { id: 'p5', street: 'Herderstraße 16, 2. OG rechts', city: '44147 Dortmund' },
+  { id: 'p6', street: 'Herderstraße 16, EG links', city: '44147 Dortmund' },
+];
+
+// ============================================================
+// SUPABASE HELPERS
+// ============================================================
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+async function insertApplication(data) {
+  return sbFetch('applications', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    prefer: 'return=representation'
+  });
+}
+
+async function fetchApplications(status) {
+  let path = 'applications?order=created_at.desc';
+  if (status && status !== 'all') path += '&status=eq.' + status;
+  return sbFetch(path, { method: 'GET', prefer: '' });
+}
+
+async function updateApplication(id, updates) {
+  return sbFetch('applications?id=eq.' + id, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+    prefer: 'return=representation'
+  });
+}
+
+// ============================================================
+// EMAILJS CONFIG (localStorage nur für EmailJS-Einstellungen)
+// ============================================================
+function getEJSConfig() {
+  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch { return {}; }
+}
+function saveEmailJSConfig() {
+  const cfg = {
+    publicKey: document.getElementById('ejsPublicKey').value.trim(),
+    serviceId: document.getElementById('ejsServiceId').value.trim(),
+    templateId: document.getElementById('ejsTemplateId').value.trim(),
+  };
+  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+}
+
+// ============================================================
+// PROPERTIES GRID
+// ============================================================
+function buildPropertyGrid() {
+  const grid = document.getElementById('propertyGrid');
+  grid.innerHTML = PROPERTIES.map(p => `
+    <div class="property-card" id="card_${p.id}" onclick="selectProperty('${p.id}', this)">
+      <input type="radio" name="propertyRadio" value="${p.id}">
+      <div class="prop-check" id="check_${p.id}">✓</div>
+      <div class="prop-street">${p.street}</div>
+      <div class="prop-city">${p.city}</div>
+    </div>
+  `).join('');
+}
+
+function selectProperty(id, el) {
+  document.querySelectorAll('.property-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const prop = PROPERTIES.find(p => p.id === id);
+  document.getElementById('selectedProperty').value = prop ? prop.street + ', ' + prop.city : '';
+}
+
+// ============================================================
+// TOGGLE RADIO BUTTONS STYLE
+// ============================================================
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'radio') {
+    const group = e.target.closest('.toggle-group');
+    if (group) {
+      group.querySelectorAll('label').forEach(l => { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
+      const checked = e.target.closest('label');
+      if (checked) {
+        checked.style.borderColor = 'var(--gold)';
+        checked.style.color = 'var(--gold)';
+        checked.style.background = 'rgba(201,169,110,0.08)';
+      }
+    }
+  }
+});
+
+// ============================================================
+// FORM SUBMIT
+// ============================================================
+async function submitForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const raw = {};
+  for (let [k, v] of fd.entries()) { raw[k] = v; }
+
+  if (!raw.property) {
+    showAlert('formAlert', 'error', 'Bitte wählen Sie eine Immobilie aus.');
+    document.querySelector('.property-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Wird gesendet…';
+
+  // Map form field names → Supabase column names (snake_case)
+  const payload = {
+    status: 'pending',
+    first_name: raw.firstName, last_name: raw.lastName,
+    email: raw.email, phone: raw.phone,
+    birthdate: raw.birthdate, birthplace: raw.birthplace,
+    nationality: raw.nationality, id_number: raw.idNumber,
+    street: raw.street, zip: raw.zip, city: raw.city,
+    property: raw.property,
+    current_landlord: raw.currentLandlord, current_rent: raw.currentRent,
+    rent_since: raw.rentSince, notice_period: raw.noticeperiod, move_reason: raw.moveReason,
+    move_in_date: raw.moveInDate, viewing_date: raw.viewingDate,
+    viewing_time: raw.viewingTime, viewing_date_alt: raw.viewingDateAlt,
+    total_persons: raw.totalPersons, children: raw.children,
+    children_ages: raw.childrenAges, co_residents: raw.coResidents,
+    pets: raw.pets, pet_details: raw.petDetails, smoker: raw.smoker,
+    occupation: raw.occupation, employment_status: raw.employmentStatus,
+    employer: raw.employer, employed_since: raw.employedSince,
+    net_income: raw.netIncome, additional_income: raw.additionalIncome,
+    additional_income_type: raw.additionalIncomeType, welfare: raw.welfare,
+    schufa_available: raw.schufaAvailable, schufa_score: raw.schufaScore,
+    debts: raw.debts, rent_debts: raw.rentDebts, credit_explanation: raw.creditExplanation,
+    guarantor: raw.guarantor, guarantor_name: raw.guarantorName,
+    guarantor_contact: raw.guarantorContact, guarantor_income: raw.guarantorIncome,
+    parking_needed: raw.parkingNeeded, home_office: raw.homeOffice,
+    instrument: raw.instrument, heard_from: raw.heardFrom, remarks: raw.remarks,
+  };
+
+  try {
+    await insertApplication(payload);
+
+    showAlert('formAlert', 'success', `✓ Vielen Dank, ${raw.firstName || 'lieber Interessent'}! Ihre Bewerbung ist eingegangen. Wir melden uns zeitnah bei Ihnen.`);
+    form.reset();
+    document.querySelectorAll('.property-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('selectedProperty').value = '';
+    document.querySelectorAll('.toggle-group label').forEach(l => { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Auto-reply
+    const cfg = getEJSConfig();
+    if (cfg.publicKey && cfg.serviceId && cfg.templateId && raw.email) {
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: (raw.firstName||'') + ' ' + (raw.lastName||''),
+        to_email: raw.email,
+        property: raw.property,
+        viewing_date: raw.viewingDate || 'wird noch mitgeteilt',
+        viewing_time: raw.viewingTime || '',
+        message: 'Vielen Dank für Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten und werden Ihre Anfrage prüfen. Sie erhalten in Kürze eine Rückmeldung bezüglich Ihres Besichtigungstermins.'
+      }).catch(() => {});
+    }
+  } catch (err) {
+    showAlert('formAlert', 'error', 'Fehler beim Senden: ' + err.message + ' – Bitte versuchen Sie es erneut oder kontaktieren Sie uns direkt.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Bewerbung absenden';
+  }
+}
+
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'alert ' + type + ' show';
+  el.textContent = msg;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+function toggleAdminView() {
+  const vf = document.getElementById('viewForm');
+  const va = document.getElementById('viewAdmin');
+  const btn = document.getElementById('adminToggleBtn');
+  if (va.classList.contains('active')) {
+    va.classList.remove('active');
+    vf.classList.add('active');
+    btn.textContent = 'Admin-Bereich';
+  } else {
+    vf.classList.remove('active');
+    va.classList.add('active');
+    btn.textContent = '← Zurück';
+  }
+}
+
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+    loadEJSConfig();
+    renderDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('adminPass').value = '';
+  }
+}
+
+function adminLogout() {
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminDashboard').style.display = 'none';
+  document.getElementById('adminPass').value = '';
+}
+
+function loadEJSConfig() {
+  const cfg = getEJSConfig();
+  if (cfg.publicKey) document.getElementById('ejsPublicKey').value = cfg.publicKey;
+  if (cfg.serviceId) document.getElementById('ejsServiceId').value = cfg.serviceId;
+  if (cfg.templateId) document.getElementById('ejsTemplateId').value = cfg.templateId;
+}
+
+let currentFilter = 'all';
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+async function renderDashboard() {
+  const list = document.getElementById('appList');
+  list.innerHTML = '<div class="empty-state"><div class="big" style="font-size:1.5rem;opacity:0.5;">Lädt…</div></div>';
+
+  try {
+    // Fetch all for stats, filtered for list
+    const all = await fetchApplications('all');
+    const pending = all.filter(a => a.status === 'pending').length;
+    const confirmed = all.filter(a => a.status === 'confirmed').length;
+    const rejected = all.filter(a => a.status === 'rejected').length;
+
+    document.getElementById('statsRow').innerHTML = `
+      <div class="stat-card"><div class="num">${all.length}</div><div class="lbl">Gesamt</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--gold)">${pending}</div><div class="lbl">Ausstehend</div></div>
+      <div class="stat-card"><div class="num" style="color:#6DCEAA">${confirmed}</div><div class="lbl">Bestätigt</div></div>
+      <div class="stat-card"><div class="num" style="color:#E8837F">${rejected}</div><div class="lbl">Abgelehnt</div></div>
+    `;
+
+    const filtered = currentFilter === 'all' ? all : all.filter(a => a.status === currentFilter);
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state"><div class="big">📭</div>Keine Bewerbungen vorhanden.</div>';
+    } else {
+      list.innerHTML = filtered.map(app => buildAppCard(app)).join('');
+    }
+  } catch (err) {
+    list.innerHTML = `<div class="empty-state" style="color:#E8837F;">Fehler beim Laden: ${err.message}</div>`;
+  }
+}
+
+function buildAppCard(app) {
+  // Supabase returns snake_case – normalize to camelCase for display
+  const fn = app.first_name || '';
+  const ln = app.last_name || '';
+  const initials = ((fn[0]||'?') + (ln[0]||'?')).toUpperCase();
+  const statusMap = { pending: ['status-pending','Ausstehend'], confirmed: ['status-confirmed','Bestätigt'], rejected: ['status-rejected','Abgelehnt'] };
+  const [sc, sl] = statusMap[app.status] || statusMap.pending;
+  const date = app.created_at ? new Date(app.created_at).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  const fields = [
+    ['Immobilie', app.property], ['E-Mail', app.email], ['Telefon', app.phone],
+    ['Geburtsdatum', app.birthdate], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
+    ['Beruf', app.occupation], ['Beschäftigung', app.employment_status],
+    ['Nettoeinkommen', app.net_income ? app.net_income + ' €' : ''], ['Bürgergeld', app.welfare],
+    ['Personen', app.total_persons], ['Kinder', app.children], ['Haustiere', app.pets],
+    ['Raucher', app.smoker], ['Wunscheinzug', app.move_in_date], ['Wunschbesichtigung', app.viewing_date],
+    ['Besichtigungszeit', app.viewing_time], ['Alternativtermin', app.viewing_date_alt],
+    ['Schufa', app.schufa_available], ['Schufa-Score', app.schufa_score],
+    ['Bürge', app.guarantor_name || app.guarantor], ['Schulden', app.debts],
+    ['Homeoffice', app.home_office], ['Stellplatz', app.parking_needed],
+    ['Mitbewohner', app.co_residents], ['Bemerkungen', app.remarks]
+  ].filter(([,v]) => v && String(v).trim() !== '');
+
+  return `
+  <div class="app-card" id="appcard_${app.id}">
+    <div class="app-card-head" onclick="toggleCard('${app.id}')">
+      <div class="app-avatar">${initials}</div>
+      <div>
+        <div class="app-name">${fn} ${ln}</div>
+        <div class="app-meta">${app.property || ''} · eingegangen ${date}</div>
+      </div>
+      <span class="app-status ${sc}">${sl}</span>
+      <span class="app-chevron">▾</span>
+    </div>
+    <div class="app-card-body">
+      <div class="detail-grid">
+        ${fields.map(([l,v]) => `<div class="detail-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('')}
+      </div>
+      ${app.status === 'pending' ? `
+      <div class="action-row">
+        <div class="field">
+          <label>Bestätigter Besichtigungstermin (Datum)</label>
+          <input type="date" id="confDate_${app.id}" value="${app.viewing_date||''}">
+        </div>
+        <div class="field">
+          <label>Uhrzeit</label>
+          <select id="confTime_${app.id}">
+            <option value="">– wählen –</option>
+            <option>09:00 Uhr</option><option>09:30 Uhr</option><option>10:00 Uhr</option>
+            <option>10:30 Uhr</option><option>11:00 Uhr</option><option>11:30 Uhr</option>
+            <option>12:00 Uhr</option><option>13:00 Uhr</option><option>14:00 Uhr</option>
+            <option>14:30 Uhr</option><option>15:00 Uhr</option><option>15:30 Uhr</option>
+            <option>16:00 Uhr</option><option>16:30 Uhr</option><option>17:00 Uhr</option>
+            <option>17:30 Uhr</option><option>18:00 Uhr</option>
+          </select>
+        </div>
+        <button class="btn-confirm" onclick="confirmApp('${app.id}', '${fn}', '${ln}', '${app.email||''}', '${app.property||''}')">✓ Termin bestätigen & E-Mail senden</button>
+        <button class="btn-reject" onclick="rejectApp('${app.id}', '${fn}', '${ln}', '${app.email||''}', '${app.property||''}')">✗ Ablehnen</button>
+      </div>
+      <div id="feedback_${app.id}" class="action-feedback"></div>
+      ` : `<div style="margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:${app.status==='confirmed'?'#6DCEAA':'#E8837F'}">${app.status==='confirmed'?'Bestätigt am '+(app.confirmed_date||'')+' um '+(app.confirmed_time||''):'Abgelehnt'}</strong></div>`}
+    </div>
+  </div>`;
+}
+
+function toggleCard(id) {
+  document.getElementById('appcard_' + id).classList.toggle('expanded');
+}
+
+async function confirmApp(id, fn, ln, email, property) {
+  const date = document.getElementById('confDate_' + id).value;
+  const time = document.getElementById('confTime_' + id).value;
+  if (!date) { showFeedback(id, 'err', 'Bitte Datum auswählen.'); return; }
+  if (!time) { showFeedback(id, 'err', 'Bitte Uhrzeit auswählen.'); return; }
+
+  try {
+    await updateApplication(id, { status: 'confirmed', confirmed_date: date, confirmed_time: time });
+
+    const cfg = getEJSConfig();
+    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
+      emailjs.init(cfg.publicKey);
+      const dateFormatted = new Date(date).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: fn + ' ' + ln,
+        to_email: email,
+        property: property,
+        viewing_date: dateFormatted,
+        viewing_time: time,
+        message: `Sehr geehrte/r ${fn} ${ln},\n\nvielen Dank für Ihr Interesse an unserer Wohnung. Wir freuen uns, Ihnen einen Besichtigungstermin anbieten zu können.\n\n────────────────────────\nBESICHTIGUNGSTERMIN\n────────────────────────\nObjekt:   ${property}\nDatum:    ${dateFormatted}\nUhrzeit:  ${time}\n────────────────────────\n\nBitte erscheinen Sie pünktlich zum vereinbarten Termin.\n\nSollten sich Änderungen ergeben oder Sie den Termin nicht wahrnehmen können, bitten wir Sie, uns rechtzeitig zu informieren:\n\n📧  centralcitydo@gmail.com\n📞  +49 178 2687170\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen\nCentral City Apartment Dortmund`
+      }).then(() => {
+        showFeedback(id, 'ok', `✓ Termin bestätigt. E-Mail an ${email} gesendet.`);
+      }).catch(() => {
+        showFeedback(id, 'ok', `✓ Termin bestätigt. E-Mail-Versand fehlgeschlagen (EmailJS prüfen).`);
+      });
+    } else {
+      showFeedback(id, 'ok', `✓ Termin bestätigt (EmailJS nicht konfiguriert – kein E-Mail-Versand).`);
+    }
+    setTimeout(() => renderDashboard(), 2000);
+  } catch (err) {
+    showFeedback(id, 'err', 'Fehler: ' + err.message);
+  }
+}
+
+async function rejectApp(id, fn, ln, email, property) {
+  if (!confirm('Bewerbung wirklich ablehnen?')) return;
+  try {
+    await updateApplication(id, { status: 'rejected' });
+
+    const cfg = getEJSConfig();
+    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
+      emailjs.init(cfg.publicKey);
+      emailjs.send(cfg.serviceId, cfg.templateId, {
+        to_name: fn + ' ' + ln,
+        to_email: email,
+        property: property,
+        viewing_date: '', viewing_time: '',
+        message: `Sehr geehrte/r ${fn} ${ln},\n\nvielen Dank für Ihr Interesse an der Wohnung ${property} und die Zeit, die Sie sich für Ihre Bewerbung genommen haben.\n\nNach sorgfältiger Prüfung müssen wir Ihnen leider mitteilen, dass wir Ihre Anfrage zum jetzigen Zeitpunkt nicht berücksichtigen können.\n\nWir wünschen Ihnen weiterhin viel Erfolg bei Ihrer Wohnungssuche.\n\nBei Rückfragen stehen wir Ihnen gerne zur Verfügung:\n\n📧  centralcitydo@gmail.com\n📞  +49 178 2687170\n\nMit freundlichen Grüßen\nCentral City Apartment Dortmund`
+      }).catch(() => {});
+    }
+    renderDashboard();
+  } catch (err) {
+    alert('Fehler: ' + err.message);
+  }
+}
+
+function showFeedback(id, type, msg) {
+  const el = document.getElementById('feedback_' + id);
+  if (!el) return;
+  el.className = 'action-feedback show ' + type;
+  el.textContent = msg;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildPropertyGrid();
+</script>
+</body>
+</html>
