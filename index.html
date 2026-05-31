@@ -379,12 +379,49 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 
     <!-- EDITOR -->
     <div id="adminEditor" style="display:none;">
-      <div class="admin-listing-tabs" id="adminTabs"></div>
-      <div id="adminForms"></div>
-      <div style="display:flex; align-items:center; padding-top:1rem; border-top:1px solid var(--border);">
-        <button class="save-btn" onclick="saveAllListings()">Änderungen speichern</button>
-        <span class="save-feedback" id="saveFeedback">✓ Gespeichert!</span>
-        <button onclick="adminLogout()" style="margin-left:auto; background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:8px 16px; border-radius:var(--radius); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.8rem;">Abmelden</button>
+      <!-- TABS -->
+      <div style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid var(--border);">
+        <button class="admin-tab active" id="tab-inserate" onclick="switchAdminTab('inserate')">Inserate</button>
+        <button class="admin-tab" id="tab-settings" onclick="switchAdminTab('settings')">Einstellungen</button>
+      </div>
+
+      <!-- TAB: INSERATE -->
+      <div id="tabContent-inserate">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+          <div style="font-size:0.85rem;color:var(--text-muted);">Änderungen sind sofort live sichtbar</div>
+          <button onclick="addNewListing()" style="background:var(--gold);border:none;color:var(--dark);padding:8px 18px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;">+ Neues Inserat</button>
+        </div>
+        <div id="inserateList"><div style="color:var(--text-muted);font-size:0.85rem;">Wird geladen...</div></div>
+      </div>
+
+      <!-- TAB: EINSTELLUNGEN -->
+      <div id="tabContent-settings" style="display:none;">
+        <div class="form-section" style="background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;">
+          <h3 style="font-size:1rem;color:var(--gold);margin-bottom:0.5rem;">EmailJS Konfiguration</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a></p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Public Key</label>
+              <input type="text" id="ejsPublicKey" placeholder="abcXYZ123..." style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Service ID</label>
+              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Template ID</label>
+              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button onclick="saveEmailJStoSupabase()" style="background:var(--gold);border:none;color:var(--dark);padding:10px 24px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;">Dauerhaft speichern</button>
+            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+        <button onclick="adminLogout()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.8rem;">Abmelden</button>
       </div>
     </div>
   </div>
@@ -638,33 +675,18 @@ function adminLogout() { document.getElementById('adminLoginBox').style.display 
 var adminListings = [];
 var adminActiveTab = 0;
 
-async function buildAdminEditor() {
-  var tabs = document.getElementById('adminTabs');
-  var forms = document.getElementById('adminForms');
-  tabs.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">Lade...</span>';
-  try { adminListings = await fetchListings(); } catch(e) { tabs.innerHTML = '<span style="color:#E8837F;">Fehler: ' + e.message + '</span>'; return; }
-  tabs.innerHTML = adminListings.map(function(l,i){ return '<button class="admin-listing-tab' + (i===0?' active':'') + '" onclick="switchAdminTab(' + i + ')">' + l.short + '</button>'; }).join('');
-  forms.innerHTML = adminListings.map(function(l,i) {
-    var statusOpts = ['frei','vergeben','demnachst'].map(function(s){ return '<option value="' + s + '"' + (l.status===s?' selected':'') + '>' + (s==='frei'?'Frei':s==='vergeben'?'Vergeben':'Demnächst') + '</option>'; }).join('');
-    var photoList = (l.photos||'').split(',').map(function(u){return u.trim();}).filter(Boolean);
-    var photoInputs = photoList.map(function(url,pi){ return '<div class="photo-url-item"><input type="text" value="' + url + '" placeholder="https://i.imgur.com/..." onchange="updatePhoto(' + i + ',' + pi + ',this.value)"><button onclick="removePhoto(' + i + ',' + pi + ')">✕</button></div>'; }).join('');
-    return '<div class="admin-listing-form' + (i===0?' active':'') + '" id="adminForm_' + i + '">'
-      + '<div class="agrid2"><div class="afield"><label>Titel</label><input type="text" value="' + (l.title||'').replace(/"/g,'&quot;') + '" onchange="adminListings[' + i + '].title=this.value"></div>'
-      + '<div class="afield"><label>Status</label><select onchange="adminListings[' + i + '].status=this.value">' + statusOpts + '</select></div></div>'
-      + '<div class="afield"><label>Adresse</label><input type="text" value="' + (l.address||'').replace(/"/g,'&quot;') + '" onchange="adminListings[' + i + '].address=this.value"></div>'
-      + '<div class="agrid3"><div class="afield"><label>m²</label><input type="number" value="' + (l.sqm||0) + '" onchange="adminListings[' + i + '].sqm=parseInt(this.value)||0"></div>'
-      + '<div class="afield"><label>Zimmer</label><input type="number" value="' + (l.rooms||0) + '" onchange="adminListings[' + i + '].rooms=parseInt(this.value)||0"></div>'
-      + '<div class="afield"><label>Kaltmiete (€)</label><input type="number" value="' + (l.kalt||0) + '" onchange="adminListings[' + i + '].kalt=parseInt(this.value)||0"></div></div>'
-      + '<div class="agrid3"><div class="afield"><label>Nebenkosten (€)</label><input type="number" value="' + (l.nebenkosten||0) + '" onchange="adminListings[' + i + '].nebenkosten=parseInt(this.value)||0"></div>'
-      + '<div class="afield"><label>Heizkosten (€)</label><input type="number" value="' + (l.heizung||0) + '" onchange="adminListings[' + i + '].heizung=parseInt(this.value)||0"></div>'
-      + '<div class="afield"><label>Kaution (€)</label><input type="number" value="' + (l.kaution||0) + '" onchange="adminListings[' + i + '].kaution=parseInt(this.value)||0"></div></div>'
-      + '<div class="afield"><label>Beschreibung</label><textarea onchange="adminListings[' + i + '].description=this.value">' + (l.description||'') + '</textarea></div>'
-      + '<div class="afield"><label>Ausstattungs-Tags (kommagetrennt)</label><input type="text" value="' + (l.features||'') + '" onchange="adminListings[' + i + '].features=this.value"></div>'
-      + '<div class="afield"><label>Video-URL (YouTube oder Vimeo)</label><input type="text" value="' + (l.video_url||'') + '" placeholder="https://www.youtube.com/watch?v=..." onchange="adminListings[' + i + '].video_url=this.value"></div>'
-      + '<div class="afield"><label>Fotos (Imgur-Links)</label><div class="photo-url-list" id="photoList_' + i + '">' + photoInputs + '</div>'
-      + '<button class="add-photo-btn" onclick="addPhoto(' + i + ')">+ Foto hinzufügen</button></div>'
-      + '</div>';
-  }).join('');
+function switchAdminTab(tab) {
+  ['inserate','settings'].forEach(function(t) {
+    var el = document.getElementById('tabContent-' + t);
+    var btn = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'inserate') renderInserateAdmin();
+}
+
+function loadEJSConfig() {
+  loadEJSFromSupabase();
 }
 
 function switchAdminTab(idx) {
