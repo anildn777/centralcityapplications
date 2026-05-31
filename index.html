@@ -702,6 +702,45 @@ function switchAdminTab(tab) {
   if (tab === 'inserate') renderInserateAdmin();
 }
 
+
+var ejsConfigCache = {};
+
+function getEJSConfig() {
+  if (ejsConfigCache.publicKey) return ejsConfigCache;
+  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
+}
+
+async function loadEJSFromSupabase() {
+  try {
+    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
+    if (data && data[0] && data[0].value) {
+      var cfg = JSON.parse(data[0].value);
+      ejsConfigCache = cfg;
+      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
+      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
+      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
+    }
+  } catch(e) { console.log('EJS load error:', e); }
+}
+
+async function saveEmailJStoSupabase() {
+  var cfg = {
+    publicKey: document.getElementById('ejsPublicKey').value.trim(),
+    serviceId: document.getElementById('ejsServiceId').value.trim(),
+    templateId: document.getElementById('ejsTemplateId').value.trim()
+  };
+  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+  ejsConfigCache = cfg;
+  try {
+    await sbFetch('settings?key=eq.emailjs', { method: 'PATCH', body: JSON.stringify({ value: JSON.stringify(cfg) }) });
+  } catch(e) {
+    try { await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) }) }); } catch(e2) {}
+  }
+  var fb = document.getElementById('ejsSaveFeedback');
+  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
+}
+
 function loadEJSConfig() {
   loadEJSFromSupabase();
 }
