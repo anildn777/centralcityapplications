@@ -2578,6 +2578,8 @@ async function submitAddApplication() {
 // ============================================================
 var emailTemplates = [];
 
+var templateEditMode = {};
+
 function renderTemplateList() {
   var list = document.getElementById('templateList');
   if (!list) return;
@@ -2586,38 +2588,74 @@ function renderTemplateList() {
     return;
   }
   list.innerHTML = emailTemplates.map(function(t, i) {
-    return '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.8rem;align-items:center;padding:0.8rem;background:rgba(201,169,110,0.04);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.6rem;">'
-      + '<div style="display:flex;flex-direction:column;gap:4px;">'
-      + '<label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Name</label>'
-      + '<input type="text" value="' + (t.name||'').replace(/"/g,'&quot;') + '" onchange="emailTemplates[' + i + '].name=this.value" placeholder="z.B. Terminbestätigung" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;">'
-      + '</div>'
-      + '<div style="display:flex;flex-direction:column;gap:4px;">'
-      + '<label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Template ID</label>'
-      + '<input type="text" value="' + (t.id||'').replace(/"/g,'&quot;') + '" onchange="emailTemplates[' + i + '].id=this.value" placeholder="template_xxxxxxx" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;font-family:monospace;">'
-      + '</div>'
-      + '<button onclick="removeTemplate(' + i + ')" style="background:transparent;border:1px solid rgba(224,82,82,0.3);color:#E8837F;width:34px;height:34px;border-radius:var(--radius);cursor:pointer;font-size:1rem;margin-top:18px;">✕</button>'
-      + '</div>';
+    var isEdit = templateEditMode[i] || (!t.name && !t.id);
+    if (isEdit) {
+      return '<div style="padding:1rem;background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.3);border-radius:var(--radius);margin-bottom:0.6rem;">'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">'
+        + '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Name</label><input type="text" id="tname_' + i + '" value="' + (t.name||'').replace(/"/g,'&quot;') + '" placeholder="z.B. Terminbestätigung" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;"></div>'
+        + '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Template ID</label><input type="text" id="tid_' + i + '" value="' + (t.id||'').replace(/"/g,'&quot;') + '" placeholder="template_xxxxxxx" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;font-family:monospace;width:100%;box-sizing:border-box;"></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:8px;">'
+        + '<button data-idx="' + i + '" onclick="confirmTemplateEdit(this.dataset.idx)" style="background:var(--gold);border:none;color:var(--dark);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-size:0.82rem;font-weight:500;">Fertig</button>'
+        + '<button data-idx="' + i + '" onclick="removeTemplate(this.dataset.idx)" style="background:transparent;border:1px solid rgba(224,82,82,0.3);color:#E8837F;padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-size:0.82rem;">Löschen</button>'
+        + '</div>'
+        + '</div>';
+    } else {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1rem;background:rgba(201,169,110,0.04);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.6rem;">'
+        + '<div style="display:flex;align-items:center;gap:1.5rem;">'
+        + '<div style="font-size:0.88rem;color:var(--text);font-weight:500;">' + (t.name||'Unbenannt') + '</div>'
+        + '<div style="font-size:0.78rem;color:var(--text-muted);font-family:monospace;background:var(--dark3);padding:3px 8px;border-radius:4px;">' + (t.id||'') + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:8px;">'
+        + '<button data-idx="' + i + '" onclick="editTemplate(this.dataset.idx)" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;">Bearbeiten</button>'
+        + '<button data-idx="' + i + '" onclick="removeTemplate(this.dataset.idx)" style="background:transparent;border:1px solid rgba(224,82,82,0.3);color:#E8837F;padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;">Löschen</button>'
+        + '</div>'
+        + '</div>';
+    }
   }).join('');
 }
 
+function editTemplate(idx) {
+  templateEditMode[idx] = true;
+  renderTemplateList();
+}
+
+function confirmTemplateEdit(idx) {
+  var nameEl = document.getElementById('tname_' + idx);
+  var idEl = document.getElementById('tid_' + idx);
+  if (nameEl) emailTemplates[idx].name = nameEl.value;
+  if (idEl) emailTemplates[idx].id = idEl.value;
+  templateEditMode[idx] = false;
+  renderTemplateList();
+}
+
 function addTemplate() {
+  var newIdx = emailTemplates.length;
   emailTemplates.push({ name: '', id: '' });
+  templateEditMode[newIdx] = true;
   renderTemplateList();
 }
 
 function removeTemplate(idx) {
-  emailTemplates.splice(idx, 1);
+  emailTemplates.splice(parseInt(idx), 1);
+  delete templateEditMode[idx];
   renderTemplateList();
 }
 
 async function saveTemplatesToSupabase() {
   try {
     var val = JSON.stringify(emailTemplates);
-    try {
-      await sbFetch('settings?key=eq.emailTemplates', { method: 'PATCH', body: JSON.stringify({ value: val }) });
-    } catch(e) {
-      await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailTemplates', value: val }) });
-    }
+    // Use upsert to handle both insert and update
+    await fetch(SUPABASE_URL + '/rest/v1/settings', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ key: 'emailTemplates', value: val })
+    });
     var fb = document.getElementById('templateSaveFeedback');
     if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
   } catch(e) { alert('Fehler: ' + e.message); }
