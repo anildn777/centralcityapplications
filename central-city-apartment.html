@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central City Apartment Dortmund – Mietinteressen</title>
+<title>Central City Apartments Dortmund – Mietinteressen</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
@@ -778,7 +778,7 @@
 <!-- HEADER -->
 <header class="site-header">
   <div class="logo">
-    Central City Apartment
+    Central City Apartments
     <span>Dortmund</span>
   </div>
   <a href="index.html" class="nav-btn" style="text-decoration:none;">← Zur Übersicht</a>
@@ -1328,7 +1328,7 @@
         <div style="display:flex; gap:10px; align-items:flex-start; margin-top:0.5rem;">
           <input type="checkbox" id="privacy" name="privacy" required style="margin-top:3px; accent-color: var(--gold); width:16px; height:16px; flex-shrink:0;">
           <label for="privacy" style="font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-            Ich stimme zu, dass meine Angaben zum Zweck der Wohnungsbewerbung gespeichert und verarbeitet werden. Die Daten werden ausschließlich von Central City Apartment Dortmund genutzt und nicht an Dritte weitergegeben. <span class="req">*</span>
+            Ich stimme zu, dass meine Angaben zum Zweck der Wohnungsbewerbung gespeichert und verarbeitet werden. Die Daten werden ausschließlich von Central City Apartments Dortmund genutzt und nicht an Dritte weitergegeben. <span class="req">*</span>
           </label>
         </div>
         <div style="display:flex; gap:10px; align-items:flex-start; margin-top:1rem;">
@@ -1355,7 +1355,7 @@
   <!-- LOGIN -->
   <div id="adminLogin" class="admin-login">
     <h2>Admin-Bereich</h2>
-    <p>Central City Apartment Dortmund</p>
+    <p>Central City Apartments Dortmund</p>
     <div id="loginError" class="error-msg">Falsches Passwort.</div>
     <input type="password" id="adminPass" placeholder="Passwort" onkeydown="if(event.key==='Enter')adminLogin()">
     <button class="btn-primary" onclick="adminLogin()">Einloggen</button>
@@ -1367,7 +1367,7 @@
       <div class="admin-header">
         <div>
           <h2>Bewerbungseingang</h2>
-          <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartments Dortmund</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
           <button onclick="showAddApplicationModal()" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.4);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.78rem;">+ Bewerbung</button>
@@ -1431,12 +1431,12 @@
 
       <!-- TAB: EINSTELLUNGEN -->
       <div id="tabContent-settings" style="display:none;">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
             <div style="width:40px;height:40px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📧</div>
             <div>
               <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);">EmailJS Konfiguration</div>
-              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Für automatischen E-Mail-Versand bei Terminbestätigung &amp; Absagen</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Public Key &amp; Service ID — einmalig einrichten</div>
             </div>
             <a href="https://emailjs.com" target="_blank" style="margin-left:auto;color:var(--gold);font-size:0.78rem;text-decoration:none;border:1px solid rgba(201,169,110,0.3);padding:5px 12px;border-radius:var(--radius);">emailjs.com ↗</a>
           </div>
@@ -1450,16 +1450,32 @@
               <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx">
             </div>
             <div class="field">
-              <label>Template ID</label>
+              <label>Standard Template ID</label>
               <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
             </div>
           </div>
-          <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.15);border-radius:var(--radius);padding:10px 14px;margin-top:1rem;font-size:0.78rem;color:var(--text-muted);">
-            💡 Template-Variablen: <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_name}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_email}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{property}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{viewing_date}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{message}}</code>
-          </div>
           <div style="margin-top:1.2rem;display:flex;align-items:center;gap:12px;">
-            <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Einstellungen speichern</button>
-            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Dauerhaft gespeichert!</span>
+            <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Speichern</button>
+            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
+          </div>
+        </div>
+
+        <!-- TEMPLATE MANAGER -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);">E-Mail Templates</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Templates verwalten — beim Senden auswählbar</div>
+            </div>
+            <button onclick="addTemplate()" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.4);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;">+ Template</button>
+          </div>
+          <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.15);border-radius:var(--radius);padding:10px 14px;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text-muted);">
+            💡 Variablen: <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_name}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_email}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{property}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{viewing_date}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{message}}</code>
+          </div>
+          <div id="templateList"></div>
+          <div style="margin-top:1rem;display:flex;align-items:center;gap:12px;">
+            <button onclick="saveTemplatesToSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Templates speichern</button>
+            <span id="templateSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
           </div>
         </div>
       </div>
@@ -1473,7 +1489,7 @@
 
 
 <footer class="site-footer">
-  Central City Apartment Dortmund · <a href="mailto:info@centralcityapartments.de" style="color:var(--gold);">info@centralcityapartments.de</a>
+  Central City Apartments Dortmund · <a href="mailto:info@centralcityapartments.de" style="color:var(--gold);">info@centralcityapartments.de</a>
 </footer>
 <script>
 const ADMIN_PASSWORD = 'CCA2024!';
@@ -1578,10 +1594,11 @@ async function loadEJSFromSupabase() {
   } catch(e) { console.log('Could not load EJS config:', e); }
 }
 
-function sendEmail(cfg, params) {
+function sendEmail(cfg, params, templateOverride) {
   if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) return;
   emailjs.init(cfg.publicKey);
-  emailjs.send(cfg.serviceId, cfg.templateId, params).catch(function(){});
+  var tid = templateOverride || cfg.templateId;
+  emailjs.send(cfg.serviceId, tid, params).catch(function(){});
 }
 
 // PROPERTY GRID
@@ -1763,6 +1780,7 @@ function switchAdminTab(tab) {
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
   });
   if (tab === 'kalender') renderCalendar();
+  if (tab === 'settings') { loadEJSConfig(); loadTemplatesFromSupabase(); }
 }
 
 // FILTER + DASHBOARD
@@ -1837,6 +1855,7 @@ function buildAppCard(app) {
     ? '<div class="action-row">'
       + '<div class="field"><label>Best\u00e4tigter Termin (Datum)</label><input type="date" onclick="try{this.showPicker()}catch(e){}" id="confDate_' + app.id + '" value="' + (app.viewing_date||'') + '"></div>'
       + '<div class="field"><label>Uhrzeit</label><select id="confTime_' + app.id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
+      + '<div class="field"><label>E-Mail Template</label><select id="confTemplate_' + app.id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;width:100%;"><option value="">Standard</option>' + emailTemplates.map(function(t){ return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('') + '</select></div>'
       + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
       + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
       + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
@@ -1871,11 +1890,13 @@ async function confirmApp(id) {
   try {
     await updateApplication(id, { status: 'confirmed', confirmed_date: date, confirmed_time: time });
     var cfg = getEJSConfig();
+    var selectedTemplate = document.getElementById('confTemplate_' + id);
+    var templateOverride = selectedTemplate ? selectedTemplate.value : '';
     var fn = app.first_name || '';
     var ln = app.last_name || '';
     var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nwir freuen uns, Ihnen Ihren Besichtigungstermin bestaetigen zu koennen.\n\n---\nBESICHTIGUNGSTERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\nBitte erscheinen Sie puenktlich.\nBei Aenderungen melden Sie sich bitte:\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nwir freuen uns, Ihnen Ihren Besichtigungstermin bestaetigen zu koennen.\n\n---\nBESICHTIGUNGSTERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\nBitte erscheinen Sie puenktlich.\nBei Aenderungen melden Sie sich bitte:\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
     setTimeout(function() { renderDashboard(); }, 1500);
   } catch(err) {
@@ -1890,10 +1911,12 @@ async function rejectApp(id) {
   try {
     await updateApplication(id, { status: 'rejected' });
     var cfg = getEJSConfig();
+    var selectedTemplate = document.getElementById('confTemplate_' + id);
+    var templateOverride = selectedTemplate ? selectedTemplate.value : '';
     var fn = app.first_name || '';
     var ln = app.last_name || '';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nvielen Dank fuer Ihr Interesse an ' + (app.property||'') + '.\n\nLeider koennen wir Ihre Anfrage zum jetzigen Zeitpunkt nicht beruecksichtigen.\n\nWir wuenschen Ihnen viel Erfolg bei Ihrer Wohnungssuche.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nvielen Dank fuer Ihr Interesse an ' + (app.property||'') + '.\n\nLeider koennen wir Ihre Anfrage zum jetzigen Zeitpunkt nicht beruecksichtigen.\n\nWir wuenschen Ihnen viel Erfolg bei Ihrer Wohnungssuche.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
     renderDashboard();
   } catch(err) {
     alert('Fehler: ' + err.message);
@@ -2027,8 +2050,8 @@ async function saveTerminEdit(id) {
     var cfg = getEJSConfig();
     var fn = app.first_name||'', ln = app.last_name||'';
     var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nIhr Besichtigungstermin wurde geaendert.\n\n---\nNEUER TERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nIhr Besichtigungstermin wurde geaendert.\n\n---\nNEUER TERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     showModalFeedback('\u2713 Termin gespeichert und E-Mail gesendet.', 'ok');
     renderCalendar();
   } catch(e) { showModalFeedback('Fehler: ' + e.message, 'err'); }
@@ -2042,8 +2065,8 @@ async function cancelTermin(id) {
     await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
     var cfg = getEJSConfig();
     var fn = app.first_name||'', ln = app.last_name||'';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nleider muessen wir Ihren Besichtigungstermin fuer ' + (app.property||'') + ' absagen.\n\nWir melden uns in Kuerze mit einem neuen Vorschlag.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nleider muessen wir Ihren Besichtigungstermin fuer ' + (app.property||'') + ' absagen.\n\nWir melden uns in Kuerze mit einem neuen Vorschlag.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
     showModalFeedback('\u2713 Termin abgesagt.', 'ok');
     closeModal();
     renderCalendar();
@@ -2105,7 +2128,7 @@ async function exportICS() {
   try { apps = await fetchApplications(); } catch(e) { alert('Fehler: ' + e.message); return; }
   var confirmed = apps.filter(function(a) { return a.confirmed_date && a.status === 'confirmed'; });
   if (!confirmed.length) { alert('Keine best\u00e4tigten Termine vorhanden.'); return; }
-  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Central City Apartment Dortmund//DE\r\nCALSCALE:GREGORIAN\r\n';
+  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Central City Apartments Dortmund//DE\r\nCALSCALE:GREGORIAN\r\n';
   confirmed.forEach(function(a) {
     var parts = a.confirmed_date.split('-');
     var y = parts[0], m = parts[1], d = parts[2];
@@ -2545,6 +2568,67 @@ async function submitAddApplication() {
     document.getElementById('addAppModal').remove();
     renderDashboard();
   } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+
+// ============================================================
+// TEMPLATE MANAGER
+// ============================================================
+var emailTemplates = [];
+
+function renderTemplateList() {
+  var list = document.getElementById('templateList');
+  if (!list) return;
+  if (emailTemplates.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:1rem;">Noch keine Templates. Klick auf "+ Template" um eines hinzuzufügen.</div>';
+    return;
+  }
+  list.innerHTML = emailTemplates.map(function(t, i) {
+    return '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.8rem;align-items:center;padding:0.8rem;background:rgba(201,169,110,0.04);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.6rem;">'
+      + '<div style="display:flex;flex-direction:column;gap:4px;">'
+      + '<label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Name</label>'
+      + '<input type="text" value="' + (t.name||'').replace(/"/g,'&quot;') + '" onchange="emailTemplates[' + i + '].name=this.value" placeholder="z.B. Terminbestätigung" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;">'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:4px;">'
+      + '<label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Template ID</label>'
+      + '<input type="text" value="' + (t.id||'').replace(/"/g,'&quot;') + '" onchange="emailTemplates[' + i + '].id=this.value" placeholder="template_xxxxxxx" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);color:var(--text);padding:7px 10px;font-size:0.85rem;outline:none;font-family:monospace;">'
+      + '</div>'
+      + '<button onclick="removeTemplate(' + i + ')" style="background:transparent;border:1px solid rgba(224,82,82,0.3);color:#E8837F;width:34px;height:34px;border-radius:var(--radius);cursor:pointer;font-size:1rem;margin-top:18px;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function addTemplate() {
+  emailTemplates.push({ name: '', id: '' });
+  renderTemplateList();
+}
+
+function removeTemplate(idx) {
+  emailTemplates.splice(idx, 1);
+  renderTemplateList();
+}
+
+async function saveTemplatesToSupabase() {
+  try {
+    var val = JSON.stringify(emailTemplates);
+    try {
+      await sbFetch('settings?key=eq.emailTemplates', { method: 'PATCH', body: JSON.stringify({ value: val }) });
+    } catch(e) {
+      await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailTemplates', value: val }) });
+    }
+    var fb = document.getElementById('templateSaveFeedback');
+    if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function loadTemplatesFromSupabase() {
+  try {
+    var data = await sbFetch('settings?key=eq.emailTemplates', { prefer: '' });
+    if (data && data[0] && data[0].value) {
+      emailTemplates = JSON.parse(data[0].value);
+      renderTemplateList();
+    }
+  } catch(e) { console.log('Templates load error:', e); }
 }
 
 // INIT
