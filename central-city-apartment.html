@@ -1394,18 +1394,22 @@
           <div class="grid-3">
             <div class="field">
               <label>Public Key</label>
-              <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123..." oninput="saveEmailJSConfig()">
+              <input type="text" id="ejsPublicKey" placeholder="z.B. abcXYZ123...">
             </div>
             <div class="field">
               <label>Service ID</label>
-              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" oninput="saveEmailJSConfig()">
+              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx">
             </div>
             <div class="field">
               <label>Template ID</label>
-              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" oninput="saveEmailJSConfig()">
+              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
             </div>
           </div>
-          <p class="small mt-1">💡 Einstellungen werden im Browser gespeichert. Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
+          <p class="small mt-1">💡 Das Template sollte folgende Variablen enthalten: <code style="background:var(--dark3);padding:1px 5px;border-radius:3px;font-size:0.78rem;">{{to_name}}, {{to_email}}, {{property}}, {{viewing_date}}, {{viewing_time}}, {{message}}</code></p>
+          <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;">
+            <button onclick="saveEmailJStoSupabase()" class="save-btn">Einstellungen dauerhaft speichern</button>
+            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
+          </div>
         </div>
       </div>
 
@@ -1463,16 +1467,64 @@ async function updateApplication(id, updates) {
 }
 
 // EMAILJS CONFIG
+var ejsConfigCache = {};
+
 function getEJSConfig() {
+  // Try cache first, then localStorage fallback
+  if (ejsConfigCache.publicKey) return ejsConfigCache;
   try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
 }
+
 function saveEmailJSConfig() {
+  // Keep localStorage as fallback
+  var cfg = {
+    publicKey: document.getElementById('ejsPublicKey') ? document.getElementById('ejsPublicKey').value.trim() : '',
+    serviceId: document.getElementById('ejsServiceId') ? document.getElementById('ejsServiceId').value.trim() : '',
+    templateId: document.getElementById('ejsTemplateId') ? document.getElementById('ejsTemplateId').value.trim() : ''
+  };
+  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+  ejsConfigCache = cfg;
+}
+
+async function saveEmailJStoSupabase() {
   var cfg = {
     publicKey: document.getElementById('ejsPublicKey').value.trim(),
     serviceId: document.getElementById('ejsServiceId').value.trim(),
     templateId: document.getElementById('ejsTemplateId').value.trim()
   };
   localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+  ejsConfigCache = cfg;
+  try {
+    await sbFetch('settings?key=eq.emailjs', {
+      method: 'PATCH',
+      body: JSON.stringify({ value: JSON.stringify(cfg) })
+    });
+  } catch(e) {
+    // If PATCH fails, try POST (first time)
+    try {
+      await sbFetch('settings', {
+        method: 'POST',
+        body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) })
+      });
+    } catch(e2) { console.log('Settings save error:', e2); }
+  }
+  var fb = document.getElementById('ejsSaveFeedback');
+  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
+}
+
+async function loadEJSFromSupabase() {
+  try {
+    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
+    if (data && data[0] && data[0].value) {
+      var cfg = JSON.parse(data[0].value);
+      ejsConfigCache = cfg;
+      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+      // Fill inputs if visible
+      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
+      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
+      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
+    }
+  } catch(e) { console.log('Could not load EJS config:', e); }
 }
 
 function sendEmail(cfg, params) {
@@ -1644,10 +1696,13 @@ function adminLogout() {
 }
 
 function loadEJSConfig() {
-  var cfg = getEJSConfig();
-  if (cfg.publicKey) document.getElementById('ejsPublicKey').value = cfg.publicKey;
-  if (cfg.serviceId) document.getElementById('ejsServiceId').value = cfg.serviceId;
-  if (cfg.templateId) document.getElementById('ejsTemplateId').value = cfg.templateId;
+  // Load from Supabase first, fallback to localStorage
+  loadEJSFromSupabase().then(function() {
+    var cfg = getEJSConfig();
+    if (document.getElementById('ejsPublicKey') && cfg.publicKey) document.getElementById('ejsPublicKey').value = cfg.publicKey;
+    if (document.getElementById('ejsServiceId') && cfg.serviceId) document.getElementById('ejsServiceId').value = cfg.serviceId;
+    if (document.getElementById('ejsTemplateId') && cfg.templateId) document.getElementById('ejsTemplateId').value = cfg.templateId;
+  });
 }
 
 // ADMIN TABS
@@ -1734,13 +1789,14 @@ function buildAppCard(app) {
       + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
       + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
       + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
-    : '<div style="margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></div>';
+    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:0.75rem;">&#8635; Zur\u00fccksetzen</button></div>';
 
   return '<div class="app-card" id="appcard_' + app.id + '">'
     + '<div class="app-card-head" onclick="toggleCard(\'' + app.id + '\')">'
     + '<div class="app-avatar">' + initials + '</div>'
     + '<div><div class="app-name">' + fn + ' ' + ln + '</div><div class="app-meta">' + (app.property||'') + ' \u00b7 eingegangen ' + date + '</div></div>'
     + '<span class="app-status ' + sc + '">' + sl + '</span>'
+    + '<button onclick="event.stopPropagation();toggleFavorite(\'' + app.id + '\')" style="background:transparent;border:none;font-size:1.1rem;cursor:pointer;padding:0 4px;opacity:' + (app.favorite?'1':'0.25') + ';transition:opacity 0.2s;color:#FFD700;" title="Favorit">' + (app.favorite ? '★' : '☆') + '</button>'
     + '<span class="app-chevron">\u25be</span>'
     + '</div>'
     + '<div class="app-card-body">'
