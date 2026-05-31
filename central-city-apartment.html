@@ -1337,6 +1337,7 @@
           <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button onclick="showAddApplicationModal()" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.4);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.78rem;">+ Bewerbung</button>
           <button onclick="exportCSV()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ CSV Export</button>
           <button onclick="exportICS()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ Kalender (.ics)</button>
           <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
