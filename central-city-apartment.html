@@ -633,6 +633,43 @@
   }
   .edit-field input:focus, .edit-field select:focus { border-color: var(--gold); }
 
+
+/* INSERAT MODAL */
+.ins-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:400; overflow-y:auto; padding:2rem 1rem; }
+.ins-overlay.open { display:block; }
+.ins-box { max-width:860px; margin:0 auto; background:#1E1E1E; border:1px solid rgba(201,169,110,0.2); border-radius:14px; overflow:hidden; animation:insIn 0.25s ease; }
+@keyframes insIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.ins-gallery { position:relative; height:380px; background:#282828; }
+.ins-gallery img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.4s; }
+.ins-gallery img.active { opacity:1; }
+.ins-gallery-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.6); border:none; color:white; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:1.2rem; z-index:10; }
+.ins-gallery-btn.prev { left:12px; }
+.ins-gallery-btn.next { right:12px; }
+.ins-close { position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.7); border:none; color:white; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:1rem; z-index:20; }
+.ins-counter { position:absolute; bottom:12px; right:14px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; padding:3px 10px; border-radius:20px; z-index:10; }
+.ins-thumbs { display:flex; gap:8px; overflow-x:auto; padding:10px 1.5rem; }
+.ins-thumb { width:68px; height:50px; border-radius:6px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid transparent; transition:border-color 0.2s; }
+.ins-thumb.active { border-color:#C9A96E; }
+.ins-thumb img { width:100%; height:100%; object-fit:cover; }
+.ins-body { padding:1.5rem; }
+.ins-badge { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.8rem; }
+.ins-badge.frei { background:rgba(76,175,136,0.12); color:#6DCEAA; border:1px solid rgba(76,175,136,0.3); }
+.ins-badge.vergeben { background:rgba(224,82,82,0.12); color:#E8837F; border:1px solid rgba(224,82,82,0.3); }
+.ins-badge.demnachst { background:rgba(201,169,110,0.12); color:#C9A96E; border:1px solid rgba(201,169,110,0.3); }
+.ins-addr { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:#C9A96E; margin-bottom:0.4rem; }
+.ins-title { font-family:'Playfair Display',serif; font-size:1.4rem; margin-bottom:1rem; color:#E8E0D0; }
+.ins-specs { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid rgba(201,169,110,0.2); }
+.ins-spec .val { font-family:'Playfair Display',serif; font-size:1.2rem; color:#C9A96E; }
+.ins-spec .lbl { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#9A9080; margin-top:2px; }
+.ins-desc { font-size:0.88rem; color:#9A9080; line-height:1.7; margin-bottom:1rem; }
+.ins-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1rem; }
+.ins-tag { background:rgba(201,169,110,0.08); border:1px solid rgba(201,169,110,0.2); color:#9A9080; padding:3px 10px; border-radius:20px; font-size:0.7rem; }
+.ins-price { background:#282828; border:1px solid rgba(201,169,110,0.2); border-radius:8px; padding:1rem 1.2rem; margin-bottom:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.ins-price .kalt { font-family:'Playfair Display',serif; font-size:1.6rem; color:#C9A96E; }
+.ins-price .kalt span { font-family:'DM Sans',sans-serif; font-size:0.78rem; color:#9A9080; margin-left:4px; }
+.ins-price .breakdown { font-size:0.8rem; color:#9A9080; line-height:1.8; }
+@media(max-width:640px){ .ins-gallery{height:240px;} .ins-body{padding:1rem;} }
+
 </style>
 </head>
 <body>
@@ -643,6 +680,7 @@
     Central City Apartment
     <span>Dortmund</span>
   </div>
+  <a href="index.html" class="nav-btn" style="text-decoration:none;">← Zur Übersicht</a>
   <button class="nav-btn" id="adminToggleBtn" onclick="toggleAdminView()">Admin-Bereich</button>
 </header>
 
@@ -1929,6 +1967,7 @@ function buildPropertyGridShort() {
       + '<div class="prop-check">✓</div>'
       + '<div class="prop-street">' + p.street + '</div>'
       + '<div class="prop-city">' + p.city + '</div>'
+      + '<a href="#" onclick="event.stopPropagation();openInsModal(\'' + p.id + '\');return false;" style="display:block;margin-top:6px;font-size:0.7rem;color:var(--gold);text-decoration:none;letter-spacing:0.05em;">Inserat ansehen ↗</a>'
       + '</div>';
   }).join('');
 }
@@ -2016,6 +2055,105 @@ function toggleFullForm() {
   }
 }
 
+
+// ============================================================
+// INSERAT MODAL (mini version for this page)
+// ============================================================
+var SB_URL_INS = 'https://mxgwmmitbuperbiozdtz.supabase.co';
+var SB_KEY_INS = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
+var insPhotos = [];
+var insIdx = 0;
+
+async function openInsModal(id) {
+  var res = await fetch(SB_URL_INS + '/rest/v1/listings?id=eq.' + id + '&select=*', {
+    headers: { 'apikey': SB_KEY_INS, 'Authorization': 'Bearer ' + SB_KEY_INS }
+  });
+  var data = await res.json();
+  var l = data[0];
+  if (!l) return;
+
+  insPhotos = (l.photos && l.photos.trim()) ? l.photos.split(',').map(function(u){return u.trim();}).filter(Boolean) : ['https://via.placeholder.com/800x380/1E1E1E/C9A96E?text=Foto+folgt'];
+  insIdx = 0;
+
+  var gallery = document.getElementById('insGallery');
+  gallery.querySelectorAll('img').forEach(function(i){i.remove();});
+  insPhotos.forEach(function(url, i) {
+    var img = document.createElement('img');
+    img.src = url; img.alt = 'Foto ' + (i+1);
+    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:' + (i===0?'1':'0') + ';transition:opacity 0.4s;';
+    if (i===0) img.classList.add('active');
+    gallery.appendChild(img);
+  });
+  document.getElementById('insCounter').textContent = '1 / ' + insPhotos.length;
+
+  var thumbs = document.getElementById('insThumbs');
+  if (insPhotos.length > 1) {
+    thumbs.style.display = 'flex';
+    thumbs.innerHTML = insPhotos.map(function(url, i) {
+      return '<div class="ins-thumb ' + (i===0?'active':'') + '" id="insthumb_' + i + '" data-idx="' + i + '"><img src="' + url + '" alt=""></div>';
+    }).join('');
+    thumbs.addEventListener('click', function(e) {
+      var t = e.target.closest('[data-idx]');
+      if (t) insThumbClick(parseInt(t.dataset.idx));
+    });
+  } else { thumbs.style.display = 'none'; }
+
+  var warm = (l.kalt||0) + (l.nebenkosten||0) + (l.heizung||0);
+  var features = (l.features && l.features.trim()) ? l.features.split(',').map(function(f){return f.trim();}).filter(Boolean) : [];
+  var tags = features.map(function(f){ return '<span class="ins-tag">' + f + '</span>'; }).join('');
+  var specs = '';
+  if (l.sqm > 0) specs += '<div class="ins-spec"><div class="val">' + l.sqm + '</div><div class="lbl">m²</div></div>';
+  if (l.rooms > 0) specs += '<div class="ins-spec"><div class="val">' + l.rooms + '</div><div class="lbl">Zimmer</div></div>';
+  if (l.kalt > 0) specs += '<div class="ins-spec"><div class="val">' + l.kalt + ' €</div><div class="lbl">Kaltmiete</div></div>';
+  if (warm > 0) specs += '<div class="ins-spec"><div class="val">' + warm + ' €</div><div class="lbl">Warmmiete</div></div>';
+
+  var badgeCls = l.status === 'frei' ? 'frei' : l.status === 'vergeben' ? 'vergeben' : 'demnachst';
+  var badgeTxt = l.status === 'frei' ? 'Frei' : l.status === 'vergeben' ? 'Vergeben' : 'Demnächst';
+
+  var priceHtml = l.kalt > 0
+    ? '<div class="ins-price"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="breakdown">Nebenkosten: ' + (l.nebenkosten||0) + ' €<br>Heizkosten: ' + (l.heizung||0) + ' €<br>Warmmiete: ' + warm + ' €<br>Kaution: <strong style="color:#C9A96E;">' + (l.kaution||0) + ' €</strong></div></div>'
+    : '<div class="ins-price"><div style="color:#9A9080;">Preis auf Anfrage</div></div>';
+
+  document.getElementById('insBody').innerHTML =
+    '<span class="ins-badge ' + badgeCls + '">' + badgeTxt + '</span>'
+    + '<div class="ins-addr">' + (l.address||'') + '</div>'
+    + '<div class="ins-title">' + (l.title||'') + '</div>'
+    + (specs ? '<div class="ins-specs">' + specs + '</div>' : '')
+    + '<div class="ins-desc">' + (l.description||'') + '</div>'
+    + (tags ? '<div class="ins-tags">' + tags + '</div>' : '')
+    + priceHtml;
+
+  document.getElementById('insModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInsModal() {
+  document.getElementById('insModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function insSlide(dir) {
+  var imgs = document.getElementById('insGallery').querySelectorAll('img');
+  imgs[insIdx].style.opacity='0'; imgs[insIdx].classList.remove('active');
+  var t = document.getElementById('insthumb_'+insIdx); if(t) t.classList.remove('active');
+  insIdx = (insIdx + dir + insPhotos.length) % insPhotos.length;
+  imgs[insIdx].style.opacity='1'; imgs[insIdx].classList.add('active');
+  var nt = document.getElementById('insthumb_'+insIdx); if(nt) nt.classList.add('active');
+  document.getElementById('insCounter').textContent = (insIdx+1) + ' / ' + insPhotos.length;
+}
+
+function insThumbClick(idx) {
+  var imgs = document.getElementById('insGallery').querySelectorAll('img');
+  imgs[insIdx].style.opacity='0'; imgs[insIdx].classList.remove('active');
+  var t = document.getElementById('insthumb_'+insIdx); if(t) t.classList.remove('active');
+  insIdx = idx;
+  imgs[insIdx].style.opacity='1'; imgs[insIdx].classList.add('active');
+  var nt = document.getElementById('insthumb_'+insIdx); if(nt) nt.classList.add('active');
+  document.getElementById('insCounter').textContent = (insIdx+1) + ' / ' + insPhotos.length;
+}
+
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeInsModal(); });
+
 // INIT
 buildPropertyGrid();
 buildPropertyGridShort();
@@ -2027,6 +2165,21 @@ if (toggleBtn) {
   toggleBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'; });
 }
 </script>
+
+
+<!-- INSERAT MODAL -->
+<div class="ins-overlay" id="insModal" onclick="if(event.target===this)closeInsModal()">
+  <div class="ins-box">
+    <div class="ins-gallery" id="insGallery">
+      <button class="ins-close" onclick="closeInsModal()">✕</button>
+      <button class="ins-gallery-btn prev" onclick="insSlide(-1)">‹</button>
+      <button class="ins-gallery-btn next" onclick="insSlide(1)">›</button>
+      <div class="ins-counter" id="insCounter">1 / 1</div>
+    </div>
+    <div class="ins-thumbs" id="insThumbs"></div>
+    <div class="ins-body" id="insBody"></div>
+  </div>
+</div>
 
 </body>
 </html>
