@@ -1901,7 +1901,7 @@ async function confirmApp(id) {
     var fn = app.first_name || '';
     var ln = app.last_name || '';
     var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Ihr Besichtigungstermin für ' + (app.property||'') + ' wurde bestätigt: ' + dateFormatted + ' um ' + time + '. Bitte erscheinen Sie pünktlich.';
+    var msg = 'Ihr Besichtigungstermin f\u00fcr ' + (app.property||'') + ' wurde best\u00e4tigt.\n\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n\nBitte erscheinen Sie p\u00fcnktlich. Bei R\u00fcckfragen stehen wir Ihnen gerne zur Verf\u00fcgung:\ninfo@centralcityapartments.de\n+49 178 2687170';
     if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
     setTimeout(function() { renderDashboard(); }, 1500);
