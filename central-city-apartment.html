@@ -1359,6 +1359,7 @@
           <button class="filter-btn" onclick="setFilter('pending', this)">Ausstehend</button>
           <button class="filter-btn" onclick="setFilter('confirmed', this)">Bestätigt</button>
           <button class="filter-btn" onclick="setFilter('rejected', this)">Abgelehnt</button>
+          <button class="filter-btn" onclick="setFilter('favorite', this)">⭐ Favoriten</button>
         </div>
         <div class="app-list" id="appList"></div>
       </div>
@@ -1690,7 +1691,9 @@ async function renderDashboard() {
 
 function renderAppList() {
   var list = document.getElementById('appList');
-  var filtered = currentFilter === 'all' ? allApps : allApps.filter(function(a) { return a.status === currentFilter; });
+  var filtered = currentFilter === 'all' ? allApps
+    : currentFilter === 'favorite' ? allApps.filter(function(a) { return a.favorite; })
+    : allApps.filter(function(a) { return a.status === currentFilter; });
   if (!filtered.length) {
     list.innerHTML = '<div class="empty-state"><div class="big">\ud83d\udceb</div>Keine Bewerbungen vorhanden.</div>';
     return;
@@ -2221,6 +2224,25 @@ function insThumbClick(idx) {
 }
 
 document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeInsModal(); });
+
+
+async function resetToAusstehend(id) {
+  try {
+    await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
+    renderDashboard();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function toggleFavorite(id) {
+  var app = allApps.find(function(a) { return a.id === id; });
+  if (!app) return;
+  var newVal = !app.favorite;
+  try {
+    await updateApplication(id, { favorite: newVal });
+    app.favorite = newVal;
+    renderAppList();
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
 
 // INIT
 buildPropertyGrid();
