@@ -1901,7 +1901,7 @@ async function confirmApp(id) {
     var fn = app.first_name || '';
     var ln = app.last_name || '';
     var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = '';
+    var msg = 'Ihr Besichtigungstermin für ' + (app.property||'') + ' wurde bestätigt: ' + dateFormatted + ' um ' + time + '. Bitte erscheinen Sie pünktlich.';
     if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
     setTimeout(function() { renderDashboard(); }, 1500);
@@ -1921,7 +1921,7 @@ async function rejectApp(id) {
     var templateOverride = selectedTemplate ? selectedTemplate.value : '';
     var fn = app.first_name || '';
     var ln = app.last_name || '';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nvielen Dank fuer Ihr Interesse an ' + (app.property||'') + '.\n\nLeider koennen wir Ihre Anfrage zum jetzigen Zeitpunkt nicht beruecksichtigen.\n\nWir wuenschen Ihnen viel Erfolg bei Ihrer Wohnungssuche.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    var msg = 'Leider k\u00f6nnen wir Ihre Anfrage f\u00fcr ' + (app.property||'') + ' nicht ber\u00fccksichtigen. Vielen Dank f\u00fcr Ihr Interesse.';
     if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
     renderDashboard();
   } catch(err) {
@@ -2071,7 +2071,7 @@ async function cancelTermin(id) {
     await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
     var cfg = getEJSConfig();
     var fn = app.first_name||'', ln = app.last_name||'';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nleider muessen wir Ihren Besichtigungstermin fuer ' + (app.property||'') + ' absagen.\n\nWir melden uns in Kuerze mit einem neuen Vorschlag.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartments Dortmund';
+    var msg = 'Ihr Besichtigungstermin f\u00fcr ' + (app.property||'') + ' wurde leider abgesagt. Wir werden uns zu einem sp\u00e4teren Zeitpunkt erneut bei Ihnen melden.';
     if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
     showModalFeedback('\u2713 Termin abgesagt.', 'ok');
     closeModal();
