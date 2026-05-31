@@ -3,614 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central City Apartment Dortmund – Mietinteressen</title>
+<title>Central City Apartment Dortmund – Wohnungen</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
-  :root {
-    --gold: #C9A96E;
-    --gold-light: #F0DEB8;
-    --gold-dark: #8B6914;
-    --dark: #1A1A1A;
-    --dark2: #2A2A2A;
-    --dark3: #3A3A3A;
-    --text: #E8E0D0;
-    --text-muted: #9A9080;
-    --surface: #222222;
-    --surface2: #2E2E2E;
-    --border: rgba(201,169,110,0.25);
-    --border-hover: rgba(201,169,110,0.6);
-    --success: #4CAF88;
-    --danger: #E05252;
-    --radius: 6px;
-    --radius-lg: 12px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+:root {
+  --gold: #C9A96E;
+  --gold-light: #F0DEB8;
+  --dark: #141414;
+  --dark2: #1E1E1E;
+  --dark3: #282828;
+  --text: #E8E0D0;
+  --text-muted: #9A9080;
+  --border: rgba(201,169,110,0.2);
+  --radius: 8px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; }
 
-  /* ===== HEADER ===== */
-  .site-header {
-    background: var(--dark2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: var(--gold);
-    letter-spacing: 0.05em;
-  }
-  .logo span { color: var(--text-muted); font-size: 0.75rem; display: block; font-family: 'DM Sans', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
-  .nav-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 6px 16px;
-    border-radius: var(--radius);
-    font-size: 0.8rem;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
-  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+/* HEADER */
+.site-header {
+  background: rgba(20,20,20,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px; position: sticky; top: 0; z-index: 200;
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--gold); letter-spacing: 0.04em; text-decoration: none; }
+.logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 1px; }
+.header-nav { display: flex; gap: 10px; align-items: center; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: var(--radius); font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: all 0.2s; display: inline-block; }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-gold { background: var(--gold); border: none; color: var(--dark); padding: 8px 20px; border-radius: var(--radius); font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: all 0.2s; display: inline-block; }
+.btn-gold:hover { background: #D4B07A; transform: translateY(-1px); }
 
-  /* ===== VIEWS ===== */
-  .view { display: none; }
-  .view.active { display: block; }
+/* HERO */
+.hero {
+  min-height: 90vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 4rem 2rem;
+  position: relative; overflow: hidden;
+  background: var(--dark);
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.hero-bg img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 1.2s ease;
+}
+.hero-bg img.active { opacity: 1; }
+.hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.45) 40%, rgba(20,20,20,0.92) 100%);
+  z-index: 1;
+}
+.hero > *:not(.hero-bg) { position: relative; z-index: 2; }
+.hero-eyebrow { font-size: 0.68rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; opacity: 0.8; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 400; line-height: 1.15; margin-bottom: 1.5rem; max-width: 700px; }
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero p { color: var(--text-muted); max-width: 480px; font-size: 0.95rem; line-height: 1.7; margin-bottom: 2.5rem; }
+.hero-line { width: 50px; height: 1px; background: var(--gold); margin: 0 auto 2.5rem; opacity: 0.4; }
+.hero-stats { display: flex; gap: 3rem; justify-content: center; margin-bottom: 3rem; }
+.hero-stat .num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); }
+.hero-stat .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 2px; }
+.scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.scroll-arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); }
 
-  /* ===== HERO ===== */
-  .hero {
-    padding: 5rem 2rem 3rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, #1E1A14 0%, var(--dark) 100%);
-  }
-  .hero-eyebrow {
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-  .hero p {
-    color: var(--text-muted);
-    max-width: 520px;
-    margin: 0 auto 2.5rem;
-    font-size: 0.95rem;
-  }
-  .hero-divider {
-    width: 60px;
-    height: 1px;
-    background: var(--gold);
-    margin: 0 auto 2.5rem;
-    opacity: 0.5;
-  }
+/* SECTION */
+.section { padding: 5rem 2rem; }
+.section-header { text-align: center; margin-bottom: 3.5rem; }
+.section-eyebrow { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; margin-bottom: 0.8rem; }
+.section-sub { color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto; }
 
-  /* ===== FORM CONTAINER ===== */
-  .form-container {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 3rem 2rem 5rem;
-  }
+/* LISTINGS GRID */
+.listings { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
 
-  /* ===== SECTIONS ===== */
-  .form-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-  }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: var(--gold);
-    margin-bottom: 0.25rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-  .section-sub {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
+/* LISTING CARD */
+.listing-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform 0.25s, border-color 0.25s;
+  position: relative;
+}
+.listing-card:hover { transform: translateY(-4px); border-color: rgba(201,169,110,0.5); }
+.listing-card.vergeben { opacity: 0.5; pointer-events: none; }
 
-  /* ===== GRID ===== */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-  .span-2 { grid-column: span 2; }
-  .span-3 { grid-column: span 3; }
-  @media (max-width: 640px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .span-2, .span-3 { grid-column: span 1; }
-  }
+/* PHOTO SLIDER */
+.photo-slider { position: relative; height: 240px; overflow: hidden; background: var(--dark3); }
+.photo-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s; }
+.photo-slider img.active { opacity: 1; }
+.slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 10; }
+.slider-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
+.slider-dot.active { background: var(--gold); }
+.slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
+.slider-btn:hover { background: rgba(0,0,0,0.8); }
+.slider-btn.prev { left: 10px; }
+.slider-btn.next { right: 10px; }
+.vergeben-badge { position: absolute; top: 14px; left: 14px; background: rgba(0,0,0,0.8); color: #E8837F; border: 1px solid rgba(224,82,82,0.4); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; z-index: 10; }
+.frei-badge { position: absolute; top: 14px; left: 14px; background: rgba(0,0,0,0.8); color: #6DCEAA; border: 1px solid rgba(76,175,136,0.4); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; z-index: 10; }
 
-  /* ===== FORM ELEMENTS ===== */
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-  .field label .req { color: var(--gold); margin-left: 2px; }
-  .field input,
-  .field select,
-  .field textarea {
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    padding: 10px 14px;
-    transition: border-color 0.2s;
-    outline: none;
-  }
-  .field input:focus,
-  .field select:focus,
-  .field textarea:focus { border-color: var(--gold); }
-  .field select option { background: var(--dark2); }
-  .field textarea { resize: vertical; min-height: 90px; }
-  input[type="date"] {
-    cursor: pointer;
-  }
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-    opacity: 0.6;
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    margin-left: 4px;
-  }
-  input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 1;
-  }
-  input[type="date"]:hover {
-    border-color: rgba(201,169,110,0.6);
-  }
-  /* Better select arrow */
-  .field select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239A9080' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
-  }
-  .field select:hover { border-color: rgba(201,169,110,0.6); }
-  /* Smooth focus ring */
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
-  }
-  /* Better placeholder */
-  .field input::placeholder, .field textarea::placeholder {
-    color: rgba(154,144,128,0.5);
-    font-size: 0.88rem;
-  }
-  /* Hover state for inputs */
-  .field input:hover, .field textarea:hover {
-    border-color: rgba(201,169,110,0.4);
-  }
-  /* Property card hover improvement */
-  .property-card {
-    transition: all 0.2s;
-  }
-  .property-card:hover {
-    border-color: rgba(201,169,110,0.6) !important;
-    transform: translateY(-2px);
-  }
-  /* Radio label hover */
-  .radio-label:hover {
-    border-color: var(--gold) !important;
-    color: var(--gold) !important;
-  }
-  /* Submit button pulse on hover */
-  .btn-primary {
-    transition: all 0.25s;
-  }
-  .btn-primary:not(:disabled):hover {
-    background: #D4B07A;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(201,169,110,0.25);
-  }
-  .btn-primary:not(:disabled):active {
-    transform: translateY(0);
-  }
+/* LISTING BODY */
+.listing-body { padding: 1.4rem; }
+.listing-address { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.4rem; }
+.listing-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.8rem; }
+.listing-specs { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.listing-spec { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-muted); }
+.listing-spec svg { width: 14px; height: 14px; opacity: 0.6; }
+.listing-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.2rem; }
+.listing-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.3rem; }
+.feature-tag { background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.2); color: var(--text-muted); padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; }
+.listing-price-row { display: flex; align-items: flex-end; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--border); gap: 1rem; }
+.price-block .kalt { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold); }
+.price-block .kalt span { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--text-muted); margin-left: 2px; }
+.price-block .warm { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+.btn-anfrage { background: var(--gold); border: none; color: var(--dark); padding: 10px 18px; border-radius: var(--radius); font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; text-decoration: none; display: inline-block; }
+.btn-anfrage:hover { background: #D4B07A; }
 
-  .field input[type="file"] {
-    padding: 8px 10px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-  }
-  .field input[type="file"]::file-selector-button {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--gold);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    padding: 4px 12px;
-    cursor: pointer;
-    margin-right: 10px;
-    transition: border-color 0.2s;
-  }
-  .field input[type="file"]::file-selector-button:hover { border-color: var(--gold); }
+/* LOCATION SECTION */
+.location-section { background: var(--dark2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.location-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 5rem 2rem; }
+.location-perks { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
+.perk { display: flex; gap: 12px; align-items: flex-start; }
+.perk-icon { width: 36px; height: 36px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+.perk-title { font-size: 0.88rem; font-weight: 500; margin-bottom: 2px; }
+.perk-sub { font-size: 0.78rem; color: var(--text-muted); }
+.map-placeholder { background: var(--dark3); border: 1px solid var(--border); border-radius: var(--radius-lg); height: 320px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--text-muted); font-size: 0.85rem; }
 
-  /* ===== RADIO / CHECKBOX GROUPS ===== */
-  .toggle-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .toggle-group label {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 14px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    transition: all 0.2s;
-    text-transform: none;
-    letter-spacing: 0;
-    font-weight: 400;
-  }
-  .toggle-group input { display: none; }
-  .toggle-group label:hover { border-color: var(--gold); color: var(--text); }
-  .toggle-group input:checked + span,
-  .toggle-group label:has(input:checked) {
-    border-color: var(--gold) !important;
-    color: var(--gold) !important;
-    background: rgba(201,169,110,0.08) !important;
-  }
+/* CTA SECTION */
+.cta-section { text-align: center; padding: 6rem 2rem; background: linear-gradient(180deg, var(--dark) 0%, #0E0C09 100%); }
+.cta-section h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 400; margin-bottom: 1rem; }
+.cta-section p { color: var(--text-muted); max-width: 440px; margin: 0 auto 2rem; font-size: 0.9rem; }
 
-  .radio-label { cursor: pointer; }
-  .radio-label input[type="radio"],
-  .radio-label input[type="checkbox"] {
-    width: 15px; height: 15px;
-    accent-color: var(--gold);
-    cursor: pointer;
-  }
+/* FOOTER */
+.site-footer { background: var(--dark2); border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-size: 0.78rem; color: var(--text-muted); }
+.site-footer a { color: var(--gold); text-decoration: none; }
 
-  /* ===== UPLOAD HINTS ===== */
-  .upload-hint {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    margin-top: 3px;
-  }
+/* ADMIN PANEL */
+.admin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; overflow-y: auto; padding: 2rem; }
+.admin-overlay.open { display: block; }
+.admin-panel { max-width: 900px; margin: 0 auto; background: #1A1A1A; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; }
+.admin-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.admin-panel-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold); }
+.close-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+.admin-login-box { max-width: 320px; margin: 0 auto; text-align: center; padding: 2rem 0; }
+.admin-login-box h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); margin-bottom: 0.5rem; }
+.admin-login-box p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.admin-login-box input { width: 100%; background: #111; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; padding: 10px 14px; outline: none; margin-bottom: 10px; }
+.admin-login-box input:focus { border-color: var(--gold); }
+.admin-login-box .err { color: #E8837F; font-size: 0.8rem; margin-bottom: 8px; display: none; }
 
-  /* ===== SUBMIT BUTTON ===== */
-  .btn-primary {
-    background: var(--gold);
-    color: var(--dark);
-    border: none;
-    padding: 14px 40px;
-    border-radius: var(--radius);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-  }
-  .btn-primary:hover { background: #D4B07A; transform: translateY(-1px); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* ADMIN LISTING EDITOR */
+.admin-listing-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.admin-listing-tab { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; transition: all 0.2s; }
+.admin-listing-tab.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
+.admin-listing-form { display: none; }
+.admin-listing-form.active { display: block; }
+.afield { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1rem; }
+.afield label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.afield input, .afield textarea, .afield select {
+  background: #111; border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+  padding: 9px 12px; outline: none; transition: border-color 0.2s;
+}
+.afield input:focus, .afield textarea:focus, .afield select:focus { border-color: var(--gold); }
+.afield textarea { min-height: 80px; resize: vertical; }
+.agrid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.agrid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.save-btn { background: var(--gold); border: none; color: var(--dark); padding: 11px 28px; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.save-btn:hover { background: #D4B07A; }
+.save-feedback { font-size: 0.82rem; color: #6DCEAA; margin-left: 12px; display: none; }
+.photo-url-list { display: flex; flex-direction: column; gap: 6px; }
+.photo-url-item { display: flex; gap: 8px; align-items: center; }
+.photo-url-item input { flex: 1; }
+.photo-url-item button { background: transparent; border: 1px solid rgba(224,82,82,0.4); color: #E8837F; padding: 6px 10px; border-radius: var(--radius); cursor: pointer; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; }
+.add-photo-btn { background: transparent; border: 1px dashed var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; margin-top: 6px; transition: all 0.2s; }
+.add-photo-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-  /* ===== SUCCESS / ERROR ===== */
-  .alert {
-    padding: 14px 18px;
-    border-radius: var(--radius);
-    font-size: 0.88rem;
-    margin-bottom: 1.5rem;
-    display: none;
-  }
-  .alert.success { background: rgba(76,175,136,0.12); border: 1px solid rgba(76,175,136,0.4); color: #6DCEAA; }
-  .alert.error { background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.4); color: #E8837F; }
-  .alert.show { display: block; }
+@media (max-width: 640px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-stats { gap: 1.5rem; }
+  .listings { grid-template-columns: 1fr; }
+  .location-inner { grid-template-columns: 1fr; }
+  .location-perks { grid-template-columns: 1fr; }
+  .agrid2, .agrid3 { grid-template-columns: 1fr; }
+}
 
-  /* ===== IMMOBILIEN CARDS ===== */
-  .property-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-  }
-  .property-card {
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-  }
-  .property-card:hover { border-color: var(--gold); }
-  .property-card.selected {
-    border-color: var(--gold);
-    background: rgba(201,169,110,0.08);
-  }
-  .property-card input[type="radio"] { position: absolute; opacity: 0; }
-  .property-card .prop-street {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  .property-card .prop-city {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-  }
-  .property-card .prop-check {
-    position: absolute;
-    top: 10px; right: 10px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    border: 1.5px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    transition: all 0.2s;
-  }
-  .property-card.selected .prop-check {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--dark);
-  }
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92); z-index: 300;
+  overflow-y: auto; padding: 2rem 1rem;
+}
+.modal-overlay.open { display: block; }
+.modal-box {
+  max-width: 900px; margin: 0 auto;
+  background: var(--dark2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  animation: modalIn 0.25s ease;
+}
+@keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.modal-gallery { position: relative; height: 420px; background: var(--dark3); }
+.modal-gallery img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 0.4s;
+}
+.modal-gallery img.active { opacity: 1; }
+.modal-gallery-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.6); border: none; color: white;
+  width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+  z-index: 10; transition: background 0.2s;
+}
+.modal-gallery-btn:hover { background: rgba(0,0,0,0.9); }
+.modal-gallery-btn.prev { left: 14px; }
+.modal-gallery-btn.next { right: 14px; }
+.modal-gallery-counter {
+  position: absolute; bottom: 14px; right: 16px;
+  background: rgba(0,0,0,0.6); color: white;
+  font-size: 0.78rem; padding: 4px 10px; border-radius: 20px; z-index: 10;
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(0,0,0,0.7); border: none; color: white;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+  z-index: 20; transition: background 0.2s;
+}
+.modal-close:hover { background: rgba(0,0,0,1); }
+.modal-body { padding: 2rem; }
+.modal-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+.modal-badge.frei { background: rgba(76,175,136,0.12); color: #6DCEAA; border: 1px solid rgba(76,175,136,0.3); }
+.modal-badge.vergeben { background: rgba(224,82,82,0.12); color: #E8837F; border: 1px solid rgba(224,82,82,0.3); }
+.modal-badge.demnachst { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
+.modal-address { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.5rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 1.2rem; }
+.modal-specs-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.modal-spec { text-align: center; }
+.modal-spec .val { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold); }
+.modal-spec .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 2px; }
+.modal-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+.modal-features { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1.5rem; }
+.modal-price-block { background: var(--dark3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.modal-price-block .kalt { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); }
+.modal-price-block .kalt span { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; color: var(--text-muted); margin-left: 4px; }
+.modal-price-breakdown { font-size: 0.82rem; color: var(--text-muted); line-height: 1.8; }
+.modal-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-thumbnails { display: flex; gap: 8px; overflow-x: auto; padding: 0 2rem 1.5rem; }
+.modal-thumb { width: 72px; height: 52px; border-radius: 6px; overflow: hidden; flex-shrink: 0; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+.modal-thumb.active { border-color: var(--gold); }
+.modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) {
+  .modal-gallery { height: 260px; }
+  .modal-body { padding: 1.2rem; }
+  .modal-title { font-size: 1.2rem; }
+}
 
-  /* ===== ADMIN LOGIN ===== */
-  .admin-login {
-    max-width: 380px;
-    margin: 8rem auto;
-    padding: 2.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    text-align: center;
-  }
-  .admin-login h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    color: var(--gold);
-    margin-bottom: 0.4rem;
-  }
-  .admin-login p {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
-  .admin-login input {
-    width: 100%;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    padding: 10px 14px;
-    outline: none;
-    margin-bottom: 10px;
-  }
-  .admin-login input:focus { border-color: var(--gold); }
-  .admin-login .error-msg { color: var(--danger); font-size: 0.8rem; margin-bottom: 8px; display: none; }
 
-  /* ===== ADMIN DASHBOARD ===== */
-  .admin-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2.5rem 2rem 5rem;
-  }
-  .admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .admin-header h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold); }
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin-bottom: 2rem;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem 1.2rem;
-  }
-  .stat-card .num { font-size: 1.8rem; font-weight: 300; color: var(--gold); font-family: 'Playfair Display', serif; }
-  .stat-card .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 2px; }
-
-  /* ===== APPLICATION CARDS ===== */
-  .app-list { display: flex; flex-direction: column; gap: 12px; }
-  .app-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-  .app-card-head {
-    padding: 1.1rem 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.2s;
-  }
-  .app-card-head:hover { background: rgba(255,255,255,0.03); }
-  .app-avatar {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: rgba(201,169,110,0.15);
-    border: 1px solid var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    color: var(--gold);
-    flex-shrink: 0;
-  }
-  .app-name { font-weight: 500; font-size: 0.95rem; }
-  .app-meta { font-size: 0.78rem; color: var(--text-muted); }
-  .app-status {
-    margin-left: auto;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-  .status-pending { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
-  .status-confirmed { background: rgba(76,175,136,0.12); color: #6DCEAA; border: 1px solid rgba(76,175,136,0.3); }
-  .status-rejected { background: rgba(224,82,82,0.12); color: #E8837F; border: 1px solid rgba(224,82,82,0.3); }
-  .app-chevron { color: var(--text-muted); font-size: 1rem; transition: transform 0.2s; }
-  .app-card.expanded .app-chevron { transform: rotate(180deg); }
-
-  .app-card-body {
-    display: none;
-    padding: 0 1.4rem 1.4rem;
-    border-top: 1px solid var(--border);
-  }
-  .app-card.expanded .app-card-body { display: block; }
-
-  .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 1.2rem 0;
-  }
-  .detail-item .dl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 3px; }
-  .detail-item .dv { font-size: 0.88rem; color: var(--text); }
-
-  .action-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-  .action-row .field { flex: 1; min-width: 200px; }
-  .btn-confirm {
-    background: rgba(76,175,136,0.15);
-    border: 1px solid rgba(76,175,136,0.5);
-    color: #6DCEAA;
-    padding: 10px 20px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .btn-confirm:hover { background: rgba(76,175,136,0.25); }
-  .btn-reject {
-    background: rgba(224,82,82,0.1);
-    border: 1px solid rgba(224,82,82,0.4);
-    color: #E8837F;
-    padding: 10px 20px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-  }
-  .btn-reject:hover { background: rgba(224,82,82,0.2); }
-
-  .filter-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.2rem;
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 6px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    transition: all 0.2s;
-  }
-  .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.08); }
-
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-  }
-  .empty-state .big { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.3; }
-
-  .action-feedback {
-    font-size: 0.82rem;
-    margin-top: 8px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    display: none;
-  }
-  .action-feedback.show { display: block; }
-  .action-feedback.ok { background: rgba(76,175,136,0.12); color: #6DCEAA; }
-  .action-feedback.err { background: rgba(224,82,82,0.12); color: #E8837F; }
-
-  /* ===== FOOTER ===== */
-  .site-footer {
-    text-align: center;
-    padding: 2rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
-  }
-
-  /* ===== UTIL ===== */
-  .mt-1 { margin-top: 0.5rem; }
-  .mt-2 { margin-top: 1rem; }
-  .mt-3 { margin-top: 1.5rem; }
-  .small { font-size: 0.78rem; color: var(--text-muted); }
-  .tag { display: inline-block; background: rgba(201,169,110,0.1); color: var(--gold); border: 1px solid rgba(201,169,110,0.25); border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
-
-  /* ===== ADMIN TABS ===== */
   .admin-tab {
     background: transparent;
     border: none;
@@ -626,1760 +282,428 @@
   }
   .admin-tab:hover { color: var(--text); }
   .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-
-  /* ===== CALENDAR ===== */
-  .cal-header-row {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
-  .cal-header-cell {
-    padding: 10px 0;
-    text-align: center;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-  .cal-grid-week {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
-  .cal-grid-week:last-child { border-bottom: none; }
-  .cal-day {
-    min-height: 90px;
-    padding: 8px;
-    border-right: 1px solid var(--border);
-    cursor: pointer;
-    transition: background 0.15s;
-    position: relative;
-  }
-  .cal-day:last-child { border-right: none; }
-  .cal-day:hover { background: rgba(201,169,110,0.05); }
-  .cal-day.other-month { opacity: 0.3; }
-  .cal-day.today .cal-day-num {
-    background: var(--gold);
-    color: var(--dark);
-    border-radius: 50%;
-    width: 24px; height: 24px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .cal-day-num {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    width: 24px; height: 24px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 4px;
-  }
-  .cal-event {
-    background: rgba(201,169,110,0.15);
-    border-left: 2px solid var(--gold);
-    border-radius: 3px;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    color: var(--gold);
-    margin-bottom: 3px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background 0.15s;
-  }
-  .cal-event:hover { background: rgba(201,169,110,0.3); }
-  .cal-event.rejected { border-color: #E8837F; color: #E8837F; background: rgba(224,82,82,0.1); }
-
-  /* Edit form in modal */
-  .edit-field { display:flex; flex-direction:column; gap:4px; }
-  .edit-field label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); }
-  .edit-field input, .edit-field select {
-    background: var(--dark); border: 1px solid var(--border);
-    border-radius: var(--radius); color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size:0.88rem;
-    padding: 8px 12px; outline: none;
-  }
-  .edit-field input:focus, .edit-field select:focus { border-color: var(--gold); }
-
-
-/* INSERAT MODAL */
-.ins-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:400; overflow-y:auto; padding:2rem 1rem; }
-.ins-overlay.open { display:block; }
-.ins-box { max-width:860px; margin:0 auto; background:#1E1E1E; border:1px solid rgba(201,169,110,0.2); border-radius:14px; overflow:hidden; animation:insIn 0.25s ease; }
-@keyframes insIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-.ins-gallery { position:relative; height:380px; background:#282828; }
-.ins-gallery img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.4s; }
-.ins-gallery img.active { opacity:1; }
-.ins-gallery-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.6); border:none; color:white; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:1.2rem; z-index:10; }
-.ins-gallery-btn.prev { left:12px; }
-.ins-gallery-btn.next { right:12px; }
-.ins-close { position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.7); border:none; color:white; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:1rem; z-index:20; }
-.ins-counter { position:absolute; bottom:12px; right:14px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; padding:3px 10px; border-radius:20px; z-index:10; }
-.ins-thumbs { display:flex; gap:8px; overflow-x:auto; padding:10px 1.5rem; }
-.ins-thumb { width:68px; height:50px; border-radius:6px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid transparent; transition:border-color 0.2s; }
-.ins-thumb.active { border-color:#C9A96E; }
-.ins-thumb img { width:100%; height:100%; object-fit:cover; }
-.ins-body { padding:1.5rem; }
-.ins-badge { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.8rem; }
-.ins-badge.frei { background:rgba(76,175,136,0.12); color:#6DCEAA; border:1px solid rgba(76,175,136,0.3); }
-.ins-badge.vergeben { background:rgba(224,82,82,0.12); color:#E8837F; border:1px solid rgba(224,82,82,0.3); }
-.ins-badge.demnachst { background:rgba(201,169,110,0.12); color:#C9A96E; border:1px solid rgba(201,169,110,0.3); }
-.ins-addr { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:#C9A96E; margin-bottom:0.4rem; }
-.ins-title { font-family:serif; font-size:1.4rem; margin-bottom:1rem; color:#E8E0D0; }
-.ins-specs { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid rgba(201,169,110,0.2); }
-.ins-spec .val { font-family:serif; font-size:1.2rem; color:#C9A96E; }
-.ins-spec .lbl { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#9A9080; margin-top:2px; }
-.ins-desc { font-size:0.88rem; color:#9A9080; line-height:1.7; margin-bottom:1rem; }
-.ins-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1rem; }
-.ins-tag { background:rgba(201,169,110,0.08); border:1px solid rgba(201,169,110,0.2); color:#9A9080; padding:3px 10px; border-radius:20px; font-size:0.7rem; }
-.ins-price { background:#282828; border:1px solid rgba(201,169,110,0.2); border-radius:8px; padding:1rem 1.2rem; margin-bottom:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-.ins-price .kalt { font-family:serif; font-size:1.6rem; color:#C9A96E; }
-.ins-price .kalt span { font-family:sans-serif; font-size:0.78rem; color:#9A9080; margin-left:4px; }
-.ins-price .breakdown { font-size:0.8rem; color:#9A9080; line-height:1.8; }
-@media(max-width:640px){ .ins-gallery{height:240px;} .ins-body{padding:1rem;} }
-
-
-  /* ADD APPLICATION MODAL */
-  #addAppModal input, #addAppModal select, #addAppModal textarea {
-    background: #111 !important;
-    border: 1px solid rgba(201,169,110,0.25) !important;
-    border-radius: var(--radius) !important;
-    color: var(--text) !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 0.88rem !important;
-    padding: 9px 12px !important;
-    outline: none !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    transition: border-color 0.2s !important;
-  }
-  #addAppModal input:focus, #addAppModal select:focus, #addAppModal textarea:focus {
-    border-color: var(--gold) !important;
-  }
-  #addAppModal input::placeholder, #addAppModal textarea::placeholder {
-    color: rgba(154,144,128,0.5) !important;
-  }
-  #addAppModal select option { background: #1A1A1A; }
-  #addAppModal label {
-    font-size: 0.72rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    color: var(--text-muted) !important;
-    display: block !important;
-    margin-bottom: 5px !important;
-    font-family: 'DM Sans', sans-serif !important;
-  }
-  #addAppModal textarea { min-height: 80px; resize: vertical; }
-
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="site-header">
-  <div class="logo">
-    Central City Apartment
-    <span>Dortmund</span>
-  </div>
-  <a href="index.html" class="nav-btn" style="text-decoration:none;">← Zur Übersicht</a>
-  <button class="nav-btn" id="adminToggleBtn" onclick="toggleAdminView()">Admin-Bereich</button>
+  <a href="#" class="logo">Central City Apartment<span>Dortmund</span></a>
+  <nav class="header-nav">
+    <a href="#wohnungen" class="btn-outline">Wohnungen</a>
+    <a href="#lage" class="btn-outline">Lage</a>
+    <a href="central-city-apartment.html" class="btn-gold">Jetzt bewerben</a>
+    <button class="btn-outline" onclick="openAdmin()">Admin</button>
+  </nav>
 </header>
 
-<!-- ===== VIEW: FORM ===== -->
-<div id="viewForm" class="view active">
-  <div class="hero">
-    <p class="hero-eyebrow">Mietinteressen</p>
-    <h1>Ihr Traumzuhause<br>in Dortmund</h1>
-    <div class="hero-divider"></div>
-    <p>Füllen Sie das kurze Formular aus – wir melden uns zeitnah bei Ihnen.</p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://i.imgur.com/eHDVBnW.jpeg" alt="Wohnung" class="active" id="heroBg0">
+    <img src="https://i.imgur.com/KeWNZ3v.jpeg" alt="Wohnung" id="heroBg1">
   </div>
+  <p class="hero-eyebrow">Herzlich Willkommen</p>
+  <h1>Wohnen im Herzen<br>von <em>Dortmund</em></h1>
+  <div class="hero-line"></div>
+  <p>Moderne, voll möblierte Wohnungen in zentraler Lage – ideal für Singles, Paare, Pendler und Monteure.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">6</div><div class="lbl">Wohnungen</div></div>
+    <div class="hero-stat"><div class="num">34–49</div><div class="lbl">Quadratmeter</div></div>
+    <div class="hero-stat"><div class="num">100%</div><div class="lbl">Möbliert</div></div>
+  </div>
+  <a href="#wohnungen" class="btn-gold">Alle Inserate ansehen</a>
+  <div class="scroll-hint"><div class="scroll-arrow"></div>Scrollen</div>
+</section>
 
-  <!-- ===== KURZES KONTAKTFORMULAR ===== -->
-  <div class="form-container">
-    <div id="shortFormAlert" class="alert"></div>
+<!-- LISTINGS -->
+<section class="section" id="wohnungen">
+  <div class="section-header">
+    <p class="section-eyebrow">Verfügbare Wohnungen</p>
+    <h2 class="section-title">Unsere Inserate</h2>
+    <p class="section-sub">Alle Wohnungen voll möbliert und sofort bezugsfertig</p>
+  </div>
+  <div class="listings" id="listingsContainer"></div>
+</section>
 
-    <div class="form-section" style="border:1px solid rgba(201,169,110,0.5);">
-      <h2 class="section-title" style="color:var(--gold);">Besichtigung anfragen</h2>
-      <p class="section-sub">Das reicht uns für den ersten Schritt – wir melden uns bei Ihnen.</p>
-
-      <form id="shortForm" onsubmit="submitShortForm(event)">
-
-        <div class="form-section" style="border:none;padding:0;background:transparent;">
-          <h2 class="section-title">Gewünschte Wohnung</h2>
-          <p class="section-sub">Sie können auch mehrere auswählen</p>
-          <div class="property-grid" id="propertyGridShort"></div>
-          <input type="hidden" id="selectedPropertyShort" name="property" required>
-        </div>
-
-        <div class="grid-2" style="margin-top:1.5rem;">
-          <div class="field">
-            <label>Vorname <span class="req">*</span></label>
-            <input type="text" name="firstName" required placeholder="Max">
-          </div>
-          <div class="field">
-            <label>Nachname <span class="req">*</span></label>
-            <input type="text" name="lastName" required placeholder="Mustermann">
-          </div>
-          <div class="field">
-            <label>E-Mail <span class="req">*</span></label>
-            <input type="email" name="email" required placeholder="max@beispiel.de">
-          </div>
-          <div class="field">
-            <label>Telefon <span class="req">*</span></label>
-            <input type="tel" name="phone" required placeholder="+49 231 123456">
-          </div>
-          <div class="field">
-            <label>Beschäftigungsart <span class="req">*</span></label>
-            <select name="employmentStatus" required>
-              <option value="">– bitte wählen –</option>
-              <option>Festangestellt (unbefristet)</option>
-              <option>Festangestellt (befristet)</option>
-              <option>Selbstständig / Freiberuflich</option>
-              <option>Beamter/in</option>
-              <option>Student/in</option>
-              <option>Auszubildende/r</option>
-              <option>Rentner/in</option>
-              <option>Arbeitslos / Bürgergeld</option>
-              <option>Sonstiges</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Nettoeinkommen / Monat (€) <span class="req">*</span></label>
-            <input type="number" name="netIncome" required placeholder="2200" min="0">
-          </div>
-          <div class="field">
-            <label>Wunschbesichtigung <span class="req">*</span></label>
-            <input type="date" onclick="try{this.showPicker()}catch(e){}" name="viewingDate" required>
-          </div>
-          <div class="field">
-            <label>Bevorzugte Uhrzeit</label>
-            <select name="viewingTime">
-              <option value="">– bitte wählen –</option>
-              <option>09:00–11:00 Uhr</option>
-              <option>11:00–13:00 Uhr</option>
-              <option>13:00–15:00 Uhr</option>
-              <option>15:00–17:00 Uhr</option>
-              <option>17:00–19:00 Uhr</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mt-2">
-          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:8px;">Besichtigungsart</label>
-          <div class="toggle-group">
-            <label class="radio-label"><input type="radio" name="viewingType" value="Vor Ort"><span>Vor Ort</span></label>
-            <label class="radio-label"><input type="radio" name="viewingType" value="Online (Video-Call)"><span>Online (Video-Call)</span></label>
-            <label class="radio-label"><input type="radio" name="viewingType" value="Beides möglich"><span>Beides möglich</span></label>
-          </div>
-        </div>
-
-        <div class="field mt-2">
-          <label>Dokumente anhängen (Schufa, Einkommensnachweis etc.)</label>
-          <input type="file" name="shortDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
-          <p class="upload-hint">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>
-        </div>
-
-        <div class="field mt-2">
-          <label>Sonstige Bemerkungen</label>
-          <textarea name="remarks" placeholder="Besondere Wünsche, Fragen oder Anmerkungen…" style="min-height:100px;"></textarea>
-        </div>
-
-        <div style="display:flex;gap:10px;align-items:flex-start;margin-top:1.5rem;">
-          <input type="checkbox" id="shortPrivacy" required style="margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;">
-          <label for="shortPrivacy" style="font-size:0.85rem;color:var(--text-muted);cursor:pointer;">
-            Ich stimme zu, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden. <span class="req">*</span>
-          </label>
-        </div>
-
-        <button type="submit" class="btn-primary" id="shortSubmitBtn" style="margin-top:1.5rem;">
-          Besichtigung anfragen
-        </button>
-      </form>
+<!-- LAGE -->
+<section class="location-section" id="lage">
+  <div class="location-inner">
+    <div>
+      <p class="section-eyebrow">Standort</p>
+      <h2 class="section-title" style="text-align:left; margin-bottom:1rem;">Zentrale Lage<br>in Dortmund</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.7; margin-bottom:0.5rem;">Die Wohnungen befinden sich in zentralen Dortmunder Stadtteilen – alles was man braucht ist fußläufig oder mit öffentlichen Verkehrsmitteln schnell erreichbar.</p>
+      <div class="location-perks">
+        <div class="perk"><div class="perk-icon">🚇</div><div><div class="perk-title">ÖPNV</div><div class="perk-sub">Bus & Bahn in wenigen Minuten</div></div></div>
+        <div class="perk"><div class="perk-icon">🛒</div><div><div class="perk-title">Einkaufen</div><div class="perk-sub">Supermärkte in der Nähe</div></div></div>
+        <div class="perk"><div class="perk-icon">🍽️</div><div><div class="perk-title">Gastronomie</div><div class="perk-sub">Restaurants & Cafés direkt um die Ecke</div></div></div>
+        <div class="perk"><div class="perk-icon">🏫</div><div><div class="perk-title">Schulen</div><div class="perk-sub">Kitas und Schulen in der Nähe</div></div></div>
+        <div class="perk"><div class="perk-icon">🏥</div><div><div class="perk-title">Ärzte</div><div class="perk-sub">Medizinische Versorgung gut erreichbar</div></div></div>
+        <div class="perk"><div class="perk-icon">🚗</div><div><div class="perk-title">Autobahn</div><div class="perk-sub">A40 / A45 schnell erreichbar</div></div></div>
+      </div>
     </div>
-
-    <!-- VOLLSTÄNDIGE SELBSTAUSKUNFT -->
-    <div style="text-align:center;margin:2rem 0 1rem;">
-      <button id="toggleFullFormBtn" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:12px 28px;border-radius:var(--radius);font-family:sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;">
-        Optional: Vollständige Selbstauskunft ausfüllen ▾
-      </button>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">Beschleunigt den Prozess – erhöht Ihre Chancen bei mehreren Interessenten</p>
+    <div class="map-placeholder">
+      <div style="font-size:2rem;">📍</div>
+      <div>Dortmund, NRW</div>
+      <div style="font-size:0.75rem; margin-top:4px;">Herderstraße 16, 44147 Dortmund</div>
     </div>
+  </div>
+</section>
 
-    <div id="fullFormWrapper" style="display:none;">
-      <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-muted);">
-        💡 Die vollständige Selbstauskunft ist <strong style="color:var(--text);">freiwillig</strong>. Sie können sie jetzt ausfüllen oder auch später nachreichen.
-      </div>
-<form id="applicationForm" onsubmit="submitForm(event)">
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-eyebrow">Interesse?</p>
+  <h2>Jetzt Besichtigung anfragen</h2>
+  <p>Füllen Sie das Bewerbungsformular aus – wir melden uns schnellstmöglich bei Ihnen.</p>
+  <a href="central-city-apartment.html" class="btn-gold" style="font-size:0.95rem; padding:14px 36px;">Zum Bewerbungsformular</a>
+</section>
 
-      <!-- IMMOBILIE -->
-      <div class="form-section">
-        <h2 class="section-title">Gewünschte Immobilie</h2>
-        <p class="section-sub">Wählen Sie eine oder mehrere Wohneinheiten, für die Sie sich interessieren</p>
-        <div class="property-grid" id="propertyGrid">
-          <!-- generated by JS -->
-        </div>
-        <input type="hidden" id="selectedProperty" name="property" required>
-      </div>
+<footer class="site-footer">
+  Central City Apartment Dortmund &nbsp;·&nbsp; <a href="mailto:info@centralcityapartments.de">info@centralcityapartments.de</a> &nbsp;·&nbsp; <a href="tel:+4917826871170"></a>
+</footer>
 
-      <!-- PERSÖNLICHE DATEN -->
-      <div class="form-section">
-        <h2 class="section-title">Persönliche Daten</h2>
-        <p class="section-sub">Angaben zur Hauptmietperson</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Vorname <span class="req">*</span></label>
-            <input type="text" name="firstName" required placeholder="Max">
-          </div>
-          <div class="field">
-            <label>Nachname <span class="req">*</span></label>
-            <input type="text" name="lastName" required placeholder="Mustermann">
-          </div>
-          <div class="field">
-            <label>Geburtsdatum <span class="req">*</span></label>
-            <input type="date" onclick="try{this.showPicker()}catch(e){}" name="birthdate" required>
-          </div>
-          <div class="field">
-            <label>Geburtsort</label>
-            <input type="text" name="birthplace" placeholder="Dortmund">
-          </div>
-          <div class="field">
-            <label>Staatsangehörigkeit <span class="req">*</span></label>
-            <input type="text" name="nationality" required placeholder="Deutsch">
-          </div>
-          <div class="field">
-            <label>Ausweisnummer / Personalausweis</label>
-            <input type="text" name="idNumber" placeholder="L01X00T47">
-          </div>
-        </div>
-      </div>
 
-      <!-- KONTAKT -->
-      <div class="form-section">
-        <h2 class="section-title">Kontaktdaten</h2>
-        <p class="section-sub">Ihre aktuelle Wohnanschrift und Erreichbarkeit</p>
-        <div class="grid-2">
-          <div class="field span-2">
-            <label>Straße und Hausnummer <span class="req">*</span></label>
-            <input type="text" name="street" required placeholder="Musterstraße 12">
-          </div>
-          <div class="field">
-            <label>PLZ <span class="req">*</span></label>
-            <input type="text" name="zip" required placeholder="44135">
-          </div>
-          <div class="field">
-            <label>Ort <span class="req">*</span></label>
-            <input type="text" name="city" required placeholder="Dortmund">
-          </div>
-          <div class="field">
-            <label>Telefon <span class="req">*</span></label>
-            <input type="tel" name="phone" required placeholder="+49 231 123456">
-          </div>
-          <div class="field">
-            <label>E-Mail-Adresse <span class="req">*</span></label>
-            <input type="email" name="email" required placeholder="max@beispiel.de">
-          </div>
-        </div>
-      </div>
-
-      <!-- WOHNVERHÄLTNIS -->
-      <div class="form-section">
-        <h2 class="section-title">Aktuelle Wohnsituation</h2>
-        <p class="section-sub">Informationen zu Ihrer bisherigen Unterkunft</p>
-        <div class="grid-2">
-          <div class="field span-2">
-            <label>Derzeitiger Vermieter / Vermieterinfo</label>
-            <input type="text" name="currentLandlord" placeholder="Name und Kontakt des aktuellen Vermieters">
-          </div>
-          <div class="field">
-            <label>Aktuelle Monatsmiete (€)</label>
-            <input type="number" name="currentRent" placeholder="650" min="0">
-          </div>
-          <div class="field">
-            <label>Mietdauer dort (seit)</label>
-            <input type="month" name="rentSince">
-          </div>
-          <div class="field">
-            <label>Kündigungsfrist / Auszugsdatum</label>
-            <input type="text" name="noticeperiod" placeholder="3 Monate / 01.09.2025">
-          </div>
-          <div class="field">
-            <label>Grund für den Umzug</label>
-            <input type="text" name="moveReason" placeholder="Beruflich, Vergrößerung, …">
-          </div>
-        </div>
-      </div>
-
-      <!-- EINZUG & TERMINE -->
-      <div class="form-section">
-        <h2 class="section-title">Einzug & Besichtigung</h2>
-        <p class="section-sub">Wunschtermine – wir versuchen, diese zu berücksichtigen</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Wunscheinzugstermin <span class="req">*</span></label>
-            <input type="date" onclick="try{this.showPicker()}catch(e){}" name="moveInDate" required>
-          </div>
-          <div class="field">
-            <label>Wunschtermin Besichtigung <span class="req">*</span></label>
-            <input type="date" onclick="try{this.showPicker()}catch(e){}" name="viewingDate" required>
-          </div>
-          <div class="field">
-            <label>Bevorzugte Uhrzeit Besichtigung</label>
-            <select name="viewingTime">
-              <option value="">– bitte wählen –</option>
-              <option>09:00–11:00 Uhr</option>
-              <option>11:00–13:00 Uhr</option>
-              <option>13:00–15:00 Uhr</option>
-              <option>15:00–17:00 Uhr</option>
-              <option>17:00–19:00 Uhr</option>
-            </select>
-          </div>
-          <div class="field span-2">
-            <label>Besichtigungsart <span class="req">*</span></label>
-            <div class="toggle-group" id="viewingTypeGroup">
-              <label class="radio-label"><input type="radio" name="viewingType" value="Vor Ort"><span>Vor Ort</span></label>
-              <label class="radio-label"><input type="radio" name="viewingType" value="Online (Video-Call)"><span>Online (Video-Call)</span></label>
-              <label class="radio-label"><input type="radio" name="viewingType" value="Beides möglich"><span>Beides möglich</span></label>
-            </div>
-          </div>
-          <div class="field">
-            <label>Alternativtermin Besichtigung</label>
-            <input type="date" onclick="try{this.showPicker()}catch(e){}" name="viewingDateAlt">
-          </div>
-        </div>
-      </div>
-
-      <!-- HAUSHALT -->
-      <div class="form-section">
-        <h2 class="section-title">Haushalt & Mitbewohner</h2>
-        <p class="section-sub">Angaben zu allen einziehenden Personen</p>
-        <div class="grid-3">
-          <div class="field">
-            <label>Anzahl Personen gesamt <span class="req">*</span></label>
-            <select name="totalPersons" required>
-              <option value="">–</option>
-              <option value="1">1 Person</option>
-              <option value="2">2 Personen</option>
-              <option value="3">3 Personen</option>
-              <option value="4">4 Personen</option>
-              <option value="5+">5 oder mehr</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Davon Kinder</label>
-            <select name="children">
-              <option value="0">Keine</option>
-              <option value="1">1 Kind</option>
-              <option value="2">2 Kinder</option>
-              <option value="3+">3 oder mehr</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Alter der Kinder</label>
-            <input type="text" name="childrenAges" placeholder="z.B. 3, 7, 12 Jahre">
-          </div>
-        </div>
-        <div class="mt-2">
-          <div class="field">
-            <label>Namen & Geburtsdaten weiterer einziehender Personen (Erwachsene)</label>
-            <textarea name="coResidents" placeholder="z.B. Anna Mustermann, 12.05.1990&#10;Weitere Personen..."></textarea>
-          </div>
-        </div>
-        <div class="mt-2 grid-2">
-          <div class="field">
-            <label>Haustiere <span class="req">*</span></label>
-            <select name="pets" required>
-              <option value="Keine">Keine Haustiere</option>
-              <option value="Hund">Hund</option>
-              <option value="Katze">Katze</option>
-              <option value="Kleintiere">Kleintiere (Hamster, Vögel, etc.)</option>
-              <option value="Mehrere">Mehrere Tiere</option>
-              <option value="Sonstige">Sonstige</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Art / Rasse (bei Haustieren)</label>
-            <input type="text" name="petDetails" placeholder="z.B. Labrador, kastriert">
-          </div>
-        </div>
-        <div class="mt-2">
-          <label style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display:block; margin-bottom:8px;">Raucher?</label>
-          <div class="toggle-group" id="smokerGroup">
-            <label class="radio-label"><input type="radio" name="smoker" value="Nichtraucher"><span>Nichtraucher</span></label>
-            <label class="radio-label"><input type="radio" name="smoker" value="Raucher (draußen)"><span>Raucher (nur draußen)</span></label>
-            <label class="radio-label"><input type="radio" name="smoker" value="Raucher"><span>Raucher (in der Wohnung)</span></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- BERUF & EINKOMMEN -->
-      <div class="form-section">
-        <h2 class="section-title">Beruf & Einkommen</h2>
-        <p class="section-sub">Angaben zur finanziellen Situation</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Beruf / Tätigkeit <span class="req">*</span></label>
-            <input type="text" name="occupation" required placeholder="Softwareentwickler, Krankenpfleger, …">
-          </div>
-          <div class="field">
-            <label>Beschäftigungsstatus <span class="req">*</span></label>
-            <select name="employmentStatus" required>
-              <option value="">– bitte wählen –</option>
-              <option>Festangestellt (unbefristet)</option>
-              <option>Festangestellt (befristet)</option>
-              <option>Selbstständig / Freiberuflich</option>
-              <option>Beamter/in</option>
-              <option>Student/in</option>
-              <option>Auszubildende/r</option>
-              <option>Rentner/in</option>
-              <option>Arbeitslos / Bürgergeld</option>
-              <option>Sonstiges</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Arbeitgeber / Unternehmen</label>
-            <input type="text" name="employer" placeholder="Name des Arbeitgebers">
-          </div>
-          <div class="field">
-            <label>Beschäftigt seit</label>
-            <input type="month" name="employedSince">
-          </div>
-          <div class="field">
-            <label>Nettoeinkommen pro Monat (€) <span class="req">*</span></label>
-            <input type="number" name="netIncome" required placeholder="2200" min="0">
-          </div>
-          <div class="field">
-            <label>Zusätzliche Einnahmen (€/Monat)</label>
-            <input type="number" name="additionalIncome" placeholder="0" min="0">
-          </div>
-          <div class="field span-2">
-            <label>Art der zusätzlichen Einnahmen</label>
-            <input type="text" name="additionalIncomeType" placeholder="Kindergeld, Unterhalt, Vermietung, Nebenjob, …">
-          </div>
-        </div>
-        <div class="mt-2">
-          <label style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display:block; margin-bottom:8px;">Bürgergeld / Transferleistungen?</label>
-          <div class="toggle-group">
-            <label class="radio-label"><input type="radio" name="welfare" value="Nein"><span>Nein</span></label>
-            <label class="radio-label"><input type="radio" name="welfare" value="Ja (teilweise)"><span>Ja (teilweise)</span></label>
-            <label class="radio-label"><input type="radio" name="welfare" value="Ja (vollständig)"><span>Ja (vollständig)</span></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- BONITÄT -->
-      <div class="form-section">
-        <h2 class="section-title">Bonität & Schufa</h2>
-        <p class="section-sub">Angaben zu Ihrer finanziellen Zuverlässigkeit</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Schufa-Auskunft vorhanden?</label>
-            <select name="schufaAvailable">
-              <option value="Nein">Nein, noch nicht</option>
-              <option value="Ja">Ja, wird hochgeladen</option>
-              <option value="Angefordert">Gerade angefordert</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Schufa-Score (falls bekannt)</label>
-            <input type="text" name="schufaScore" placeholder="z.B. 97,5% oder 452 Punkte">
-          </div>
-          <div class="field">
-            <label>Offene Schulden / Insolvenz?</label>
-            <select name="debts">
-              <option value="Nein">Nein</option>
-              <option value="Ja (wird erläutert)">Ja (wird erläutert)</option>
-              <option value="Privatinsolvenz laufend">Privatinsolvenz laufend</option>
-              <option value="Privatinsolvenz abgeschlossen">Privatinsolvenz abgeschlossen</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Bisherige Mietschulden?</label>
-            <select name="rentDebts">
-              <option value="Nein">Nein</option>
-              <option value="Ja (wird erläutert)">Ja (wird erläutert)</option>
-            </select>
-          </div>
-          <div class="field span-2">
-            <label>Ergänzende Erläuterungen zur Bonität</label>
-            <textarea name="creditExplanation" placeholder="Erklärung zu Einträgen, besonderen Umständen, etc."></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- BÜRGSCHAFT -->
-      <div class="form-section">
-        <h2 class="section-title">Bürgschaft</h2>
-        <p class="section-sub">Falls vorhanden – freiwillige Angabe</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Bürge vorhanden?</label>
-            <select name="guarantor">
-              <option value="Nein">Nein</option>
-              <option value="Ja">Ja</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Name des Bürgen</label>
-            <input type="text" name="guarantorName" placeholder="Max Bürge">
-          </div>
-          <div class="field">
-            <label>Kontakt Bürge (Telefon/E-Mail)</label>
-            <input type="text" name="guarantorContact" placeholder="+49 231 …">
-          </div>
-          <div class="field">
-            <label>Nettoeinkommen Bürge (€/Monat)</label>
-            <input type="number" name="guarantorIncome" placeholder="2000" min="0">
-          </div>
-        </div>
-      </div>
-
-      <!-- DOKUMENTE HOCHLADEN -->
-      <div class="form-section">
-        <h2 class="section-title">Dokumente & Nachweise</h2>
-        <p class="section-sub">Bitte laden Sie die relevanten Dokumente hoch (PDF, JPG, PNG – max. 10 MB je Datei)</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Einkommensnachweise (letzte 3 Monate)</label>
-            <input type="file" name="incomeProof" accept=".pdf,.jpg,.jpeg,.png" multiple>
-            <p class="upload-hint">Gehaltsabrechnungen, Rentenbescheid, etc.</p>
-          </div>
-          <div class="field">
-            <label>Schufa-Auskunft</label>
-            <input type="file" name="schufaDoc" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Nicht älter als 3 Monate</p>
-          </div>
-          <div class="field">
-            <label>Personalausweis / Reisepass (Vorder- & Rückseite)</label>
-            <input type="file" name="idDoc" accept=".pdf,.jpg,.jpeg,.png" multiple>
-          </div>
-          <div class="field">
-            <label>Bürgschaftserklärung</label>
-            <input type="file" name="guarantorDoc" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Nur falls Bürge vorhanden</p>
-          </div>
-          <div class="field">
-            <label>Jobcenter-Bescheid / Bürgergeld-Bewilligung</label>
-            <input type="file" name="welfareLetter" accept=".pdf,.jpg,.jpeg,.png">
-          </div>
-          <div class="field">
-            <label>Mietschuldenfreiheitsbescheinigung</label>
-            <input type="file" name="noDebtCert" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Vom aktuellen Vermieter ausgestellt</p>
-          </div>
-          <div class="field">
-            <label>Sonstige Unterlagen</label>
-            <input type="file" name="otherDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
-          </div>
-        </div>
-        <p class="small mt-2">⚠ Die Datei-Anhänge werden nur lokal gespeichert und nicht auf externe Server übertragen. Für die spätere Weiterleitung per E-Mail empfehlen wir, Dokumente bei Bedarf nachzureichen.</p>
-      </div>
-
-      <!-- SONSTIGES -->
-      <div class="form-section">
-        <h2 class="section-title">Sonstige Angaben</h2>
-        <p class="section-sub">Ergänzende Informationen zu Ihrer Bewerbung</p>
-        <div class="grid-2">
-          <div class="field">
-            <label>Fahrzeug vorhanden (Stellplatz erwünscht)?</label>
-            <select name="parkingNeeded">
-              <option value="Nein">Nein</option>
-              <option value="Ja, 1 PKW">Ja, 1 PKW</option>
-              <option value="Ja, 2 PKW">Ja, 2 PKW</option>
-              <option value="Motorrad">Motorrad</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Heimarbeit / Homeoffice?</label>
-            <select name="homeOffice">
-              <option value="Nein">Nein</option>
-              <option value="Teilweise">Teilweise</option>
-              <option value="Vollzeit Homeoffice">Vollzeit Homeoffice</option>
-              <option value="Gewerbliche Nutzung">Gewerbliche Nutzung geplant</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Musikinstrument(e)?</label>
-            <input type="text" name="instrument" placeholder="z.B. Klavier, Gitarre – oder: Nein">
-          </div>
-          <div class="field">
-            <label>Wie sind Sie auf uns aufmerksam geworden?</label>
-            <select name="heardFrom">
-              <option value="">– bitte wählen –</option>
-              <option>ImmoScout24</option>
-              <option>Immowelt</option>
-              <option>Kleinanzeigen (eBay)</option>
-              <option>Instagram / Social Media</option>
-              <option>Empfehlung</option>
-              <option>Sonstiges</option>
-            </select>
-          </div>
-        </div>
-        <div class="mt-2">
-          <div class="field">
-            <label>Sonstige Bemerkungen / Nachricht an uns</label>
-            <textarea name="remarks" placeholder="Besondere Wünsche, Fragen, Anmerkungen zu Ihrer Situation…" style="min-height:120px;"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- DATENSCHUTZ -->
-      <div class="form-section">
-        <h2 class="section-title">Datenschutz & Einwilligung</h2>
-        <div style="display:flex; gap:10px; align-items:flex-start; margin-top:0.5rem;">
-          <input type="checkbox" id="privacy" name="privacy" required style="margin-top:3px; accent-color: var(--gold); width:16px; height:16px; flex-shrink:0;">
-          <label for="privacy" style="font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-            Ich stimme zu, dass meine Angaben zum Zweck der Wohnungsbewerbung gespeichert und verarbeitet werden. Die Daten werden ausschließlich von Central City Apartment Dortmund genutzt und nicht an Dritte weitergegeben. <span class="req">*</span>
-          </label>
-        </div>
-        <div style="display:flex; gap:10px; align-items:flex-start; margin-top:1rem;">
-          <input type="checkbox" id="accuracy" name="accuracy" required style="margin-top:3px; accent-color: var(--gold); width:16px; height:16px; flex-shrink:0;">
-          <label for="accuracy" style="font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-            Ich bestätige, dass alle gemachten Angaben der Wahrheit entsprechen. Mir ist bekannt, dass falsche Angaben zur sofortigen Ablehnung oder Kündigung des Mietvertrages führen können. <span class="req">*</span>
-          </label>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-primary" id="submitBtn">
-        Bewerbung absenden
-      </button>
-
-    </form>
-
-    </div><!-- end fullFormWrapper -->
-  </div><!-- end form-container -->
+<!-- LISTING MODAL -->
+<div class="modal-overlay" id="listingModal" onclick="handleModalClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-gallery" id="modalGallery">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-gallery-btn prev" onclick="modalSlide(-1)">‹</button>
+      <button class="modal-gallery-btn next" onclick="modalSlide(1)">›</button>
+      <div class="modal-gallery-counter" id="modalCounter">1 / 1</div>
+    </div>
+    <div class="modal-thumbnails" id="modalThumbs"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
 </div>
 
-<!-- ===== VIEW: ADMIN ===== -->
-<div id="viewAdmin" class="view">
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-panel">
+    <div class="admin-panel-header">
+      <h2>Inserate verwalten</h2>
+      <button class="close-btn" onclick="closeAdmin()">✕</button>
+    </div>
 
-  <!-- LOGIN -->
-  <div id="adminLogin" class="admin-login">
-    <h2>Admin-Bereich</h2>
-    <p>Central City Apartment Dortmund</p>
-    <div id="loginError" class="error-msg">Falsches Passwort.</div>
-    <input type="password" id="adminPass" placeholder="Passwort" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button class="btn-primary" onclick="adminLogin()">Einloggen</button>
-  </div>
+    <!-- LOGIN -->
+    <div id="adminLoginBox" class="admin-login-box">
+      <h3>Admin-Zugang</h3>
+      <p>Central City Apartment Dortmund</p>
+      <div id="adminLoginErr" class="err">Falsches Passwort.</div>
+      <input type="password" id="adminPw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doAdminLogin()">
+      <button class="save-btn" style="width:100%" onclick="doAdminLogin()">Einloggen</button>
+    </div>
 
-  <!-- DASHBOARD -->
-  <div id="adminDashboard" style="display:none;">
-    <div class="admin-container">
-      <div class="admin-header">
-        <div>
-          <h2>Bewerbungseingang</h2>
-          <p style="font-size:0.8rem; color:var(--text-muted);">Central City Apartment Dortmund</p>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <button onclick="showAddApplicationModal()" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.4);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.78rem;">+ Bewerbung</button>
-          <button onclick="exportCSV()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ CSV Export</button>
-          <button onclick="exportICS()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:7px 14px; border-radius:var(--radius); cursor:pointer; font-family:sans-serif; font-size:0.78rem; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↓ Kalender (.ics)</button>
-          <button class="btn-reject" onclick="adminLogout()">Abmelden</button>
-        </div>
-      </div>
-
-      <div class="stats-row" id="statsRow"></div>
-
-      <!-- ADMIN TABS -->
-      <div style="display:flex; gap:0; margin-bottom:1.5rem; border-bottom:1px solid var(--border);">
-        <button class="admin-tab active" id="tab-bewerbungen" onclick="switchAdminTab('bewerbungen')">Bewerbungen</button>
-        <button class="admin-tab" id="tab-kalender" onclick="switchAdminTab('kalender')">Terminkalender</button>
+    <!-- EDITOR -->
+    <div id="adminEditor" style="display:none;">
+      <!-- TABS -->
+      <div style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid var(--border);">
+        <button class="admin-tab active" id="tab-inserate" onclick="switchAdminTab('inserate')">Inserate</button>
         <button class="admin-tab" id="tab-settings" onclick="switchAdminTab('settings')">Einstellungen</button>
       </div>
 
-      <!-- TAB: BEWERBUNGEN -->
-      <div id="tabContent-bewerbungen">
-        <div class="filter-row">
-          <button class="filter-btn active" onclick="setFilter('all', this)">Alle</button>
-          <button class="filter-btn" onclick="setFilter('pending', this)">Ausstehend</button>
-          <button class="filter-btn" onclick="setFilter('confirmed', this)">Bestätigt</button>
-          <button class="filter-btn" onclick="setFilter('rejected', this)">Abgelehnt</button>
-          <button class="filter-btn" onclick="setFilter('favorite', this)">⭐ Favoriten</button>
-        </div>
-        <div class="app-list" id="appList"></div>
-      </div>
-
-      <!-- TAB: KALENDER -->
-      <div id="tabContent-kalender" style="display:none;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <button onclick="calPrev()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">‹</button>
-            <span id="calMonthLabel" style="font-family:serif; font-size:1.2rem; color:var(--gold); min-width:200px; text-align:center;"></span>
-            <button onclick="calNext()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:var(--radius); cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">›</button>
-          </div>
-          <button onclick="goToday()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:6px 16px; border-radius:var(--radius); cursor:pointer; font-size:0.8rem; font-family:sans-serif;">Heute</button>
-        </div>
-        <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
-          <div id="calGrid"></div>
-        </div>
-        <div id="calModal" style="display:none; margin-top:1.5rem; background:var(--surface); border:1px solid var(--gold); border-radius:var(--radius-lg); padding:1.5rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h3 style="font-family:serif; color:var(--gold); font-size:1rem;" id="modalTitle">Termin</h3>
-            <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.3rem; line-height:1;">✕</button>
-          </div>
-          <div id="modalContent"></div>
-        </div>
-      </div>
-
       <!-- TAB: INSERATE -->
-      <div id="tabContent-inserate" style="display:none;">
+      <div id="tabContent-inserate">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-          <div style="font-size:0.85rem;color:var(--text-muted);">Inserate verwalten — Änderungen werden live auf der Webseite angezeigt</div>
-          <button onclick="alert('Inserate werden auf der Hauptseite verwaltet')" style="background:var(--gold);border:none;color:var(--dark);padding:8px 18px;border-radius:var(--radius);cursor:pointer;font-family:sans-serif;font-size:0.82rem;font-weight:500;">+ Neues Inserat</button>
+          <div style="font-size:0.85rem;color:var(--text-muted);">Änderungen sind sofort live sichtbar</div>
+          <button onclick="addNewListing()" style="background:var(--gold);border:none;color:var(--dark);padding:8px 18px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;">+ Neues Inserat</button>
         </div>
-        <div id="inserateList"></div>
+        <div id="inserateList"><div style="color:var(--text-muted);font-size:0.85rem;">Wird geladen...</div></div>
       </div>
 
       <!-- TAB: EINSTELLUNGEN -->
       <div id="tabContent-settings" style="display:none;">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
-            <div style="width:40px;height:40px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📧</div>
-            <div>
-              <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);">EmailJS Konfiguration</div>
-              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Für automatischen E-Mail-Versand bei Terminbestätigung &amp; Absagen</div>
+        <div class="form-section" style="background:var(--dark3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;">
+          <h3 style="font-size:1rem;color:var(--gold);margin-bottom:0.5rem;">EmailJS Konfiguration</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">Für automatischen E-Mail-Versand. <a href="https://emailjs.com" target="_blank" style="color:var(--gold);">emailjs.com</a></p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Public Key</label>
+              <input type="text" id="ejsPublicKey" placeholder="abcXYZ123..." style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
             </div>
-            <a href="https://emailjs.com" target="_blank" style="margin-left:auto;color:var(--gold);font-size:0.78rem;text-decoration:none;border:1px solid rgba(201,169,110,0.3);padding:5px 12px;border-radius:var(--radius);">emailjs.com ↗</a>
-          </div>
-          <div class="grid-3">
-            <div class="field">
-              <label>Public Key</label>
-              <input type="text" id="ejsPublicKey" placeholder="abcXYZ123...">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Service ID</label>
+              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx" style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
             </div>
-            <div class="field">
-              <label>Service ID</label>
-              <input type="text" id="ejsServiceId" placeholder="service_xxxxxxx">
-            </div>
-            <div class="field">
-              <label>Template ID</label>
-              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Template ID</label>
+              <input type="text" id="ejsTemplateId" placeholder="template_xxxxxxx" style="background:#111;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:0.88rem;outline:none;">
             </div>
           </div>
-          <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.15);border-radius:var(--radius);padding:10px 14px;margin-top:1rem;font-size:0.78rem;color:var(--text-muted);">
-            💡 Template-Variablen: <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_name}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{to_email}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{property}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{viewing_date}}</code> <code style="background:var(--dark3);padding:1px 6px;border-radius:3px;color:var(--gold);">{{message}}</code>
-          </div>
-          <div style="margin-top:1.2rem;display:flex;align-items:center;gap:12px;">
-            <button onclick="saveEmailJStoSupabase()" class="btn-primary" style="width:auto;padding:11px 28px;">Einstellungen speichern</button>
-            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Dauerhaft gespeichert!</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button onclick="saveEmailJStoSupabase()" style="background:var(--gold);border:none;color:var(--dark);padding:10px 24px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;">Dauerhaft speichern</button>
+            <span id="ejsSaveFeedback" style="font-size:0.82rem;color:#6DCEAA;display:none;">✓ Gespeichert!</span>
           </div>
         </div>
       </div>
 
+      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+        <button onclick="adminLogout()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.8rem;">Abmelden</button>
+      </div>
     </div>
   </div>
-
 </div>
 
-
-
-
-<footer class="site-footer">
-  Central City Apartment Dortmund · <a href="mailto:info@centralcityapartments.de" style="color:var(--gold);">info@centralcityapartments.de</a>
-</footer>
 <script>
-const ADMIN_PASSWORD = 'CCA2024!';
-const SUPABASE_URL = 'https://mxgwmmitbuperbiozdtz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
 
-const PROPERTIES = [
-  { id: 'p1', street: 'Schelenbrink 30', city: '44309 Dortmund' },
-  { id: 'p2', street: 'Schelenbrink 07', city: '44309 Dortmund' },
-  { id: 'p3', street: 'Herderstra\u00dfe 16, 2. OG rechts', city: '44147 Dortmund' },
-  { id: 'p4', street: 'Herderstra\u00dfe 16, EG rechts', city: '44147 Dortmund' },
-  { id: 'p5', street: 'Herderstra\u00dfe 16, 1. OG links', city: '44147 Dortmund' },
-  { id: 'p6', street: 'Herderstra\u00dfe 16, EG links', city: '44147 Dortmund' },
-];
+var SB_URL = 'https://mxgwmmitbuperbiozdtz.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
+var ADMIN_PW = 'CCA2024!';
 
-// SUPABASE
-async function sbFetch(path, options) {
-  options = options || {};
-  var res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    method: options.method || 'GET',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': options.prefer !== undefined ? options.prefer : 'return=representation'
-    },
-    body: options.body || undefined
+async function sbFetch(path, opts) {
+  opts = opts || {};
+  var res = await fetch(SB_URL + '/rest/v1/' + path, {
+    method: opts.method || 'GET',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': opts.prefer !== undefined ? opts.prefer : 'return=representation' },
+    body: opts.body
   });
-  if (!res.ok) { var e = await res.text(); throw new Error(e); }
-  var text = await res.text();
-  return text ? JSON.parse(text) : [];
+  if (!res.ok) throw new Error(await res.text());
+  var t = await res.text();
+  return t ? JSON.parse(t) : [];
 }
 
-async function insertApplication(data) {
-  return sbFetch('applications', { method: 'POST', body: JSON.stringify(data) });
-}
-async function fetchApplications() {
-  return sbFetch('applications?order=created_at.desc', { prefer: '' });
-}
-async function updateApplication(id, updates) {
-  return sbFetch('applications?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
-}
+async function fetchListings() { return sbFetch('listings?order=sort_order.asc', { prefer: '' }); }
+async function upsertListing(l) { return sbFetch('listings?id=eq.' + l.id, { method: 'PATCH', body: JSON.stringify(l) }); }
 
-// EMAILJS CONFIG
-var ejsConfigCache = {};
+function getPhotos(l) { return (l.photos && l.photos.trim()) ? l.photos.split(',').map(function(u){return u.trim();}).filter(Boolean) : []; }
+function getFeatures(l) { return (l.features && l.features.trim()) ? l.features.split(',').map(function(f){return f.trim();}).filter(Boolean) : []; }
 
-function getEJSConfig() {
-  // Try cache first, then localStorage fallback
-  if (ejsConfigCache.publicKey) return ejsConfigCache;
-  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
+// BUILD HTML helpers - NO inline onclick with dynamic data
+function el(tag, attrs, inner) {
+  var a = Object.keys(attrs||{}).map(function(k){ return k + '="' + attrs[k] + '"'; }).join(' ');
+  return '<' + tag + (a ? ' ' + a : '') + '>' + (inner||'') + '</' + tag + '>';
 }
+function div(cls, inner) { return '<div class="' + cls + '">' + inner + '</div>'; }
 
-function saveEmailJSConfig() {
-  // Keep localStorage as fallback
-  var cfg = {
-    publicKey: document.getElementById('ejsPublicKey') ? document.getElementById('ejsPublicKey').value.trim() : '',
-    serviceId: document.getElementById('ejsServiceId') ? document.getElementById('ejsServiceId').value.trim() : '',
-    templateId: document.getElementById('ejsTemplateId') ? document.getElementById('ejsTemplateId').value.trim() : ''
-  };
-  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
-  ejsConfigCache = cfg;
-}
-
-async function saveEmailJStoSupabase() {
-  var cfg = {
-    publicKey: document.getElementById('ejsPublicKey').value.trim(),
-    serviceId: document.getElementById('ejsServiceId').value.trim(),
-    templateId: document.getElementById('ejsTemplateId').value.trim()
-  };
-  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
-  ejsConfigCache = cfg;
+async function renderListings() {
+  var c = document.getElementById('listingsContainer');
+  c.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1;">Lade Inserate...</div>';
   try {
-    await sbFetch('settings?key=eq.emailjs', {
-      method: 'PATCH',
-      body: JSON.stringify({ value: JSON.stringify(cfg) })
-    });
+    var listings = await fetchListings();
+    if (!listings.length) { c.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1;">Keine Inserate gefunden.</div>'; return; }
+    c.innerHTML = listings.map(buildCard).join('');
   } catch(e) {
-    // If PATCH fails, try POST (first time)
-    try {
-      await sbFetch('settings', {
-        method: 'POST',
-        body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) })
-      });
-    } catch(e2) { console.log('Settings save error:', e2); }
+    c.innerHTML = '<div style="text-align:center;padding:3rem;color:#E8837F;grid-column:1/-1;">Fehler: ' + e.message + '</div>';
   }
-  var fb = document.getElementById('ejsSaveFeedback');
-  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
 }
 
-async function loadEJSFromSupabase() {
-  try {
-    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
-    if (data && data[0] && data[0].value) {
-      var cfg = JSON.parse(data[0].value);
-      ejsConfigCache = cfg;
-      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
-      // Fill inputs if visible
-      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
-      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
-      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
-    }
-  } catch(e) { console.log('Could not load EJS config:', e); }
-}
+function buildCard(l) {
+  var photos = getPhotos(l);
+  var imgs = photos.length ? photos : ['https://via.placeholder.com/400x240/1E1E1E/C9A96E?text=Foto+folgt'];
+  var warm = (l.kalt||0) + (l.nebenkosten||0) + (l.heizung||0);
+  var isFrei = l.status === 'frei';
 
-function sendEmail(cfg, params) {
-  if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) return;
-  emailjs.init(cfg.publicKey);
-  emailjs.send(cfg.serviceId, cfg.templateId, params).catch(function(){});
-}
+  var badgeTxt = l.status === 'vergeben' ? 'Vergeben' : l.status === 'demnachst' ? 'Demnächst' : 'Frei';
+  var badgeColor = l.status === 'vergeben' ? '#E8837F' : l.status === 'demnachst' ? '#C9A96E' : '#6DCEAA';
+  var badgeBorder = l.status === 'vergeben' ? 'rgba(224,82,82,0.4)' : l.status === 'demnachst' ? 'rgba(201,169,110,0.4)' : 'rgba(76,175,136,0.4)';
 
-// PROPERTY GRID
-function buildPropertyGrid() {
-  var grid = document.getElementById('propertyGrid');
-  grid.innerHTML = PROPERTIES.map(function(p) {
-    return '<div class="property-card" id="card_' + p.id + '" onclick="toggleProperty(\'' + p.id + '\', this)">'
-      + '<div class="prop-check" id="check_' + p.id + '">\u2713</div>'
-      + '<div class="prop-street">' + p.street + '</div>'
-      + '<div class="prop-city">' + p.city + '</div>'
-      + '</div>';
+  var imgHtml = imgs.map(function(p, i) {
+    return '<img src="' + p + '" alt="Foto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:' + (i===0?'1':'0') + ';transition:opacity 0.5s;' + (l.status !== 'frei' ? 'filter:grayscale(40%);' : '') + '" class="' + (i===0?'active':'') + '">';
   }).join('');
-}
+  var unavailableBanner = l.status === 'demnachst'
+    ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:#C9A96E;text-align:center;padding:8px;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;z-index:10;">Noch nicht verfügbar – bald frei</div>'
+    : l.status === 'vergeben'
+    ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:#E8837F;text-align:center;padding:8px;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;z-index:10;">Bereits vergeben</div>'
+    : '';
 
-function toggleProperty(id, el) {
-  el.classList.toggle('selected');
-  updateSelectedProperties();
-}
+  var dots = imgs.length > 1 ? '<div class="slider-dots">' + imgs.map(function(_, i) {
+    return '<button class="slider-dot ' + (i===0?'active':'') + '" data-idx="' + i + '" onclick="event.stopPropagation();slideTo(this,' + i + ')"></button>';
+  }).join('') + '</div>' : '';
 
-function updateSelectedProperties() {
-  var selected = [];
-  PROPERTIES.forEach(function(p) {
-    var card = document.getElementById('card_' + p.id);
-    if (card && card.classList.contains('selected')) {
-      selected.push(p.street + ', ' + p.city);
-    }
-  });
-  document.getElementById('selectedProperty').value = selected.join(' | ');
-}
+  var sliderBtns = imgs.length > 1
+    ? '<button class="slider-btn prev" onclick="event.stopPropagation();slideDir(this,-1)">‹</button><button class="slider-btn next" onclick="event.stopPropagation();slideDir(this,1)">›</button>'
+    : '';
 
+  var specs = '';
+  if (l.sqm > 0) specs += '<div class="listing-spec">' + l.sqm + ' m²</div>';
+  if (l.rooms > 0) specs += '<div class="listing-spec">' + l.rooms + ' Zimmer</div>';
 
-// RADIO STYLE
-document.addEventListener('change', function(e) {
-  if (e.target.type === 'radio') {
-    var group = e.target.closest('.toggle-group');
-    if (group) {
-      group.querySelectorAll('label').forEach(function(l) {
-        l.style.borderColor = ''; l.style.color = ''; l.style.background = '';
-      });
-      var checked = e.target.closest('label');
-      if (checked) {
-        checked.style.borderColor = 'var(--gold)';
-        checked.style.color = 'var(--gold)';
-        checked.style.background = 'rgba(201,169,110,0.08)';
-      }
-    }
-  }
-});
+  var features = getFeatures(l);
+  var tags = features.map(function(f){ return '<span class="feature-tag">' + f + '</span>'; }).join('');
 
-// FORM SUBMIT
-async function submitForm(e) {
-  e.preventDefault();
-  var form = e.target;
-  var fd = new FormData(form);
-  var raw = {};
-  for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
+  var priceHtml = l.kalt > 0
+    ? '<div class="price-block"><div class="kalt">' + l.kalt + ' €<span style="font-size:0.75rem;color:var(--text-muted);margin-left:2px;">/Monat kalt</span></div><div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Warmmiete ca. ' + warm + ' € &nbsp;·&nbsp; Kaution ' + (l.kaution||0) + ' €</div></div>'
+    : '<div class="price-block"><div class="kalt" style="font-size:1rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
 
-  if (!raw.property) {
-    showAlert('formAlert', 'error', 'Bitte w\u00e4hlen Sie eine Immobilie aus.');
-    document.querySelector('.property-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
+  var ctaHtml = isFrei
+    ? '<a href="central-city-apartment.html" class="btn-anfrage" data-lid="' + l.id + '">Besichtigung anfragen</a>'
+    : l.status === 'demnachst'
+    ? '<span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">Demnächst verfügbar</span>'
+    : '<span style="font-size:0.78rem;color:#E8837F;">Bereits vergeben</span>';
 
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Wird gesendet\u2026';
-
-  var payload = {
-    status: 'pending',
-    first_name: raw.firstName || '', last_name: raw.lastName || '',
-    email: raw.email || '', phone: raw.phone || '',
-    birthdate: raw.birthdate || '', birthplace: raw.birthplace || '',
-    nationality: raw.nationality || '', id_number: raw.idNumber || '',
-    street: raw.street || '', zip: raw.zip || '', city: raw.city || '',
-    property: raw.property || '',
-    current_landlord: raw.currentLandlord || '', current_rent: raw.currentRent || '',
-    rent_since: raw.rentSince || '', notice_period: raw.noticeperiod || '', move_reason: raw.moveReason || '',
-    move_in_date: raw.moveInDate || '', viewing_date: raw.viewingDate || '', viewing_type: raw.viewingType || '',
-    viewing_time: raw.viewingTime || '', viewing_date_alt: raw.viewingDateAlt || '',
-    total_persons: raw.totalPersons || '', children: raw.children || '',
-    children_ages: raw.childrenAges || '', co_residents: raw.coResidents || '',
-    pets: raw.pets || '', pet_details: raw.petDetails || '', smoker: raw.smoker || '',
-    occupation: raw.occupation || '', employment_status: raw.employmentStatus || '',
-    employer: raw.employer || '', employed_since: raw.employedSince || '',
-    net_income: raw.netIncome || '', additional_income: raw.additionalIncome || '',
-    additional_income_type: raw.additionalIncomeType || '', welfare: raw.welfare || '',
-    schufa_available: raw.schufaAvailable || '', schufa_score: raw.schufaScore || '',
-    debts: raw.debts || '', rent_debts: raw.rentDebts || '', credit_explanation: raw.creditExplanation || '',
-    guarantor: raw.guarantor || '', guarantor_name: raw.guarantorName || '',
-    guarantor_contact: raw.guarantorContact || '', guarantor_income: raw.guarantorIncome || '',
-    parking_needed: raw.parkingNeeded || '', home_office: raw.homeOffice || '',
-    instrument: raw.instrument || '', heard_from: raw.heardFrom || '', remarks: raw.remarks || ''
-  };
-
-  try {
-    await insertApplication(payload);
-    showAlert('formAlert', 'success', '\u2713 Vielen Dank, ' + (raw.firstName || 'lieber Interessent') + '! Ihre Bewerbung ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
-    form.reset();
-    document.querySelectorAll('.property-card').forEach(function(c) { c.classList.remove('selected'); });
-    document.getElementById('selectedProperty').value = '';
-    document.querySelectorAll('.toggle-group label').forEach(function(l) { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    var cfg = getEJSConfig();
-    if (cfg.publicKey && raw.email) {
-      sendEmail(cfg, {
-        to_name: (raw.firstName||'') + ' ' + (raw.lastName||''),
-        to_email: raw.email,
-        property: raw.property,
-        viewing_date: raw.viewingDate || 'wird noch mitgeteilt',
-        viewing_time: raw.viewingTime || '',
-        message: 'Vielen Dank fuer Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten und werden uns in Kuerze mit einem Besichtigungstermin bei Ihnen melden.'
-      });
-    }
-  } catch(err) {
-    showAlert('formAlert', 'error', 'Fehler beim Senden: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Bewerbung absenden';
-  }
-}
-
-function showAlert(id, type, msg) {
-  var el = document.getElementById(id);
-  el.className = 'alert ' + type + ' show';
-  el.textContent = msg;
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// ADMIN NAVIGATION
-function toggleAdminView() {
-  var vf = document.getElementById('viewForm');
-  var va = document.getElementById('viewAdmin');
-  var btn = document.getElementById('adminToggleBtn');
-  if (va.classList.contains('active')) {
-    va.classList.remove('active');
-    vf.classList.add('active');
-    btn.textContent = 'Admin-Bereich';
-  } else {
-    vf.classList.remove('active');
-    va.classList.add('active');
-    btn.textContent = '\u2190 Zur\u00fcck';
-  }
-}
-
-function adminLogin() {
-  var pass = document.getElementById('adminPass').value;
-  if (pass === ADMIN_PASSWORD) {
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
-    loadEJSConfig();
-    renderDashboard();
-  } else {
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('adminPass').value = '';
-  }
-}
-
-function adminLogout() {
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('adminDashboard').style.display = 'none';
-  document.getElementById('adminPass').value = '';
-}
-
-function loadEJSConfig() {
-  // Load from Supabase first, fallback to localStorage
-  loadEJSFromSupabase().then(function() {
-    var cfg = getEJSConfig();
-    if (document.getElementById('ejsPublicKey') && cfg.publicKey) document.getElementById('ejsPublicKey').value = cfg.publicKey;
-    if (document.getElementById('ejsServiceId') && cfg.serviceId) document.getElementById('ejsServiceId').value = cfg.serviceId;
-    if (document.getElementById('ejsTemplateId') && cfg.templateId) document.getElementById('ejsTemplateId').value = cfg.templateId;
-  });
-}
-
-// ADMIN TABS
-function switchAdminTab(tab) {
-  ['bewerbungen','kalender','settings'].forEach(function(t) {
-    document.getElementById('tabContent-' + t).style.display = t === tab ? 'block' : 'none';
-    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-  });
-  if (tab === 'kalender') renderCalendar();
-}
-
-// FILTER + DASHBOARD
-var currentFilter = 'all';
-var allApps = [];
-
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  renderAppList();
-}
-
-async function renderDashboard() {
-  var list = document.getElementById('appList');
-  list.innerHTML = '<div class="empty-state"><div style="opacity:0.4;margin-bottom:0.5rem;">Laedt...</div></div>';
-  try {
-    allApps = await fetchApplications();
-    var pending = allApps.filter(function(a) { return a.status === 'pending'; }).length;
-    var confirmed = allApps.filter(function(a) { return a.status === 'confirmed'; }).length;
-    var rejected = allApps.filter(function(a) { return a.status === 'rejected'; }).length;
-    document.getElementById('statsRow').innerHTML =
-      '<div class="stat-card"><div class="num">' + allApps.length + '</div><div class="lbl">Gesamt</div></div>' +
-      '<div class="stat-card"><div class="num" style="color:var(--gold)">' + pending + '</div><div class="lbl">Ausstehend</div></div>' +
-      '<div class="stat-card"><div class="num" style="color:#6DCEAA">' + confirmed + '</div><div class="lbl">Best\u00e4tigt</div></div>' +
-      '<div class="stat-card"><div class="num" style="color:#E8837F">' + rejected + '</div><div class="lbl">Abgelehnt</div></div>';
-    renderAppList();
-  } catch(err) {
-    list.innerHTML = '<div class="empty-state" style="color:#E8837F;">Fehler: ' + err.message + '</div>';
-  }
-}
-
-function renderAppList() {
-  var list = document.getElementById('appList');
-  var filtered = currentFilter === 'all' ? allApps
-    : currentFilter === 'favorite' ? allApps.filter(function(a) { return a.favorite; })
-    : allApps.filter(function(a) { return a.status === currentFilter; });
-  if (!filtered.length) {
-    list.innerHTML = '<div class="empty-state"><div class="big">\ud83d\udceb</div>Keine Bewerbungen vorhanden.</div>';
-    return;
-  }
-  list.innerHTML = filtered.map(function(app) { return buildAppCard(app); }).join('');
-}
-
-function buildAppCard(app) {
-  var fn = app.first_name || '';
-  var ln = app.last_name || '';
-  var initials = ((fn[0]||'?') + (ln[0]||'?')).toUpperCase();
-  var statusMap = { pending: ['status-pending','Ausstehend'], confirmed: ['status-confirmed','Best\u00e4tigt'], rejected: ['status-rejected','Abgelehnt'] };
-  var sc = (statusMap[app.status] || statusMap.pending)[0];
-  var sl = (statusMap[app.status] || statusMap.pending)[1];
-  var date = app.created_at ? new Date(app.created_at).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-
-  var fields = [
-    ['Immobilie', app.property], ['E-Mail', app.email], ['Telefon', app.phone],
-    ['Geburtsdatum', app.birthdate], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
-    ['Beruf', app.occupation], ['Besch\u00e4ftigung', app.employment_status],
-    ['Nettoeinkommen', app.net_income ? app.net_income + ' \u20ac' : ''], ['B\u00fcrgergeld', app.welfare],
-    ['Personen', app.total_persons], ['Kinder', app.children], ['Haustiere', app.pets],
-    ['Raucher', app.smoker], ['Wunscheinzug', app.move_in_date], ['Wunschbesichtigung', app.viewing_date],
-    ['Besichtigungszeit', app.viewing_time], ['Alternativtermin', app.viewing_date_alt],
-    ['Schufa', app.schufa_available], ['Schufa-Score', app.schufa_score],
-    ['B\u00fcrge', app.guarantor_name || app.guarantor], ['Schulden', app.debts],
-    ['Homeoffice', app.home_office], ['Stellplatz', app.parking_needed],
-    ['Mitbewohner', app.co_residents], ['Bemerkungen', app.remarks]
-  ].filter(function(f) { return f[1] && String(f[1]).trim() !== ''; });
-
-  var timeOptions = ['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'];
-  var timeOpts = timeOptions.map(function(t) { return '<option' + (t === app.viewing_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
-
-  var actionHtml = app.status === 'pending'
-    ? '<div class="action-row">'
-      + '<div class="field"><label>Best\u00e4tigter Termin (Datum)</label><input type="date" onclick="try{this.showPicker()}catch(e){}" id="confDate_' + app.id + '" value="' + (app.viewing_date||'') + '"></div>'
-      + '<div class="field"><label>Uhrzeit</label><select id="confTime_' + app.id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
-      + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
-      + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
-      + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
-    : '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></span><button onclick="resetToAusstehend(\'' + app.id + '\')" style="background:transparent;border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:4px 12px;border-radius:var(--radius);cursor:pointer;font-family:sans-serif;font-size:0.75rem;">&#8635; Zur\u00fccksetzen</button></div>';
-
-  return '<div class="app-card" id="appcard_' + app.id + '">'
-    + '<div class="app-card-head" onclick="toggleCard(\'' + app.id + '\')">'
-    + '<div class="app-avatar">' + initials + '</div>'
-    + '<div><div class="app-name">' + fn + ' ' + ln + '</div><div class="app-meta">' + (app.property||'') + ' \u00b7 eingegangen ' + date + '</div></div>'
-    + '<span class="app-status ' + sc + '">' + sl + '</span>'
-    + '<button onclick="event.stopPropagation();toggleFavorite(\'' + app.id + '\')" style="background:transparent;border:none;font-size:1.1rem;cursor:pointer;padding:0 4px;opacity:' + (app.favorite?'1':'0.25') + ';transition:opacity 0.2s;color:#FFD700;" title="Favorit">' + (app.favorite ? '★' : '☆') + '</button>'
-    + '<span class="app-chevron">\u25be</span>'
+  return '<div class="listing-card' + (isFrei ? '' : ' vergeben') + '" style="cursor:pointer;" data-lid="' + l.id + '">'
+    + '<div class="photo-slider" style="position:relative;height:240px;overflow:hidden;background:var(--dark3);" data-current="0">'
+    + '<div style="position:absolute;top:14px;left:14px;background:rgba(0,0,0,0.8);color:' + badgeColor + ';border:1px solid ' + badgeBorder + ';padding:4px 12px;border-radius:20px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;z-index:10;">' + badgeTxt + '</div>'
+    + imgHtml + unavailableBanner + dots + sliderBtns
     + '</div>'
-    + '<div class="app-card-body">'
-    + '<div class="detail-grid">' + fields.map(function(f) { return '<div class="detail-item"><div class="dl">' + f[0] + '</div><div class="dv">' + f[1] + '</div></div>'; }).join('') + '</div>'
-    + actionHtml
-    + '<div style="padding:0.5rem 0 0;border-top:1px solid var(--border);margin-top:0.8rem;"><button data-appid="' + app.id + '" onclick="deleteApplication(this.dataset.appid)" style="background:transparent;border:none;color:rgba(224,82,82,0.6);font-size:0.75rem;cursor:pointer;padding:0;font-family:sans-serif;">&#128465; Bewerbung l\u00f6schen</button></div>'
+    + '<div class="listing-body">'
+    + '<div class="listing-address">' + (l.short||'') + '</div>'
+    + '<div class="listing-title">' + (l.title||'') + '</div>'
+    + '<div class="listing-specs">' + specs + '</div>'
+    + '<div class="listing-desc">' + (l.description||'') + '</div>'
+    + (tags ? '<div class="listing-features">' + tags + '</div>' : '')
+    + '<div class="listing-price-row">' + priceHtml + ctaHtml + '</div>'
     + '</div></div>';
 }
 
-function toggleCard(id) {
-  document.getElementById('appcard_' + id).classList.toggle('expanded');
+// Event delegation - no inline handlers with dynamic data
+document.addEventListener('click', function(e) {
+  // Card click -> open modal
+  var card = e.target.closest('.listing-card[data-lid]');
+  var link = e.target.closest('a[data-lid]');
+  var sliderEl = e.target.closest('.photo-slider');
+  if (link) { preselectProperty(link.dataset.lid); return; }
+  if (card && !sliderEl) { openModal(card.dataset.lid); return; }
+  if (card && sliderEl && !e.target.closest('.slider-btn') && !e.target.closest('.slider-dot')) { openModal(card.dataset.lid); }
+});
+
+function slideTo(dotEl, idx) {
+  var slider = dotEl.closest('[data-current]');
+  slider.querySelectorAll('img').forEach(function(img, i) { img.style.opacity = i===idx?'1':'0'; img.classList.toggle('active', i===idx); });
+  slider.querySelectorAll('.slider-dot').forEach(function(d,i){ d.classList.toggle('active',i===idx); });
+  slider.dataset.current = idx;
 }
 
-async function confirmApp(id) {
-  var app = allApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  var date = document.getElementById('confDate_' + id).value;
-  var time = document.getElementById('confTime_' + id).value;
-  if (!date) { showFeedback(id, 'err', 'Bitte Datum ausw\u00e4hlen.'); return; }
-  if (!time) { showFeedback(id, 'err', 'Bitte Uhrzeit ausw\u00e4hlen.'); return; }
-  try {
-    await updateApplication(id, { status: 'confirmed', confirmed_date: date, confirmed_time: time });
-    var cfg = getEJSConfig();
-    var fn = app.first_name || '';
-    var ln = app.last_name || '';
-    var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nwir freuen uns, Ihnen Ihren Besichtigungstermin bestaetigen zu koennen.\n\n---\nBESICHTIGUNGSTERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\nBitte erscheinen Sie puenktlich.\nBei Aenderungen melden Sie sich bitte:\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
-    showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
-    setTimeout(function() { renderDashboard(); }, 1500);
-  } catch(err) {
-    showFeedback(id, 'err', 'Fehler: ' + err.message);
-  }
+function slideDir(btn, dir) {
+  var slider = btn.closest('[data-current]');
+  var imgs = slider.querySelectorAll('img');
+  var cur = parseInt(slider.dataset.current||0);
+  var next = (cur + dir + imgs.length) % imgs.length;
+  imgs.forEach(function(img,i){ img.style.opacity=i===next?'1':'0'; img.classList.toggle('active',i===next); });
+  slider.querySelectorAll('.slider-dot').forEach(function(d,i){ d.classList.toggle('active',i===next); });
+  slider.dataset.current = next;
 }
 
-async function rejectApp(id) {
-  if (!confirm('Bewerbung wirklich ablehnen?')) return;
-  var app = allApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  try {
-    await updateApplication(id, { status: 'rejected' });
-    var cfg = getEJSConfig();
-    var fn = app.first_name || '';
-    var ln = app.last_name || '';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nvielen Dank fuer Ihr Interesse an ' + (app.property||'') + '.\n\nLeider koennen wir Ihre Anfrage zum jetzigen Zeitpunkt nicht beruecksichtigen.\n\nWir wuenschen Ihnen viel Erfolg bei Ihrer Wohnungssuche.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
-    renderDashboard();
-  } catch(err) {
-    alert('Fehler: ' + err.message);
-  }
+function preselectProperty(id) { localStorage.setItem('cca_preselect', id); }
+
+function getEmbedUrl(url) {
+  if (!url) return '';
+  // YouTube
+  var yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (yt) return 'https://www.youtube.com/embed/' + yt[1];
+  // Vimeo
+  var vi = url.match(/vimeo\.com\/(\d+)/);
+  if (vi) return 'https://player.vimeo.com/video/' + vi[1];
+  return url;
 }
 
-function showFeedback(id, type, msg) {
-  var el = document.getElementById('feedback_' + id);
-  if (!el) return;
-  el.className = 'action-feedback show ' + type;
-  el.textContent = msg;
-}
+// MODAL
+var modalPhotos = [];
+var modalIdx = 0;
 
-// CALENDAR
-var calYear = new Date().getFullYear();
-var calMonth = new Date().getMonth();
-var calApps = [];
-
-function goToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); renderCalendar(); }
-function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
-function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
-
-async function renderCalendar() {
-  var months = ['Januar','Februar','M\u00e4rz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
-  try {
-    calApps = await fetchApplications();
-    calApps = calApps.filter(function(a) { return a.confirmed_date; });
-  } catch(e) { calApps = []; }
-  buildCalGrid();
-}
-
-function buildCalGrid() {
-  var firstDay = new Date(calYear, calMonth, 1).getDay();
-  var startOffset = firstDay === 0 ? 6 : firstDay - 1;
-  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  var daysInPrev = new Date(calYear, calMonth, 0).getDate();
-  var today = new Date();
-  var html = '<div class="cal-header-row">';
-  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(d) { html += '<div class="cal-header-cell">' + d + '</div>'; });
-  html += '</div>';
-  var day = 1, nextDay = 1;
-  var totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-  for (var i = 0; i < totalCells; i += 7) {
-    html += '<div class="cal-grid-week">';
-    for (var j = 0; j < 7; j++) {
-      var cell = i + j;
-      var displayDay, isOther = false, fullDate;
-      if (cell < startOffset) {
-        displayDay = daysInPrev - startOffset + cell + 1;
-        isOther = true;
-        var pm = calMonth === 0 ? 11 : calMonth - 1;
-        var py = calMonth === 0 ? calYear - 1 : calYear;
-        fullDate = py + '-' + pad2(pm+1) + '-' + pad2(displayDay);
-      } else if (day > daysInMonth) {
-        displayDay = nextDay++;
-        isOther = true;
-        var nm = calMonth === 11 ? 0 : calMonth + 1;
-        var ny = calMonth === 11 ? calYear + 1 : calYear;
-        fullDate = ny + '-' + pad2(nm+1) + '-' + pad2(displayDay);
-      } else {
-        displayDay = day++;
-        fullDate = calYear + '-' + pad2(calMonth+1) + '-' + pad2(displayDay);
-      }
-      var isToday = !isOther && displayDay === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-      var dayApps = calApps.filter(function(a) { return a.confirmed_date === fullDate; });
-      html += '<div class="cal-day' + (isOther?' other-month':'') + (isToday?' today':'') + '" onclick="calDayClick(\'' + fullDate + '\')">';
-      html += '<div class="cal-day-num">' + displayDay + '</div>';
-      dayApps.forEach(function(a) {
-        var name = (a.first_name||'') + ' ' + (a.last_name||'');
-        html += '<div class="cal-event" onclick="event.stopPropagation();openTermin(\'' + a.id + '\')" title="' + name + '">' + (a.confirmed_time||'') + ' ' + name + '</div>';
-      });
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-  document.getElementById('calGrid').innerHTML = html;
-}
-
-function pad2(n) { return String(n).padStart(2,'0'); }
-
-function calDayClick(dateStr) {
-  var dayApps = calApps.filter(function(a) { return a.confirmed_date === dateStr; });
-  if (dayApps.length === 1) { openTermin(dayApps[0].id); }
-}
-
-function openTermin(id) {
-  var app = calApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  var fn = app.first_name || '';
-  var ln = app.last_name || '';
-  var dateFormatted = app.confirmed_date ? new Date(app.confirmed_date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '';
-  document.getElementById('modalTitle').textContent = fn + ' ' + ln;
-  var timeOptions = ['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'];
-  var timeOpts = timeOptions.map(function(t) { return '<option' + (t === app.confirmed_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
-  document.getElementById('modalContent').innerHTML =
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">'
-    + '<div class="detail-item"><div class="dl">Immobilie</div><div class="dv">' + (app.property||'-') + '</div></div>'
-    + '<div class="detail-item"><div class="dl">E-Mail</div><div class="dv">' + (app.email||'-') + '</div></div>'
-    + '<div class="detail-item"><div class="dl">Telefon</div><div class="dv">' + (app.phone||'-') + '</div></div>'
-    + '<div class="detail-item"><div class="dl">Status</div><div class="dv">' + (app.status==='confirmed'?'\u2713 Best\u00e4tigt':'Ausstehend') + '</div></div>'
-    + '</div>'
-    + '<div style="background:rgba(201,169,110,0.08);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1.2rem;">'
-    + '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:6px;">Aktueller Termin</div>'
-    + '<div style="font-size:1rem;color:var(--gold);font-weight:500;">' + dateFormatted + ' \u00b7 ' + (app.confirmed_time||'-') + '</div>'
-    + '</div>'
-    + '<div style="border-top:1px solid var(--border);padding-top:1rem;">'
-    + '<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">Termin \u00e4ndern</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">'
-    + '<div class="edit-field"><label>Neues Datum</label><input type="date" onclick="try{this.showPicker()}catch(e){}" id="editDate_' + id + '" value="' + (app.confirmed_date||'') + '"></div>'
-    + '<div class="edit-field"><label>Neue Uhrzeit</label><select id="editTime_' + id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
-    + '</div>'
-    + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-    + '<button onclick="saveTerminEdit(\'' + id + '\')" class="btn-confirm">Termin speichern &amp; E-Mail senden</button>'
-    + '<button onclick="cancelTermin(\'' + id + '\')" class="btn-reject">Termin absagen</button>'
-    + '</div>'
-    + '<div id="modalFeedback" style="margin-top:10px;font-size:0.82rem;"></div>'
-    + '</div>';
-  document.getElementById('calModal').style.display = 'block';
-  document.getElementById('calModal').scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-async function saveTerminEdit(id) {
-  var app = calApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  var date = document.getElementById('editDate_' + id).value;
-  var time = document.getElementById('editTime_' + id).value;
-  if (!date) { showModalFeedback('Bitte Datum ausw\u00e4hlen.', 'err'); return; }
-  try {
-    await updateApplication(id, { confirmed_date: date, confirmed_time: time });
-    var cfg = getEJSConfig();
-    var fn = app.first_name||'', ln = app.last_name||'';
-    var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nIhr Besichtigungstermin wurde geaendert.\n\n---\nNEUER TERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
-    showModalFeedback('\u2713 Termin gespeichert und E-Mail gesendet.', 'ok');
-    renderCalendar();
-  } catch(e) { showModalFeedback('Fehler: ' + e.message, 'err'); }
-}
-
-async function cancelTermin(id) {
-  if (!confirm('Termin wirklich absagen?')) return;
-  var app = calApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  try {
-    await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
-    var cfg = getEJSConfig();
-    var fn = app.first_name||'', ln = app.last_name||'';
-    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nleider muessen wir Ihren Besichtigungstermin fuer ' + (app.property||'') + ' absagen.\n\nWir melden uns in Kuerze mit einem neuen Vorschlag.\n\ninfo@centralcityapartments.de\n\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
-    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
-    showModalFeedback('\u2713 Termin abgesagt.', 'ok');
-    closeModal();
-    renderCalendar();
-  } catch(e) { showModalFeedback('Fehler: ' + e.message, 'err'); }
-}
-
-function showModalFeedback(msg, type) {
-  var el = document.getElementById('modalFeedback');
-  if (!el) return;
-  el.style.color = type === 'ok' ? '#6DCEAA' : '#E8837F';
-  el.textContent = msg;
-}
-
-function closeModal() {
-  document.getElementById('calModal').style.display = 'none';
-}
-
-// CSV EXPORT
-async function exportCSV() {
-  var apps;
-  try { apps = await fetchApplications(); } catch(e) { alert('Fehler: ' + e.message); return; }
-  if (!apps.length) { alert('Keine Bewerbungen vorhanden.'); return; }
-  var cols = [
-    ['Status','status'],['Eingegangen','created_at'],['Vorname','first_name'],['Nachname','last_name'],
-    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Staatsangehoerigkeit','nationality'],
-    ['Strasse','street'],['PLZ','zip'],['Ort','city'],['Immobilie','property'],
-    ['Beruf','occupation'],['Beschaeftigung','employment_status'],['Arbeitgeber','employer'],
-    ['Nettoeinkommen','net_income'],['Buergergeld','welfare'],
-    ['Personen','total_persons'],['Kinder','children'],['Haustiere','pets'],['Raucher','smoker'],
-    ['Schufa','schufa_available'],['Schufa-Score','schufa_score'],['Schulden','debts'],
-    ['Buerge','guarantor_name'],['Wunscheinzug','move_in_date'],
-    ['Best. Termin','confirmed_date'],['Best. Uhrzeit','confirmed_time'],['Bemerkungen','remarks']
-  ];
-  function esc(v) {
-    if (v === null || v === undefined) return '';
-    var s = String(v).replace(/"/g, '""');
-    return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? ('"' + s + '"') : s;
-  }
-  var header = cols.map(function(c) { return esc(c[0]); }).join(',');
-  var rows = apps.map(function(a) {
-    return cols.map(function(c) {
-      var k = c[1], v = a[k];
-      if (k === 'created_at' && v) return esc(new Date(v).toLocaleDateString('de-DE'));
-      if (k === 'status') { var m = {pending:'Ausstehend',confirmed:'Bestaetigt',rejected:'Abgelehnt'}; return esc(m[v]||v); }
-      return esc(v);
-    }).join(',');
-  });
-  var csv = '\uFEFF' + [header].concat(rows).join('\n');
-  var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = 'CCA_Bewerbungen_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click(); URL.revokeObjectURL(url);
-}
-
-// ICS EXPORT
-async function exportICS() {
-  var apps;
-  try { apps = await fetchApplications(); } catch(e) { alert('Fehler: ' + e.message); return; }
-  var confirmed = apps.filter(function(a) { return a.confirmed_date && a.status === 'confirmed'; });
-  if (!confirmed.length) { alert('Keine best\u00e4tigten Termine vorhanden.'); return; }
-  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Central City Apartment Dortmund//DE\r\nCALSCALE:GREGORIAN\r\n';
-  confirmed.forEach(function(a) {
-    var parts = a.confirmed_date.split('-');
-    var y = parts[0], m = parts[1], d = parts[2];
-    var tp = a.confirmed_time ? a.confirmed_time.replace(' Uhr','').split(':') : ['10','00'];
-    var h = tp[0]||'10', min = tp[1]||'00';
-    var hEnd = String(parseInt(h)+1).padStart(2,'0');
-    var dtstart = y+m+d+'T'+h+min+'00';
-    var dtend = y+m+d+'T'+hEnd+min+'00';
-    var name = ((a.first_name||'')+' '+(a.last_name||'')).trim();
-    var now = new Date().toISOString().replace(/[-:.]/g,'').slice(0,15)+'Z';
-    ics += 'BEGIN:VEVENT\r\n';
-    ics += 'UID:' + a.id + '@cca.de\r\n';
-    ics += 'DTSTAMP:' + now + '\r\n';
-    ics += 'DTSTART:' + dtstart + '\r\n';
-    ics += 'DTEND:' + dtend + '\r\n';
-    ics += 'SUMMARY:Besichtigung - ' + name + ' - ' + (a.property||'').split(',')[0] + '\r\n';
-    ics += 'DESCRIPTION:Mieter: ' + name + '\\nTel: ' + (a.phone||'') + '\\nEmail: ' + (a.email||'') + '\\nObjekt: ' + (a.property||'') + '\r\n';
-    ics += 'LOCATION:' + (a.property||'') + '\\, Dortmund\r\n';
-    ics += 'END:VEVENT\r\n';
-  });
-  ics += 'END:VCALENDAR';
-  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8;'});
-  var url = URL.createObjectURL(blob);
-  var a2 = document.createElement('a');
-  a2.href = url; a2.download = 'CCA_Termine_' + new Date().toISOString().slice(0,10) + '.ics';
-  a2.click(); URL.revokeObjectURL(url);
-}
-
-
-// ============================================================
-// SHORT FORM
-// ============================================================
-async function buildPropertyGridShort() {
-  var grid = document.getElementById('propertyGridShort');
-  if (!grid) return;
-  grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:1rem 0;">Lade...</div>';
-  var statusMap = {};
-  try {
-    var listings = await fetch(SUPABASE_URL + '/rest/v1/listings?select=id,status', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    }).then(function(r){ return r.json(); });
-    listings.forEach(function(l){ statusMap[l.id] = l.status; });
-  } catch(e) {}
-  grid.innerHTML = PROPERTIES.map(function(p) {
-    var status = statusMap[p.id] || 'frei';
-    var isDemnachst = status === 'demnachst';
-    var isVergeben = status === 'vergeben';
-    var isUnavailable = isDemnachst || isVergeben;
-    var cardStyle = isUnavailable ? 'opacity:0.5;pointer-events:none;' : '';
-    var statusBadge = isDemnachst
-      ? '<div style="margin-top:6px;font-size:0.7rem;color:#C9A96E;letter-spacing:0.05em;">Demnächst verfügbar</div>'
-      : isVergeben
-      ? '<div style="margin-top:6px;font-size:0.7rem;color:#E8837F;letter-spacing:0.05em;">Bereits vergeben</div>'
-      : '<a href="#" onclick="event.stopPropagation();openInsModal(\'' + p.id + '\');return false;" style="display:block;margin-top:6px;font-size:0.7rem;color:var(--gold);text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">Inserat ansehen ↗</a>';
-    return '<div class="property-card" id="cardS_' + p.id + '" style="' + cardStyle + '" onclick="togglePropertyShort(\'' + p.id + '\', this)">'
-      + '<div class="prop-check">✓</div>'
-      + '<div class="prop-street">' + p.street + '</div>'
-      + '<div class="prop-city">' + p.city + '</div>'
-      + statusBadge
-      + '</div>';
-  }).join('');
-}
-
-function togglePropertyShort(id, el) {
-  el.classList.toggle('selected');
-  var selected = [];
-  PROPERTIES.forEach(function(p) {
-    var card = document.getElementById('cardS_' + p.id);
-    if (card && card.classList.contains('selected')) selected.push(p.street + ', ' + p.city);
-  });
-  document.getElementById('selectedPropertyShort').value = selected.join(' | ');
-}
-
-async function submitShortForm(e) {
-  e.preventDefault();
-  var form = e.target;
-  var fd = new FormData(form);
-  var raw = {};
-  for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
-
-  if (!raw.property) {
-    showAlert('shortFormAlert', 'error', 'Bitte wählen Sie mindestens eine Wohnung aus.');
-    document.getElementById('propertyGridShort').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  var btn = document.getElementById('shortSubmitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Wird gesendet…';
-
-  var payload = {
-    status: 'pending',
-    first_name: raw.firstName || '',
-    last_name: raw.lastName || '',
-    email: raw.email || '',
-    phone: raw.phone || '',
-    property: raw.property || '',
-    employment_status: raw.employmentStatus || '',
-    net_income: raw.netIncome || '',
-    viewing_date: raw.viewingDate || '',
-    viewing_time: raw.viewingTime || '',
-    viewing_type: raw.viewingType || '',
-    remarks: raw.remarks || ''
-  };
-
-  try {
-    await insertApplication(payload);
-    showAlert('shortFormAlert', 'success', '✓ Vielen Dank, ' + (raw.firstName||'') + '! Ihre Anfrage ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
-    form.reset();
-    document.querySelectorAll('#propertyGridShort .property-card').forEach(function(c){ c.classList.remove('selected'); });
-    document.getElementById('selectedPropertyShort').value = '';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    var cfg = getEJSConfig();
-    if (cfg.publicKey && raw.email) {
-      emailjs.init(cfg.publicKey);
-      emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_name: (raw.firstName||'') + ' ' + (raw.lastName||''),
-        to_email: raw.email,
-        property: raw.property,
-        viewing_date: raw.viewingDate || 'wird noch mitgeteilt',
-        viewing_time: raw.viewingTime || '',
-        message: 'Vielen Dank für Ihre Besichtigungsanfrage. Wir haben Ihre Angaben erhalten und melden uns in Kürze bei Ihnen.'
-      }).catch(function(){});
-    }
-  } catch(err) {
-    showAlert('shortFormAlert', 'error', 'Fehler: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Besichtigung anfragen';
-  }
-}
-
-function toggleFullForm() {
-  var wrapper = document.getElementById('fullFormWrapper');
-  var btn = document.getElementById('toggleFullFormBtn');
-  if (!wrapper || !btn) return;
-  if (wrapper.style.display === 'none') {
-    wrapper.style.display = 'block';
-    btn.textContent = 'Vollständige Selbstauskunft ausblenden ▴';
-    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    wrapper.style.display = 'none';
-    btn.textContent = 'Optional: Vollständige Selbstauskunft ausfüllen ▾';
-  }
-}
-
-
-// ============================================================
-// INSERAT MODAL (mini version for this page)
-// ============================================================
-var SB_URL_INS = 'https://mxgwmmitbuperbiozdtz.supabase.co';
-var SB_KEY_INS = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
-var insPhotos = [];
-var insIdx = 0;
-
-async function openInsModal(id) {
-  var res = await fetch(SB_URL_INS + '/rest/v1/listings?id=eq.' + id + '&select=*', {
-    headers: { 'apikey': SB_KEY_INS, 'Authorization': 'Bearer ' + SB_KEY_INS }
-  });
-  var data = await res.json();
-  var l = data[0];
+async function openModal(id) {
+  var listings = await fetchListings();
+  var l = listings.find(function(x){ return x.id === id; });
   if (!l) return;
 
-  insPhotos = (l.photos && l.photos.trim()) ? l.photos.split(',').map(function(u){return u.trim();}).filter(Boolean) : ['https://via.placeholder.com/800x380/1E1E1E/C9A96E?text=Foto+folgt'];
-  insIdx = 0;
+  modalPhotos = getPhotos(l);
+  if (!modalPhotos.length) modalPhotos = ['https://via.placeholder.com/800x420/1E1E1E/C9A96E?text=Foto+folgt'];
+  modalIdx = 0;
 
-  var gallery = document.getElementById('insGallery');
-  gallery.querySelectorAll('img').forEach(function(i){i.remove();});
-  insPhotos.forEach(function(url, i) {
+  var gallery = document.getElementById('modalGallery');
+  gallery.querySelectorAll('img').forEach(function(i){ i.remove(); });
+  modalPhotos.forEach(function(url, i) {
     var img = document.createElement('img');
     img.src = url; img.alt = 'Foto ' + (i+1);
     img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:' + (i===0?'1':'0') + ';transition:opacity 0.4s;';
     if (i===0) img.classList.add('active');
     gallery.appendChild(img);
   });
-  document.getElementById('insCounter').textContent = '1 / ' + insPhotos.length;
+  updateCounter();
 
-  var thumbs = document.getElementById('insThumbs');
-  if (insPhotos.length > 1) {
+  var thumbs = document.getElementById('modalThumbs');
+  if (modalPhotos.length > 1) {
     thumbs.style.display = 'flex';
-    thumbs.innerHTML = insPhotos.map(function(url, i) {
-      return '<div class="ins-thumb ' + (i===0?'active':'') + '" id="insthumb_' + i + '" data-idx="' + i + '"><img src="' + url + '" alt=""></div>';
+    thumbs.innerHTML = modalPhotos.map(function(url, i) {
+      return '<div class="modal-thumb ' + (i===0?'active':'') + '" id="mthumb_' + i + '" data-idx="' + i + '"><img src="' + url + '" alt="" style="width:100%;height:100%;object-fit:cover;"></div>';
     }).join('');
-    thumbs.addEventListener('click', function(e) {
-      var t = e.target.closest('[data-idx]');
-      if (t) insThumbClick(parseInt(t.dataset.idx));
-    });
-  } else { thumbs.style.display = 'none'; }
+  } else { thumbs.style.display = 'none'; thumbs.innerHTML = ''; }
+
+  document.getElementById('modalThumbs').addEventListener('click', function(e) {
+    var thumb = e.target.closest('[data-idx]');
+    if (thumb) thumbClick(parseInt(thumb.dataset.idx));
+  });
 
   var warm = (l.kalt||0) + (l.nebenkosten||0) + (l.heizung||0);
-  var features = (l.features && l.features.trim()) ? l.features.split(',').map(function(f){return f.trim();}).filter(Boolean) : [];
-  var tags = features.map(function(f){ return '<span class="ins-tag">' + f + '</span>'; }).join('');
+  var features = getFeatures(l);
+  var tags = features.map(function(f){ return '<span class="feature-tag">' + f + '</span>'; }).join('');
   var specs = '';
-  if (l.sqm > 0) specs += '<div class="ins-spec"><div class="val">' + l.sqm + '</div><div class="lbl">m²</div></div>';
-  if (l.rooms > 0) specs += '<div class="ins-spec"><div class="val">' + l.rooms + '</div><div class="lbl">Zimmer</div></div>';
-  if (l.kalt > 0) specs += '<div class="ins-spec"><div class="val">' + l.kalt + ' €</div><div class="lbl">Kaltmiete</div></div>';
-  if (warm > 0) specs += '<div class="ins-spec"><div class="val">' + warm + ' €</div><div class="lbl">Warmmiete</div></div>';
+  if (l.sqm > 0) specs += '<div class="modal-spec"><div class="val">' + l.sqm + '</div><div class="lbl">m²</div></div>';
+  if (l.rooms > 0) specs += '<div class="modal-spec"><div class="val">' + l.rooms + '</div><div class="lbl">Zimmer</div></div>';
+  if (l.kalt > 0) specs += '<div class="modal-spec"><div class="val">' + l.kalt + ' €</div><div class="lbl">Kaltmiete</div></div>';
+  if (warm > 0) specs += '<div class="modal-spec"><div class="val">' + warm + ' €</div><div class="lbl">Warmmiete</div></div>';
 
   var badgeCls = l.status === 'frei' ? 'frei' : l.status === 'vergeben' ? 'vergeben' : 'demnachst';
   var badgeTxt = l.status === 'frei' ? 'Frei' : l.status === 'vergeben' ? 'Vergeben' : 'Demnächst';
 
   var priceHtml = l.kalt > 0
-    ? '<div class="ins-price"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="breakdown">Nebenkosten: ' + (l.nebenkosten||0) + ' €<br>Heizkosten: ' + (l.heizung||0) + ' €<br>Warmmiete: ' + warm + ' €<br>Kaution: <strong style="color:#C9A96E;">' + (l.kaution||0) + ' €</strong></div></div>'
-    : '<div class="ins-price"><div style="color:#9A9080;">Preis auf Anfrage</div></div>';
+    ? '<div class="modal-price-block"><div><div class="kalt">' + l.kalt + ' €<span>/ Monat kalt</span></div></div><div class="modal-price-breakdown">Nebenkosten: ' + (l.nebenkosten||0) + ' €<br>Heizkosten: ' + (l.heizung||0) + ' €<br><strong style="color:var(--text);">Warmmiete: ' + warm + ' €</strong><br>Kaution: <strong style="color:var(--gold);">' + (l.kaution||0) + ' €</strong></div></div>'
+    : '<div class="modal-price-block"><div style="font-size:1.1rem;color:var(--text-muted);">Preis auf Anfrage</div></div>';
 
-  document.getElementById('insBody').innerHTML =
-    '<span class="ins-badge ' + badgeCls + '">' + badgeTxt + '</span>'
-    + '<div class="ins-addr">' + (l.address||'') + '</div>'
-    + '<div class="ins-title">' + (l.title||'') + '</div>'
-    + (specs ? '<div class="ins-specs">' + specs + '</div>' : '')
-    + '<div class="ins-desc">' + (l.description||'') + '</div>'
-    + (tags ? '<div class="ins-tags">' + tags + '</div>' : '')
-    + priceHtml;
+  var ctaHtml = l.status === 'frei'
+    ? '<a href="central-city-apartment.html" class="btn-gold" data-lid="' + l.id + '">Besichtigung anfragen</a><button onclick="closeModal()" class="btn-outline">Schließen</button>'
+    : '<button onclick="closeModal()" class="btn-outline">Schließen</button>';
 
-  document.getElementById('insModal').classList.add('open');
+  var videoHtml = l.video_url ? '<div style="margin-bottom:1.5rem;"><div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:8px;">Video-Besichtigung</div><div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius);background:var(--dark3);"><iframe src="' + getEmbedUrl(l.video_url) + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe></div></div>' : '';
+
+  document.getElementById('modalBody').innerHTML =
+    '<span class="modal-badge ' + badgeCls + '">' + badgeTxt + '</span>'
+    + '<div class="modal-address">' + (l.address||'') + '</div>'
+    + '<div class="modal-title">' + (l.title||'') + '</div>'
+    + (specs ? '<div class="modal-specs-row">' + specs + '</div>' : '')
+    + '<div class="modal-desc">' + (l.description||'') + '</div>'
+    + (tags ? '<div class="modal-features">' + tags + '</div>' : '')
+    + priceHtml
+    + videoHtml
+    + '<div class="modal-cta">' + ctaHtml + '</div>';
+
+  document.getElementById('listingModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-function closeInsModal() {
-  document.getElementById('insModal').classList.remove('open');
-  document.body.style.overflow = '';
+function closeModal() { document.getElementById('listingModal').classList.remove('open'); document.body.style.overflow = ''; }
+function handleModalClick(e) { if (e.target === document.getElementById('listingModal')) closeModal(); }
+function modalSlide(dir) {
+  var imgs = document.getElementById('modalGallery').querySelectorAll('img');
+  imgs[modalIdx].style.opacity='0'; imgs[modalIdx].classList.remove('active');
+  var t = document.getElementById('mthumb_'+modalIdx); if(t) t.classList.remove('active');
+  modalIdx = (modalIdx + dir + modalPhotos.length) % modalPhotos.length;
+  imgs[modalIdx].style.opacity='1'; imgs[modalIdx].classList.add('active');
+  var nt = document.getElementById('mthumb_'+modalIdx); if(nt) nt.classList.add('active');
+  updateCounter();
 }
-
-function insSlide(dir) {
-  var imgs = document.getElementById('insGallery').querySelectorAll('img');
-  imgs[insIdx].style.opacity='0'; imgs[insIdx].classList.remove('active');
-  var t = document.getElementById('insthumb_'+insIdx); if(t) t.classList.remove('active');
-  insIdx = (insIdx + dir + insPhotos.length) % insPhotos.length;
-  imgs[insIdx].style.opacity='1'; imgs[insIdx].classList.add('active');
-  var nt = document.getElementById('insthumb_'+insIdx); if(nt) nt.classList.add('active');
-  document.getElementById('insCounter').textContent = (insIdx+1) + ' / ' + insPhotos.length;
+function thumbClick(idx) {
+  var imgs = document.getElementById('modalGallery').querySelectorAll('img');
+  imgs[modalIdx].style.opacity='0'; imgs[modalIdx].classList.remove('active');
+  var t = document.getElementById('mthumb_'+modalIdx); if(t) t.classList.remove('active');
+  modalIdx = idx;
+  imgs[modalIdx].style.opacity='1'; imgs[modalIdx].classList.add('active');
+  var nt = document.getElementById('mthumb_'+modalIdx); if(nt) nt.classList.add('active');
+  updateCounter();
 }
+function updateCounter() { document.getElementById('modalCounter').textContent = (modalIdx+1) + ' / ' + modalPhotos.length; }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
-function insThumbClick(idx) {
-  var imgs = document.getElementById('insGallery').querySelectorAll('img');
-  imgs[insIdx].style.opacity='0'; imgs[insIdx].classList.remove('active');
-  var t = document.getElementById('insthumb_'+insIdx); if(t) t.classList.remove('active');
-  insIdx = idx;
-  imgs[insIdx].style.opacity='1'; imgs[insIdx].classList.add('active');
-  var nt = document.getElementById('insthumb_'+insIdx); if(nt) nt.classList.add('active');
-  document.getElementById('insCounter').textContent = (insIdx+1) + ' / ' + insPhotos.length;
-}
-
-document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeInsModal(); });
-
-
-async function resetToAusstehend(id) {
-  try {
-    await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
-    renderDashboard();
-  } catch(e) { alert('Fehler: ' + e.message); }
-}
-
-async function toggleFavorite(id) {
-  var app = allApps.find(function(a) { return a.id === id; });
-  if (!app) return;
-  var newVal = !app.favorite;
-  try {
-    await updateApplication(id, { favorite: newVal });
-    app.favorite = newVal;
-    renderAppList();
-  } catch(e) { alert('Fehler: ' + e.message); }
-}
-
-
-// ============================================================
-// INSERATE ADMIN (add/edit/delete)
-// ============================================================
+// ADMIN
+function openAdmin() { document.getElementById('adminOverlay').classList.add('open'); }
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
 async function renderInserateAdmin() {
   var list = document.getElementById('inserateList');
   list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Lade...</div>';
   try {
-    var listings = await sbFetch('listings?order=sort_order.asc', { prefer: '' });
-    list.innerHTML = listings.map(function(l) { return buildInseratAdminCard(l); }).join('');
+    var listings = await fetchListings();
+    // Sort: demnachst/new listings (sort_order=99) first, then by sort_order
+    listings.sort(function(a, b) {
+      if (a.sort_order === 99 && b.sort_order !== 99) return -1;
+      if (b.sort_order === 99 && a.sort_order !== 99) return 1;
+      return a.sort_order - b.sort_order;
+    });
+    list.innerHTML = '';
+    listings.forEach(function(l) {
+      var card = buildInseratAdminCard(l);
+      var tmp = document.createElement('div');
+      tmp.innerHTML = card;
+      list.appendChild(tmp.firstChild);
+    });
   } catch(e) {
     list.innerHTML = '<div style="color:#E8837F;">Fehler: ' + e.message + '</div>';
   }
@@ -2392,36 +716,35 @@ function buildInseratAdminCard(l) {
   }).join('');
   var id = l.id;
   var div = document.createElement('div');
-  div.className = 'form-section';
+  div.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;';
   div.id = 'ins_' + id;
-  div.style.marginBottom = '1rem';
   div.innerHTML = [
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">',
       '<span style="font-size:0.95rem;color:var(--gold);">' + (l.title||id) + '</span>',
-      '<button data-dlid="' + id + '" style="background:transparent;border:1px solid rgba(224,82,82,0.4);color:#E8837F;padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;" onclick="deleteListing(this.dataset.dlid)">L\u00f6schen</button>',
+      '<button data-dlid="' + id + '" onclick="deleteListing(this.dataset.dlid)" style="background:transparent;border:1px solid rgba(224,82,82,0.4);color:#E8837F;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.78rem;">L\u00f6schen</button>',
     '</div>',
-    '<div class="agrid2">',
-      '<div class="afield"><label>Titel</label><input type="text" id="ins_title_' + id + '" value="' + (l.title||'').replace(/"/g,'&quot;') + '"></div>',
-      '<div class="afield"><label>Status</label><select id="ins_status_' + id + '">' + statusOpts + '</select></div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Titel</label><input type="text" id="ins_title_' + id + '" value="' + (l.title||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Status</label><select id="ins_status_' + id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;">' + statusOpts + '</select></div>',
     '</div>',
-    '<div class="afield"><label>Adresse</label><input type="text" id="ins_address_' + id + '" value="' + (l.address||'').replace(/"/g,'&quot;') + '"></div>',
-    '<div class="afield"><label>Kurzname</label><input type="text" id="ins_short_' + id + '" value="' + (l.short||'').replace(/"/g,'&quot;') + '"></div>',
-    '<div class="agrid3">',
-      '<div class="afield"><label>m\u00b2</label><input type="number" id="ins_sqm_' + id + '" value="' + (l.sqm||0) + '"></div>',
-      '<div class="afield"><label>Zimmer</label><input type="number" id="ins_rooms_' + id + '" value="' + (l.rooms||0) + '"></div>',
-      '<div class="afield"><label>Kaltmiete (\u20ac)</label><input type="number" id="ins_kalt_' + id + '" value="' + (l.kalt||0) + '"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Adresse</label><input type="text" id="ins_address_' + id + '" value="' + (l.address||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kurzname</label><input type="text" id="ins_short_' + id + '" value="' + (l.short||'').replace(/"/g,'&quot;') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.8rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">m\u00b2</label><input type="number" id="ins_sqm_' + id + '" value="' + (l.sqm||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Zimmer</label><input type="number" id="ins_rooms_' + id + '" value="' + (l.rooms||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kaltmiete (\u20ac)</label><input type="number" id="ins_kalt_' + id + '" value="' + (l.kalt||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
     '</div>',
-    '<div class="agrid3">',
-      '<div class="afield"><label>Nebenkosten (\u20ac)</label><input type="number" id="ins_nk_' + id + '" value="' + (l.nebenkosten||0) + '"></div>',
-      '<div class="afield"><label>Heizkosten (\u20ac)</label><input type="number" id="ins_hk_' + id + '" value="' + (l.heizung||0) + '"></div>',
-      '<div class="afield"><label>Kaution (\u20ac)</label><input type="number" id="ins_kaution_' + id + '" value="' + (l.kaution||0) + '"></div>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.8rem;">',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Nebenkosten (\u20ac)</label><input type="number" id="ins_nk_' + id + '" value="' + (l.nebenkosten||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Heizkosten (\u20ac)</label><input type="number" id="ins_hk_' + id + '" value="' + (l.heizung||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+      '<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Kaution (\u20ac)</label><input type="number" id="ins_kaution_' + id + '" value="' + (l.kaution||0) + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
     '</div>',
-    '<div class="afield"><label>Beschreibung</label><textarea id="ins_desc_' + id + '">' + (l.description||'') + '</textarea></div>',
-    '<div class="afield"><label>Tags (kommagetrennt)</label><input type="text" id="ins_features_' + id + '" value="' + (l.features||'') + '"></div>',
-    '<div class="afield"><label>Fotos (Imgur-Links, kommagetrennt)</label><input type="text" id="ins_photos_' + id + '" value="' + (l.photos||'') + '"></div>',
-    '<div class="afield"><label>Video-URL</label><input type="text" id="ins_video_' + id + '" value="' + (l.video_url||'') + '"></div>',
-    '<div style="margin-top:0.8rem;display:flex;align-items:center;gap:10px;">',
-      '<button data-slid="' + id + '" onclick="saveListingById(this.dataset.slid)" class="save-btn">Speichern</button>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Beschreibung</label><textarea id="ins_desc_' + id + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;min-height:80px;resize:vertical;">' + (l.description||'') + '</textarea></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Tags (kommagetrennt)</label><input type="text" id="ins_features_' + id + '" value="' + (l.features||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Fotos (Imgur-Links, kommagetrennt)</label><input type="text" id="ins_photos_' + id + '" value="' + (l.photos||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="display:flex;flex-direction:column;gap:4px;margin-top:0.8rem;"><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Video-URL (YouTube/Vimeo)</label><input type="text" id="ins_video_' + id + '" value="' + (l.video_url||'') + '" style="background:#111;border:1px solid rgba(201,169,110,0.2);border-radius:8px;color:#E8E0D0;padding:8px 12px;font-size:0.88rem;outline:none;"></div>',
+    '<div style="margin-top:1rem;display:flex;align-items:center;gap:10px;">',
+      '<button data-slid="' + id + '" onclick="saveListingById(this.dataset.slid)" style="background:var(--gold);border:none;color:var(--dark);padding:10px 24px;border-radius:8px;font-size:0.88rem;font-weight:500;cursor:pointer;">Speichern</button>',
       '<span id="ins_fb_' + id + '" style="font-size:0.82rem;color:#6DCEAA;display:none;">\u2713 Gespeichert!</span>',
     '</div>'
   ].join('');
@@ -2449,14 +772,16 @@ async function saveListingById(id) {
     await sbFetch('listings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
     var fb = document.getElementById('ins_fb_' + id);
     if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2000); }
+    renderListings();
   } catch(e) { alert('Fehler: ' + e.message); }
 }
 
 async function deleteListing(id) {
-  if (!confirm('Inserat wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return;
+  if (!confirm('Inserat wirklich l\u00f6schen?')) return;
   try {
     await sbFetch('listings?id=eq.' + id, { method: 'DELETE', prefer: '' });
     renderInserateAdmin();
+    renderListings();
   } catch(e) { alert('Fehler: ' + e.message); }
 }
 
@@ -2465,114 +790,120 @@ async function addNewListing() {
   var newListing = {
     id: newId, title: 'Neue Wohnung', address: '', short: 'Neue Wohnung',
     sqm: 0, rooms: 0, kalt: 0, nebenkosten: 0, heizung: 0, kaution: 0,
-    description: '', features: '', photos: '', video_url: '', status: 'demnachst',
-    sort_order: 99
+    description: '', features: '', photos: '', video_url: '', status: 'demnachst', sort_order: 99
   };
   try {
     await sbFetch('listings', { method: 'POST', body: JSON.stringify(newListing) });
+    await renderInserateAdmin();
+    var list = document.getElementById('inserateList');
+    if (list) list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+function doAdminLogin() {
+  if (document.getElementById('adminPw').value === ADMIN_PW) {
+    document.getElementById('adminLoginBox').style.display = 'none';
+    document.getElementById('adminEditor').style.display = 'block';
+    loadEJSConfig();
     renderInserateAdmin();
-  } catch(e) { alert('Fehler: ' + e.message); }
+  } else { document.getElementById('adminLoginErr').style.display = 'block'; document.getElementById('adminPw').value = ''; }
+}
+function adminLogout() { document.getElementById('adminLoginBox').style.display = 'block'; document.getElementById('adminEditor').style.display = 'none'; document.getElementById('adminPw').value = ''; }
+
+var adminListings = [];
+var adminActiveTab = 0;
+
+function switchAdminTab(tab) {
+  ['inserate','settings'].forEach(function(t) {
+    var el = document.getElementById('tabContent-' + t);
+    var btn = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'inserate') renderInserateAdmin();
 }
 
-// ============================================================
-// BEWERBUNGEN: DELETE + ADD
-// ============================================================
-async function deleteApplication(id) {
-  if (!confirm('Bewerbung wirklich löschen?')) return;
+
+var ejsConfigCache = {};
+
+function getEJSConfig() {
+  if (ejsConfigCache.publicKey) return ejsConfigCache;
+  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
+}
+
+async function loadEJSFromSupabase() {
   try {
-    await sbFetch('applications?id=eq.' + id, { method: 'DELETE', prefer: '' });
-    renderDashboard();
-  } catch(e) { alert('Fehler: ' + e.message); }
+    var data = await sbFetch('settings?key=eq.emailjs', { prefer: '' });
+    if (data && data[0] && data[0].value) {
+      var cfg = JSON.parse(data[0].value);
+      ejsConfigCache = cfg;
+      localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+      if (document.getElementById('ejsPublicKey')) document.getElementById('ejsPublicKey').value = cfg.publicKey || '';
+      if (document.getElementById('ejsServiceId')) document.getElementById('ejsServiceId').value = cfg.serviceId || '';
+      if (document.getElementById('ejsTemplateId')) document.getElementById('ejsTemplateId').value = cfg.templateId || '';
+    }
+  } catch(e) { console.log('EJS load error:', e); }
 }
 
-function showAddApplicationModal() {
-  var existing = document.getElementById('addAppModal');
-  if (existing) existing.remove();
-  var overlay = document.createElement('div');
-  overlay.id = 'addAppModal';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;overflow-y:auto;padding:2rem 1rem;';
-  var box = document.createElement('div');
-  box.style.cssText = 'max-width:700px;margin:0 auto;background:#1A1A1A;border:1px solid rgba(201,169,110,0.3);border-radius:14px;padding:2rem;';
-  box.innerHTML = [
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">',
-      '<div>',
-        '<div style="font-family:Playfair Display,serif;font-size:1.2rem;color:var(--gold);">Neue Bewerbung</div>',
-        '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Manuelle Erfassung eines Interessenten</div>',
-      '</div>',
-      '<button id="closeAddModal" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">\u2715</button>',
-    '</div>',
-    '<div class="agrid2">',
-      '<div class="afield"><label>Vorname <span style="color:var(--gold)">*</span></label><input type="text" id="aa_fn" placeholder="Max"></div>',
-      '<div class="afield"><label>Nachname <span style="color:var(--gold)">*</span></label><input type="text" id="aa_ln" placeholder="Mustermann"></div>',
-      '<div class="afield"><label>E-Mail <span style="color:var(--gold)">*</span></label><input type="email" id="aa_email" placeholder="max@beispiel.de"></div>',
-      '<div class="afield"><label>Telefon</label><input type="tel" id="aa_phone" placeholder="+49 231..."></div>',
-    '</div>',
-    '<div class="afield" style="margin-top:0.5rem;"><label>Immobilie</label><select id="aa_prop"><option value="">– bitte w\u00e4hlen –</option>' + PROPERTIES.map(function(p){ return '<option value="' + p.street + ', ' + p.city + '">' + p.street + '</option>'; }).join('') + '</select></div>',
-    '<div class="agrid2" style="margin-top:0.5rem;">',
-      '<div class="afield"><label>Besch\u00e4ftigungsart</label><select id="aa_emp"><option value="">–</option><option>Festangestellt (unbefristet)</option><option>Selbst\u00e4ndig</option><option>Student/in</option><option>Auszubildende/r</option><option>Rentner/in</option><option>B\u00fcrgergeld</option></select></div>',
-      '<div class="afield"><label>Nettoeinkommen (\u20ac)</label><input type="number" id="aa_income" placeholder="2000" min="0"></div>',
-      '<div class="afield"><label>Wunschbesichtigung</label><input type="date" id="aa_date" onclick="try{this.showPicker()}catch(e){}"></div>',
-      '<div class="afield"><label>Status</label><select id="aa_status"><option value="pending">Ausstehend</option><option value="confirmed">Best\u00e4tigt</option><option value="rejected">Abgelehnt</option></select></div>',
-    '</div>',
-    '<div class="afield" style="margin-top:0.5rem;"><label>Bemerkungen</label><textarea id="aa_remarks" placeholder="Notizen, besondere Hinweise..."></textarea></div>',
-    '<div style="margin-top:1.2rem;display:flex;gap:10px;padding-top:1rem;border-top:1px solid var(--border);">',
-      '<button id="submitAddApp" class="btn-primary" style="flex:1;">Bewerbung hinzuf\u00fcgen</button>',
-      '<button id="cancelAddApp" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 20px;border-radius:var(--radius);cursor:pointer;font-size:0.88rem;font-family:DM Sans,sans-serif;">Abbrechen</button>',
-    '</div>'
-  ].join('');
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  document.getElementById('closeAddModal').onclick = function(){ overlay.remove(); };
-  document.getElementById('cancelAddApp').onclick = function(){ overlay.remove(); };
-  document.getElementById('submitAddApp').onclick = submitAddApplication;
-}
-
-async function submitAddApplication() {
-  var payload = {
-    status: document.getElementById('aa_status').value,
-    first_name: document.getElementById('aa_fn').value,
-    last_name: document.getElementById('aa_ln').value,
-    email: document.getElementById('aa_email').value,
-    phone: document.getElementById('aa_phone').value,
-    property: document.getElementById('aa_prop').value,
-    employment_status: document.getElementById('aa_emp').value,
-    net_income: document.getElementById('aa_income').value,
-    viewing_date: document.getElementById('aa_date').value,
-    remarks: document.getElementById('aa_remarks').value
+async function saveEmailJStoSupabase() {
+  var cfg = {
+    publicKey: document.getElementById('ejsPublicKey').value.trim(),
+    serviceId: document.getElementById('ejsServiceId').value.trim(),
+    templateId: document.getElementById('ejsTemplateId').value.trim()
   };
+  localStorage.setItem('cca_ejs', JSON.stringify(cfg));
+  ejsConfigCache = cfg;
   try {
-    await insertApplication(payload);
-    document.getElementById('addAppModal').remove();
-    renderDashboard();
+    await sbFetch('settings?key=eq.emailjs', { method: 'PATCH', body: JSON.stringify({ value: JSON.stringify(cfg) }) });
+  } catch(e) {
+    try { await sbFetch('settings', { method: 'POST', body: JSON.stringify({ key: 'emailjs', value: JSON.stringify(cfg) }) }); } catch(e2) {}
+  }
+  var fb = document.getElementById('ejsSaveFeedback');
+  if (fb) { fb.style.display = 'inline'; setTimeout(function(){ fb.style.display='none'; }, 2500); }
+}
+
+function loadEJSConfig() {
+  loadEJSFromSupabase();
+}
+
+function switchAdminTab(idx) {
+  adminActiveTab = idx;
+  document.querySelectorAll('.admin-listing-tab').forEach(function(t,i){ t.classList.toggle('active',i===idx); });
+  document.querySelectorAll('.admin-listing-form').forEach(function(f,i){ f.classList.toggle('active',i===idx); });
+}
+function updatePhoto(li,pi,val){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u[pi]=val; adminListings[li].photos=u.join(','); }
+function removePhoto(li,pi){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.splice(pi,1); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
+function addPhoto(li){ var u=(adminListings[li].photos||'').split(',').map(function(x){return x.trim();}).filter(Boolean); u.push(''); adminListings[li].photos=u.join(','); renderInserateAdmin(); }
+
+async function saveAllListings() {
+  var btn = document.querySelector('.save-btn');
+  btn.textContent = 'Speichere...'; btn.disabled = true;
+  try {
+    for (var i = 0; i < adminListings.length; i++) await upsertListing(adminListings[i]);
+    var fb = document.getElementById('saveFeedback'); fb.style.display = 'inline';
+    setTimeout(function(){ fb.style.display='none'; }, 2500);
+    
+// ============================================================
+// INSERATE ADMIN
+// ============================================================
+renderListings();
   } catch(e) { alert('Fehler: ' + e.message); }
+  finally { btn.textContent = 'Änderungen speichern'; btn.disabled = false; }
 }
 
-// INIT
-buildPropertyGrid();
-buildPropertyGridShort();
-
-var toggleBtn = document.getElementById('toggleFullFormBtn');
-if (toggleBtn) {
-  toggleBtn.addEventListener('click', toggleFullForm);
-  toggleBtn.addEventListener('mouseover', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; });
-  toggleBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'; });
+// HERO SLIDESHOW
+var heroBgIdx = 0;
+var heroBgs = document.querySelectorAll('.hero-bg img');
+if (heroBgs.length > 1) {
+  setInterval(function() {
+    heroBgs[heroBgIdx].classList.remove('active');
+    heroBgIdx = (heroBgIdx + 1) % heroBgs.length;
+    heroBgs[heroBgIdx].classList.add('active');
+  }, 5000);
 }
+
+renderListings();
+
 </script>
-
-
-<!-- INSERAT MODAL -->
-<div class="ins-overlay" id="insModal" onclick="if(event.target===this)closeInsModal()">
-  <div class="ins-box">
-    <div class="ins-gallery" id="insGallery">
-      <button class="ins-close" onclick="closeInsModal()">✕</button>
-      <button class="ins-gallery-btn prev" onclick="insSlide(-1)">‹</button>
-      <button class="ins-gallery-btn next" onclick="insSlide(1)">›</button>
-      <div class="ins-counter" id="insCounter">1 / 1</div>
-    </div>
-    <div class="ins-thumbs" id="insThumbs"></div>
-    <div class="ins-body" id="insBody"></div>
-  </div>
-</div>
-
 </body>
 </html>
