@@ -1189,113 +1189,100 @@
   Central City Apartment Dortmund · <a href="mailto:centralcitydo@gmail.com" style="color:var(--gold);">centralcitydo@gmail.com</a>
 </footer>
 
+
+<footer class="site-footer">
+  Central City Apartment Dortmund · <a href="mailto:centralcitydo@gmail.com" style="color:var(--gold);">centralcitydo@gmail.com</a>
+</footer>
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
-const ADMIN_PASSWORD = 'CCA2024!'; // ← Passwort hier ändern
+const ADMIN_PASSWORD = 'CCA2024!';
 const SUPABASE_URL = 'https://mxgwmmitbuperbiozdtz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z3dtbWl0YnVwZXJiaW96ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxOTE3MDAsImV4cCI6MjA5NTc2NzcwMH0.MJXiBC4HkjyfTSSBMpEsrl1nXQsLaUWI67rQMwpwUZs';
 
 const PROPERTIES = [
   { id: 'p1', street: 'Schelenbrink 30', city: '44309 Dortmund' },
   { id: 'p2', street: 'Schelenbrink 07', city: '44309 Dortmund' },
-  { id: 'p3', street: 'Herderstraße 16, EG rechts', city: '44147 Dortmund' },
-  { id: 'p4', street: 'Herderstraße 16, 1. OG links', city: '44147 Dortmund' },
-  { id: 'p5', street: 'Herderstraße 16, 2. OG rechts', city: '44147 Dortmund' },
-  { id: 'p6', street: 'Herderstraße 16, EG links', city: '44147 Dortmund' },
+  { id: 'p3', street: 'Herderstra\u00dfe 16, EG rechts', city: '44147 Dortmund' },
+  { id: 'p4', street: 'Herderstra\u00dfe 16, 1. OG links', city: '44147 Dortmund' },
+  { id: 'p5', street: 'Herderstra\u00dfe 16, 2. OG rechts', city: '44147 Dortmund' },
+  { id: 'p6', street: 'Herderstra\u00dfe 16, EG links', city: '44147 Dortmund' },
 ];
 
-// ============================================================
-// SUPABASE HELPERS
-// ============================================================
-async function sbFetch(path, options = {}) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    ...options,
+// SUPABASE
+async function sbFetch(path, options) {
+  options = options || {};
+  var res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    method: options.method || 'GET',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + SUPABASE_KEY,
       'Content-Type': 'application/json',
-      'Prefer': options.prefer || 'return=representation',
-      ...(options.headers || {})
-    }
+      'Prefer': options.prefer !== undefined ? options.prefer : 'return=representation'
+    },
+    body: options.body || undefined
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  const text = await res.text();
+  if (!res.ok) { var e = await res.text(); throw new Error(e); }
+  var text = await res.text();
   return text ? JSON.parse(text) : [];
 }
 
 async function insertApplication(data) {
-  return sbFetch('applications', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    prefer: 'return=representation'
-  });
+  return sbFetch('applications', { method: 'POST', body: JSON.stringify(data) });
 }
-
-async function fetchApplications(status) {
-  let path = 'applications?order=created_at.desc';
-  if (status && status !== 'all') path += '&status=eq.' + status;
-  return sbFetch(path, { method: 'GET', prefer: '' });
+async function fetchApplications() {
+  return sbFetch('applications?order=created_at.desc', { prefer: '' });
 }
-
 async function updateApplication(id, updates) {
-  return sbFetch('applications?id=eq.' + id, {
-    method: 'PATCH',
-    body: JSON.stringify(updates),
-    prefer: 'return=representation'
-  });
+  return sbFetch('applications?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(updates) });
 }
 
-// ============================================================
-// EMAILJS CONFIG (localStorage nur für EmailJS-Einstellungen)
-// ============================================================
+// EMAILJS CONFIG
 function getEJSConfig() {
-  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem('cca_ejs') || '{}'); } catch(e) { return {}; }
 }
 function saveEmailJSConfig() {
-  const cfg = {
+  var cfg = {
     publicKey: document.getElementById('ejsPublicKey').value.trim(),
     serviceId: document.getElementById('ejsServiceId').value.trim(),
-    templateId: document.getElementById('ejsTemplateId').value.trim(),
+    templateId: document.getElementById('ejsTemplateId').value.trim()
   };
   localStorage.setItem('cca_ejs', JSON.stringify(cfg));
 }
 
-// ============================================================
-// PROPERTIES GRID
-// ============================================================
+function sendEmail(cfg, params) {
+  if (!cfg.publicKey || !cfg.serviceId || !cfg.templateId) return;
+  emailjs.init(cfg.publicKey);
+  emailjs.send(cfg.serviceId, cfg.templateId, params).catch(function(){});
+}
+
+// PROPERTY GRID
 function buildPropertyGrid() {
-  const grid = document.getElementById('propertyGrid');
-  grid.innerHTML = PROPERTIES.map(p => `
-    <div class="property-card" id="card_${p.id}" onclick="selectProperty('${p.id}', this)">
-      <input type="radio" name="propertyRadio" value="${p.id}">
-      <div class="prop-check" id="check_${p.id}">✓</div>
-      <div class="prop-street">${p.street}</div>
-      <div class="prop-city">${p.city}</div>
-    </div>
-  `).join('');
+  var grid = document.getElementById('propertyGrid');
+  grid.innerHTML = PROPERTIES.map(function(p) {
+    return '<div class="property-card" id="card_' + p.id + '" onclick="selectProperty(\'' + p.id + '\', this)">'
+      + '<input type="radio" name="propertyRadio" value="' + p.id + '">'
+      + '<div class="prop-check" id="check_' + p.id + '">\u2713</div>'
+      + '<div class="prop-street">' + p.street + '</div>'
+      + '<div class="prop-city">' + p.city + '</div>'
+      + '</div>';
+  }).join('');
 }
 
 function selectProperty(id, el) {
-  document.querySelectorAll('.property-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.property-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
-  const prop = PROPERTIES.find(p => p.id === id);
+  var prop = PROPERTIES.find(function(p) { return p.id === id; });
   document.getElementById('selectedProperty').value = prop ? prop.street + ', ' + prop.city : '';
 }
 
-// ============================================================
-// TOGGLE RADIO BUTTONS STYLE
-// ============================================================
+// RADIO STYLE
 document.addEventListener('change', function(e) {
   if (e.target.type === 'radio') {
-    const group = e.target.closest('.toggle-group');
+    var group = e.target.closest('.toggle-group');
     if (group) {
-      group.querySelectorAll('label').forEach(l => { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
-      const checked = e.target.closest('label');
+      group.querySelectorAll('label').forEach(function(l) {
+        l.style.borderColor = ''; l.style.color = ''; l.style.background = '';
+      });
+      var checked = e.target.closest('label');
       if (checked) {
         checked.style.borderColor = 'var(--gold)';
         checked.style.color = 'var(--gold)';
@@ -1305,80 +1292,73 @@ document.addEventListener('change', function(e) {
   }
 });
 
-// ============================================================
 // FORM SUBMIT
-// ============================================================
 async function submitForm(e) {
   e.preventDefault();
-  const form = e.target;
-  const fd = new FormData(form);
-  const raw = {};
-  for (let [k, v] of fd.entries()) { raw[k] = v; }
+  var form = e.target;
+  var fd = new FormData(form);
+  var raw = {};
+  for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
 
   if (!raw.property) {
-    showAlert('formAlert', 'error', 'Bitte wählen Sie eine Immobilie aus.');
+    showAlert('formAlert', 'error', 'Bitte w\u00e4hlen Sie eine Immobilie aus.');
     document.querySelector('.property-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
-  const btn = document.getElementById('submitBtn');
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Wird gesendet…';
+  btn.textContent = 'Wird gesendet\u2026';
 
-  // Map form field names → Supabase column names (snake_case)
-  const payload = {
+  var payload = {
     status: 'pending',
-    first_name: raw.firstName, last_name: raw.lastName,
-    email: raw.email, phone: raw.phone,
-    birthdate: raw.birthdate, birthplace: raw.birthplace,
-    nationality: raw.nationality, id_number: raw.idNumber,
-    street: raw.street, zip: raw.zip, city: raw.city,
-    property: raw.property,
-    current_landlord: raw.currentLandlord, current_rent: raw.currentRent,
-    rent_since: raw.rentSince, notice_period: raw.noticeperiod, move_reason: raw.moveReason,
-    move_in_date: raw.moveInDate, viewing_date: raw.viewingDate,
-    viewing_time: raw.viewingTime, viewing_date_alt: raw.viewingDateAlt,
-    total_persons: raw.totalPersons, children: raw.children,
-    children_ages: raw.childrenAges, co_residents: raw.coResidents,
-    pets: raw.pets, pet_details: raw.petDetails, smoker: raw.smoker,
-    occupation: raw.occupation, employment_status: raw.employmentStatus,
-    employer: raw.employer, employed_since: raw.employedSince,
-    net_income: raw.netIncome, additional_income: raw.additionalIncome,
-    additional_income_type: raw.additionalIncomeType, welfare: raw.welfare,
-    schufa_available: raw.schufaAvailable, schufa_score: raw.schufaScore,
-    debts: raw.debts, rent_debts: raw.rentDebts, credit_explanation: raw.creditExplanation,
-    guarantor: raw.guarantor, guarantor_name: raw.guarantorName,
-    guarantor_contact: raw.guarantorContact, guarantor_income: raw.guarantorIncome,
-    parking_needed: raw.parkingNeeded, home_office: raw.homeOffice,
-    instrument: raw.instrument, heard_from: raw.heardFrom, remarks: raw.remarks,
+    first_name: raw.firstName || '', last_name: raw.lastName || '',
+    email: raw.email || '', phone: raw.phone || '',
+    birthdate: raw.birthdate || '', birthplace: raw.birthplace || '',
+    nationality: raw.nationality || '', id_number: raw.idNumber || '',
+    street: raw.street || '', zip: raw.zip || '', city: raw.city || '',
+    property: raw.property || '',
+    current_landlord: raw.currentLandlord || '', current_rent: raw.currentRent || '',
+    rent_since: raw.rentSince || '', notice_period: raw.noticeperiod || '', move_reason: raw.moveReason || '',
+    move_in_date: raw.moveInDate || '', viewing_date: raw.viewingDate || '',
+    viewing_time: raw.viewingTime || '', viewing_date_alt: raw.viewingDateAlt || '',
+    total_persons: raw.totalPersons || '', children: raw.children || '',
+    children_ages: raw.childrenAges || '', co_residents: raw.coResidents || '',
+    pets: raw.pets || '', pet_details: raw.petDetails || '', smoker: raw.smoker || '',
+    occupation: raw.occupation || '', employment_status: raw.employmentStatus || '',
+    employer: raw.employer || '', employed_since: raw.employedSince || '',
+    net_income: raw.netIncome || '', additional_income: raw.additionalIncome || '',
+    additional_income_type: raw.additionalIncomeType || '', welfare: raw.welfare || '',
+    schufa_available: raw.schufaAvailable || '', schufa_score: raw.schufaScore || '',
+    debts: raw.debts || '', rent_debts: raw.rentDebts || '', credit_explanation: raw.creditExplanation || '',
+    guarantor: raw.guarantor || '', guarantor_name: raw.guarantorName || '',
+    guarantor_contact: raw.guarantorContact || '', guarantor_income: raw.guarantorIncome || '',
+    parking_needed: raw.parkingNeeded || '', home_office: raw.homeOffice || '',
+    instrument: raw.instrument || '', heard_from: raw.heardFrom || '', remarks: raw.remarks || ''
   };
 
   try {
     await insertApplication(payload);
-
-    showAlert('formAlert', 'success', `✓ Vielen Dank, ${raw.firstName || 'lieber Interessent'}! Ihre Bewerbung ist eingegangen. Wir melden uns zeitnah bei Ihnen.`);
+    showAlert('formAlert', 'success', '\u2713 Vielen Dank, ' + (raw.firstName || 'lieber Interessent') + '! Ihre Bewerbung ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
     form.reset();
-    document.querySelectorAll('.property-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.property-card').forEach(function(c) { c.classList.remove('selected'); });
     document.getElementById('selectedProperty').value = '';
-    document.querySelectorAll('.toggle-group label').forEach(l => { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
+    document.querySelectorAll('.toggle-group label').forEach(function(l) { l.style.borderColor=''; l.style.color=''; l.style.background=''; });
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Auto-reply
-    const cfg = getEJSConfig();
-    if (cfg.publicKey && cfg.serviceId && cfg.templateId && raw.email) {
-      emailjs.init(cfg.publicKey);
-      emailjs.send(cfg.serviceId, cfg.templateId, {
+    var cfg = getEJSConfig();
+    if (cfg.publicKey && raw.email) {
+      sendEmail(cfg, {
         to_name: (raw.firstName||'') + ' ' + (raw.lastName||''),
         to_email: raw.email,
         property: raw.property,
         viewing_date: raw.viewingDate || 'wird noch mitgeteilt',
         viewing_time: raw.viewingTime || '',
-        message: 'Vielen Dank für Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten und werden Ihre Anfrage prüfen. Sie erhalten in Kürze eine Rückmeldung bezüglich Ihres Besichtigungstermins.'
-      }).catch(() => {});
+        message: 'Vielen Dank fuer Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten und werden uns in Kuerze mit einem Besichtigungstermin bei Ihnen melden.'
+      });
     }
-  } catch (err) {
-    showAlert('formAlert', 'error', 'Fehler beim Senden: ' + err.message + ' – Bitte versuchen Sie es erneut oder kontaktieren Sie uns direkt.');
-    console.error(err);
+  } catch(err) {
+    showAlert('formAlert', 'error', 'Fehler beim Senden: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Bewerbung absenden';
@@ -1386,19 +1366,17 @@ async function submitForm(e) {
 }
 
 function showAlert(id, type, msg) {
-  const el = document.getElementById(id);
+  var el = document.getElementById(id);
   el.className = 'alert ' + type + ' show';
   el.textContent = msg;
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ============================================================
-// ADMIN
-// ============================================================
+// ADMIN NAVIGATION
 function toggleAdminView() {
-  const vf = document.getElementById('viewForm');
-  const va = document.getElementById('viewAdmin');
-  const btn = document.getElementById('adminToggleBtn');
+  var vf = document.getElementById('viewForm');
+  var va = document.getElementById('viewAdmin');
+  var btn = document.getElementById('adminToggleBtn');
   if (va.classList.contains('active')) {
     va.classList.remove('active');
     vf.classList.add('active');
@@ -1406,12 +1384,12 @@ function toggleAdminView() {
   } else {
     vf.classList.remove('active');
     va.classList.add('active');
-    btn.textContent = '← Zurück';
+    btn.textContent = '\u2190 Zur\u00fcck';
   }
 }
 
 function adminLogin() {
-  const pass = document.getElementById('adminPass').value;
+  var pass = document.getElementById('adminPass').value;
   if (pass === ADMIN_PASSWORD) {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
@@ -1430,427 +1408,304 @@ function adminLogout() {
 }
 
 function loadEJSConfig() {
-  const cfg = getEJSConfig();
+  var cfg = getEJSConfig();
   if (cfg.publicKey) document.getElementById('ejsPublicKey').value = cfg.publicKey;
   if (cfg.serviceId) document.getElementById('ejsServiceId').value = cfg.serviceId;
   if (cfg.templateId) document.getElementById('ejsTemplateId').value = cfg.templateId;
 }
 
-let currentFilter = 'all';
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDashboard();
-}
-
-async function renderDashboard() {
-  const list = document.getElementById('appList');
-  list.innerHTML = '<div class="empty-state"><div class="big" style="font-size:1.5rem;opacity:0.5;">Lädt…</div></div>';
-
-  try {
-    // Fetch all for stats, filtered for list
-    const all = await fetchApplications('all');
-    const pending = all.filter(a => a.status === 'pending').length;
-    const confirmed = all.filter(a => a.status === 'confirmed').length;
-    const rejected = all.filter(a => a.status === 'rejected').length;
-
-    document.getElementById('statsRow').innerHTML = `
-      <div class="stat-card"><div class="num">${all.length}</div><div class="lbl">Gesamt</div></div>
-      <div class="stat-card"><div class="num" style="color:var(--gold)">${pending}</div><div class="lbl">Ausstehend</div></div>
-      <div class="stat-card"><div class="num" style="color:#6DCEAA">${confirmed}</div><div class="lbl">Bestätigt</div></div>
-      <div class="stat-card"><div class="num" style="color:#E8837F">${rejected}</div><div class="lbl">Abgelehnt</div></div>
-    `;
-
-    const filtered = currentFilter === 'all' ? all : all.filter(a => a.status === currentFilter);
-    if (!filtered.length) {
-      list.innerHTML = '<div class="empty-state"><div class="big">📭</div>Keine Bewerbungen vorhanden.</div>';
-    } else {
-      list.innerHTML = filtered.map(app => buildAppCard(app)).join('');
-    }
-  } catch (err) {
-    list.innerHTML = `<div class="empty-state" style="color:#E8837F;">Fehler beim Laden: ${err.message}</div>`;
-  }
-}
-
-function buildAppCard(app) {
-  // Supabase returns snake_case – normalize to camelCase for display
-  const fn = app.first_name || '';
-  const ln = app.last_name || '';
-  const initials = ((fn[0]||'?') + (ln[0]||'?')).toUpperCase();
-  const statusMap = { pending: ['status-pending','Ausstehend'], confirmed: ['status-confirmed','Bestätigt'], rejected: ['status-rejected','Abgelehnt'] };
-  const [sc, sl] = statusMap[app.status] || statusMap.pending;
-  const date = app.created_at ? new Date(app.created_at).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-
-  const fields = [
-    ['Immobilie', app.property], ['E-Mail', app.email], ['Telefon', app.phone],
-    ['Geburtsdatum', app.birthdate], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
-    ['Beruf', app.occupation], ['Beschäftigung', app.employment_status],
-    ['Nettoeinkommen', app.net_income ? app.net_income + ' €' : ''], ['Bürgergeld', app.welfare],
-    ['Personen', app.total_persons], ['Kinder', app.children], ['Haustiere', app.pets],
-    ['Raucher', app.smoker], ['Wunscheinzug', app.move_in_date], ['Wunschbesichtigung', app.viewing_date],
-    ['Besichtigungszeit', app.viewing_time], ['Alternativtermin', app.viewing_date_alt],
-    ['Schufa', app.schufa_available], ['Schufa-Score', app.schufa_score],
-    ['Bürge', app.guarantor_name || app.guarantor], ['Schulden', app.debts],
-    ['Homeoffice', app.home_office], ['Stellplatz', app.parking_needed],
-    ['Mitbewohner', app.co_residents], ['Bemerkungen', app.remarks]
-  ].filter(([,v]) => v && String(v).trim() !== '');
-
-  return `
-  <div class="app-card" id="appcard_${app.id}">
-    <div class="app-card-head" onclick="toggleCard('${app.id}')">
-      <div class="app-avatar">${initials}</div>
-      <div>
-        <div class="app-name">${fn} ${ln}</div>
-        <div class="app-meta">${app.property || ''} · eingegangen ${date}</div>
-      </div>
-      <span class="app-status ${sc}">${sl}</span>
-      <span class="app-chevron">▾</span>
-    </div>
-    <div class="app-card-body">
-      <div class="detail-grid">
-        ${fields.map(([l,v]) => `<div class="detail-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('')}
-      </div>
-      ${app.status === 'pending' ? `
-      <div class="action-row">
-        <div class="field">
-          <label>Bestätigter Besichtigungstermin (Datum)</label>
-          <input type="date" id="confDate_${app.id}" value="${app.viewing_date||''}">
-        </div>
-        <div class="field">
-          <label>Uhrzeit</label>
-          <select id="confTime_${app.id}">
-            <option value="">– wählen –</option>
-            <option>09:00 Uhr</option><option>09:30 Uhr</option><option>10:00 Uhr</option>
-            <option>10:30 Uhr</option><option>11:00 Uhr</option><option>11:30 Uhr</option>
-            <option>12:00 Uhr</option><option>13:00 Uhr</option><option>14:00 Uhr</option>
-            <option>14:30 Uhr</option><option>15:00 Uhr</option><option>15:30 Uhr</option>
-            <option>16:00 Uhr</option><option>16:30 Uhr</option><option>17:00 Uhr</option>
-            <option>17:30 Uhr</option><option>18:00 Uhr</option>
-          </select>
-        </div>
-        <button class="btn-confirm" onclick="confirmApp('${app.id}', '${fn}', '${ln}', '${app.email||''}', '${app.property||''}')">✓ Termin bestätigen & E-Mail senden</button>
-        <button class="btn-reject" onclick="rejectApp('${app.id}', '${fn}', '${ln}', '${app.email||''}', '${app.property||''}')">✗ Ablehnen</button>
-      </div>
-      <div id="feedback_${app.id}" class="action-feedback"></div>
-      ` : `<div style="margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:${app.status==='confirmed'?'#6DCEAA':'#E8837F'}">${app.status==='confirmed'?'Bestätigt am '+(app.confirmed_date||'')+' um '+(app.confirmed_time||''):'Abgelehnt'}</strong></div>`}
-    </div>
-  </div>`;
-}
-
-function toggleCard(id) {
-  document.getElementById('appcard_' + id).classList.toggle('expanded');
-}
-
-async function confirmApp(id, fn, ln, email, property) {
-  const date = document.getElementById('confDate_' + id).value;
-  const time = document.getElementById('confTime_' + id).value;
-  if (!date) { showFeedback(id, 'err', 'Bitte Datum auswählen.'); return; }
-  if (!time) { showFeedback(id, 'err', 'Bitte Uhrzeit auswählen.'); return; }
-
-  try {
-    await updateApplication(id, { status: 'confirmed', confirmed_date: date, confirmed_time: time });
-
-    const cfg = getEJSConfig();
-    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
-      emailjs.init(cfg.publicKey);
-      const dateFormatted = new Date(date).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-      emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_name: fn + ' ' + ln,
-        to_email: email,
-        property: property,
-        viewing_date: dateFormatted,
-        viewing_time: time,
-        message: `Sehr geehrte/r ${fn} ${ln},\n\nvielen Dank für Ihr Interesse an unserer Wohnung. Wir freuen uns, Ihnen einen Besichtigungstermin anbieten zu können.\n\n────────────────────────\nBESICHTIGUNGSTERMIN\n────────────────────────\nObjekt:   ${property}\nDatum:    ${dateFormatted}\nUhrzeit:  ${time}\n────────────────────────\n\nBitte erscheinen Sie pünktlich zum vereinbarten Termin.\n\nSollten sich Änderungen ergeben oder Sie den Termin nicht wahrnehmen können, bitten wir Sie, uns rechtzeitig zu informieren:\n\n📧  centralcitydo@gmail.com\n📞  +49 178 2687170\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen\nCentral City Apartment Dortmund`
-      }).then(() => {
-        showFeedback(id, 'ok', `✓ Termin bestätigt. E-Mail an ${email} gesendet.`);
-      }).catch(() => {
-        showFeedback(id, 'ok', `✓ Termin bestätigt. E-Mail-Versand fehlgeschlagen (EmailJS prüfen).`);
-      });
-    } else {
-      showFeedback(id, 'ok', `✓ Termin bestätigt (EmailJS nicht konfiguriert – kein E-Mail-Versand).`);
-    }
-    setTimeout(() => renderDashboard(), 2000);
-  } catch (err) {
-    showFeedback(id, 'err', 'Fehler: ' + err.message);
-  }
-}
-
-async function rejectApp(id, fn, ln, email, property) {
-  if (!confirm('Bewerbung wirklich ablehnen?')) return;
-  try {
-    await updateApplication(id, { status: 'rejected' });
-
-    const cfg = getEJSConfig();
-    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
-      emailjs.init(cfg.publicKey);
-      emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_name: fn + ' ' + ln,
-        to_email: email,
-        property: property,
-        viewing_date: '', viewing_time: '',
-        message: `Sehr geehrte/r ${fn} ${ln},\n\nvielen Dank für Ihr Interesse an der Wohnung ${property} und die Zeit, die Sie sich für Ihre Bewerbung genommen haben.\n\nNach sorgfältiger Prüfung müssen wir Ihnen leider mitteilen, dass wir Ihre Anfrage zum jetzigen Zeitpunkt nicht berücksichtigen können.\n\nWir wünschen Ihnen weiterhin viel Erfolg bei Ihrer Wohnungssuche.\n\nBei Rückfragen stehen wir Ihnen gerne zur Verfügung:\n\n📧  centralcitydo@gmail.com\n📞  +49 178 2687170\n\nMit freundlichen Grüßen\nCentral City Apartment Dortmund`
-      }).catch(() => {});
-    }
-    renderDashboard();
-  } catch (err) {
-    alert('Fehler: ' + err.message);
-  }
-}
-
-function showFeedback(id, type, msg) {
-  const el = document.getElementById('feedback_' + id);
-  if (!el) return;
-  el.className = 'action-feedback show ' + type;
-  el.textContent = msg;
-}
-
-
-
-// ============================================================
 // ADMIN TABS
-// ============================================================
 function switchAdminTab(tab) {
-  ['bewerbungen','kalender','settings'].forEach(t => {
+  ['bewerbungen','kalender','settings'].forEach(function(t) {
     document.getElementById('tabContent-' + t).style.display = t === tab ? 'block' : 'none';
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
   });
   if (tab === 'kalender') renderCalendar();
 }
 
-// ============================================================
-// CALENDAR
-// ============================================================
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let calApps = [];
+// FILTER + DASHBOARD
+var currentFilter = 'all';
+var allApps = [];
 
-function goToday() {
-  calYear = new Date().getFullYear();
-  calMonth = new Date().getMonth();
-  renderCalendar();
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderAppList();
 }
-function calPrev() {
-  calMonth--;
-  if (calMonth < 0) { calMonth = 11; calYear--; }
-  renderCalendar();
+
+async function renderDashboard() {
+  var list = document.getElementById('appList');
+  list.innerHTML = '<div class="empty-state"><div style="opacity:0.4;margin-bottom:0.5rem;">Laedt...</div></div>';
+  try {
+    allApps = await fetchApplications();
+    var pending = allApps.filter(function(a) { return a.status === 'pending'; }).length;
+    var confirmed = allApps.filter(function(a) { return a.status === 'confirmed'; }).length;
+    var rejected = allApps.filter(function(a) { return a.status === 'rejected'; }).length;
+    document.getElementById('statsRow').innerHTML =
+      '<div class="stat-card"><div class="num">' + allApps.length + '</div><div class="lbl">Gesamt</div></div>' +
+      '<div class="stat-card"><div class="num" style="color:var(--gold)">' + pending + '</div><div class="lbl">Ausstehend</div></div>' +
+      '<div class="stat-card"><div class="num" style="color:#6DCEAA">' + confirmed + '</div><div class="lbl">Best\u00e4tigt</div></div>' +
+      '<div class="stat-card"><div class="num" style="color:#E8837F">' + rejected + '</div><div class="lbl">Abgelehnt</div></div>';
+    renderAppList();
+  } catch(err) {
+    list.innerHTML = '<div class="empty-state" style="color:#E8837F;">Fehler: ' + err.message + '</div>';
+  }
 }
-function calNext() {
-  calMonth++;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  renderCalendar();
+
+function renderAppList() {
+  var list = document.getElementById('appList');
+  var filtered = currentFilter === 'all' ? allApps : allApps.filter(function(a) { return a.status === currentFilter; });
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="big">\ud83d\udceb</div>Keine Bewerbungen vorhanden.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(function(app) { return buildAppCard(app); }).join('');
 }
+
+function buildAppCard(app) {
+  var fn = app.first_name || '';
+  var ln = app.last_name || '';
+  var initials = ((fn[0]||'?') + (ln[0]||'?')).toUpperCase();
+  var statusMap = { pending: ['status-pending','Ausstehend'], confirmed: ['status-confirmed','Best\u00e4tigt'], rejected: ['status-rejected','Abgelehnt'] };
+  var sc = (statusMap[app.status] || statusMap.pending)[0];
+  var sl = (statusMap[app.status] || statusMap.pending)[1];
+  var date = app.created_at ? new Date(app.created_at).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  var fields = [
+    ['Immobilie', app.property], ['E-Mail', app.email], ['Telefon', app.phone],
+    ['Geburtsdatum', app.birthdate], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
+    ['Beruf', app.occupation], ['Besch\u00e4ftigung', app.employment_status],
+    ['Nettoeinkommen', app.net_income ? app.net_income + ' \u20ac' : ''], ['B\u00fcrgergeld', app.welfare],
+    ['Personen', app.total_persons], ['Kinder', app.children], ['Haustiere', app.pets],
+    ['Raucher', app.smoker], ['Wunscheinzug', app.move_in_date], ['Wunschbesichtigung', app.viewing_date],
+    ['Besichtigungszeit', app.viewing_time], ['Alternativtermin', app.viewing_date_alt],
+    ['Schufa', app.schufa_available], ['Schufa-Score', app.schufa_score],
+    ['B\u00fcrge', app.guarantor_name || app.guarantor], ['Schulden', app.debts],
+    ['Homeoffice', app.home_office], ['Stellplatz', app.parking_needed],
+    ['Mitbewohner', app.co_residents], ['Bemerkungen', app.remarks]
+  ].filter(function(f) { return f[1] && String(f[1]).trim() !== ''; });
+
+  var timeOptions = ['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'];
+  var timeOpts = timeOptions.map(function(t) { return '<option' + (t === app.viewing_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+
+  var actionHtml = app.status === 'pending'
+    ? '<div class="action-row">'
+      + '<div class="field"><label>Best\u00e4tigter Termin (Datum)</label><input type="date" id="confDate_' + app.id + '" value="' + (app.viewing_date||'') + '"></div>'
+      + '<div class="field"><label>Uhrzeit</label><select id="confTime_' + app.id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
+      + '<button class="btn-confirm" onclick="confirmApp(\'' + app.id + '\')">&#10003; Termin best\u00e4tigen &amp; E-Mail senden</button>'
+      + '<button class="btn-reject" onclick="rejectApp(\'' + app.id + '\')">&#10007; Ablehnen</button>'
+      + '</div><div id="feedback_' + app.id + '" class="action-feedback"></div>'
+    : '<div style="margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted);">Status: <strong style="color:' + (app.status==='confirmed'?'#6DCEAA':'#E8837F') + '">' + (app.status==='confirmed' ? 'Best\u00e4tigt am ' + (app.confirmed_date||'') + ' um ' + (app.confirmed_time||'') : 'Abgelehnt') + '</strong></div>';
+
+  return '<div class="app-card" id="appcard_' + app.id + '">'
+    + '<div class="app-card-head" onclick="toggleCard(\'' + app.id + '\')">'
+    + '<div class="app-avatar">' + initials + '</div>'
+    + '<div><div class="app-name">' + fn + ' ' + ln + '</div><div class="app-meta">' + (app.property||'') + ' \u00b7 eingegangen ' + date + '</div></div>'
+    + '<span class="app-status ' + sc + '">' + sl + '</span>'
+    + '<span class="app-chevron">\u25be</span>'
+    + '</div>'
+    + '<div class="app-card-body">'
+    + '<div class="detail-grid">' + fields.map(function(f) { return '<div class="detail-item"><div class="dl">' + f[0] + '</div><div class="dv">' + f[1] + '</div></div>'; }).join('') + '</div>'
+    + actionHtml
+    + '</div></div>';
+}
+
+function toggleCard(id) {
+  document.getElementById('appcard_' + id).classList.toggle('expanded');
+}
+
+async function confirmApp(id) {
+  var app = allApps.find(function(a) { return a.id === id; });
+  if (!app) return;
+  var date = document.getElementById('confDate_' + id).value;
+  var time = document.getElementById('confTime_' + id).value;
+  if (!date) { showFeedback(id, 'err', 'Bitte Datum ausw\u00e4hlen.'); return; }
+  if (!time) { showFeedback(id, 'err', 'Bitte Uhrzeit ausw\u00e4hlen.'); return; }
+  try {
+    await updateApplication(id, { status: 'confirmed', confirmed_date: date, confirmed_time: time });
+    var cfg = getEJSConfig();
+    var fn = app.first_name || '';
+    var ln = app.last_name || '';
+    var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nwir freuen uns, Ihnen Ihren Besichtigungstermin bestaetigen zu koennen.\n\n---\nBESICHTIGUNGSTERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\nBitte erscheinen Sie puenktlich.\nBei Aenderungen melden Sie sich bitte:\ncentralcitydo@gmail.com\n+49 178 2687170\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
+    showFeedback(id, 'ok', '\u2713 Termin best\u00e4tigt. E-Mail an ' + (app.email||'') + ' gesendet.');
+    setTimeout(function() { renderDashboard(); }, 1500);
+  } catch(err) {
+    showFeedback(id, 'err', 'Fehler: ' + err.message);
+  }
+}
+
+async function rejectApp(id) {
+  if (!confirm('Bewerbung wirklich ablehnen?')) return;
+  var app = allApps.find(function(a) { return a.id === id; });
+  if (!app) return;
+  try {
+    await updateApplication(id, { status: 'rejected' });
+    var cfg = getEJSConfig();
+    var fn = app.first_name || '';
+    var ln = app.last_name || '';
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nvielen Dank fuer Ihr Interesse an ' + (app.property||'') + '.\n\nLeider koennen wir Ihre Anfrage zum jetzigen Zeitpunkt nicht beruecksichtigen.\n\nWir wuenschen Ihnen viel Erfolg bei Ihrer Wohnungssuche.\n\ncentralcitydo@gmail.com\n+49 178 2687170\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
+    renderDashboard();
+  } catch(err) {
+    alert('Fehler: ' + err.message);
+  }
+}
+
+function showFeedback(id, type, msg) {
+  var el = document.getElementById('feedback_' + id);
+  if (!el) return;
+  el.className = 'action-feedback show ' + type;
+  el.textContent = msg;
+}
+
+// CALENDAR
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth();
+var calApps = [];
+
+function goToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); renderCalendar(); }
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
 
 async function renderCalendar() {
-  const label = document.getElementById('calMonthLabel');
-  const grid = document.getElementById('calGrid');
-  const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  label.textContent = months[calMonth] + ' ' + calYear;
-
-  // Fetch confirmed apps
+  var months = ['Januar','Februar','M\u00e4rz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
   try {
-    const all = await fetchApplications('all');
-    calApps = all.filter(a => a.confirmed_date);
+    calApps = await fetchApplications();
+    calApps = calApps.filter(function(a) { return a.confirmed_date; });
   } catch(e) { calApps = []; }
+  buildCalGrid();
+}
 
-  // Build grid
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const startOffset = (firstDay === 0) ? 6 : firstDay - 1; // Mon=0
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
-  const today = new Date();
-
-  let html = '<div class="cal-header-row">';
-  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d => {
-    html += `<div class="cal-header-cell">${d}</div>`;
-  });
+function buildCalGrid() {
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  var startOffset = firstDay === 0 ? 6 : firstDay - 1;
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  var today = new Date();
+  var html = '<div class="cal-header-row">';
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(d) { html += '<div class="cal-header-cell">' + d + '</div>'; });
   html += '</div>';
-
-  let day = 1;
-  let nextDay = 1;
-  let totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-
-  for (let i = 0; i < totalCells; i += 7) {
+  var day = 1, nextDay = 1;
+  var totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+  for (var i = 0; i < totalCells; i += 7) {
     html += '<div class="cal-grid-week">';
-    for (let j = 0; j < 7; j++) {
-      const cell = i + j;
-      let displayDay, isOther = false, fullDate = '';
+    for (var j = 0; j < 7; j++) {
+      var cell = i + j;
+      var displayDay, isOther = false, fullDate;
       if (cell < startOffset) {
         displayDay = daysInPrev - startOffset + cell + 1;
         isOther = true;
-        const m = calMonth === 0 ? 11 : calMonth - 1;
-        const y = calMonth === 0 ? calYear - 1 : calYear;
-        fullDate = `${y}-${String(m+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
+        var pm = calMonth === 0 ? 11 : calMonth - 1;
+        var py = calMonth === 0 ? calYear - 1 : calYear;
+        fullDate = py + '-' + pad2(pm+1) + '-' + pad2(displayDay);
       } else if (day > daysInMonth) {
         displayDay = nextDay++;
         isOther = true;
-        const m = calMonth === 11 ? 0 : calMonth + 1;
-        const y = calMonth === 11 ? calYear + 1 : calYear;
-        fullDate = `${y}-${String(m+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
+        var nm = calMonth === 11 ? 0 : calMonth + 1;
+        var ny = calMonth === 11 ? calYear + 1 : calYear;
+        fullDate = ny + '-' + pad2(nm+1) + '-' + pad2(displayDay);
       } else {
         displayDay = day++;
-        fullDate = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(displayDay).padStart(2,'0')}`;
-        isOther = false;
+        fullDate = calYear + '-' + pad2(calMonth+1) + '-' + pad2(displayDay);
       }
-      const isToday = !isOther && displayDay === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-      const dayApps = calApps.filter(a => a.confirmed_date === fullDate);
-
-      html += `<div class="cal-day${isOther?' other-month':''}${isToday?' today':''}" onclick="calDayClick('${fullDate}')">`;
-      html += `<div class="cal-day-num">${displayDay}</div>`;
-      dayApps.forEach(a => {
-        const name = (a.first_name||'') + ' ' + (a.last_name||'');
-        const time = a.confirmed_time || '';
-        const cls = a.status === 'rejected' ? ' rejected' : '';
-        html += `<div class="cal-event${cls}" onclick="event.stopPropagation(); openTermin('${a.id}')" title="${name} – ${a.property||''}">${time} ${name}</div>`;
+      var isToday = !isOther && displayDay === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+      var dayApps = calApps.filter(function(a) { return a.confirmed_date === fullDate; });
+      html += '<div class="cal-day' + (isOther?' other-month':'') + (isToday?' today':'') + '" onclick="calDayClick(\'' + fullDate + '\')">';
+      html += '<div class="cal-day-num">' + displayDay + '</div>';
+      dayApps.forEach(function(a) {
+        var name = (a.first_name||'') + ' ' + (a.last_name||'');
+        html += '<div class="cal-event" onclick="event.stopPropagation();openTermin(\'' + a.id + '\')" title="' + name + '">' + (a.confirmed_time||'') + ' ' + name + '</div>';
       });
       html += '</div>';
     }
     html += '</div>';
   }
-
-  grid.innerHTML = html;
+  document.getElementById('calGrid').innerHTML = html;
 }
 
+function pad2(n) { return String(n).padStart(2,'0'); }
+
 function calDayClick(dateStr) {
-  const dayApps = calApps.filter(a => a.confirmed_date === dateStr);
-  if (dayApps.length === 0) return;
-  if (dayApps.length === 1) { openTermin(dayApps[0].id); return; }
-  // Multiple — show list
-  const modal = document.getElementById('calModal');
-  document.getElementById('modalTitle').textContent = 'Termine am ' + new Date(dateStr + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long'});
-  document.getElementById('modalContent').innerHTML = dayApps.map(a =>
-    `<div style="padding:10px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
-      <div>
-        <div style="font-weight:500;">${(a.first_name||'')} ${(a.last_name||'')} <span style="font-size:0.78rem; color:var(--text-muted);">${a.confirmed_time||''}</span></div>
-        <div style="font-size:0.8rem; color:var(--text-muted);">${a.property||''}</div>
-      </div>
-      <button onclick="openTermin('${a.id}')" style="background:transparent; border:1px solid var(--border); color:var(--gold); padding:5px 12px; border-radius:var(--radius); cursor:pointer; font-size:0.78rem; font-family:'DM Sans',sans-serif;">Details</button>
-    </div>`
-  ).join('');
-  modal.style.display = 'block';
+  var dayApps = calApps.filter(function(a) { return a.confirmed_date === dateStr; });
+  if (dayApps.length === 1) { openTermin(dayApps[0].id); }
 }
 
 function openTermin(id) {
-  const app = calApps.find(a => a.id === id);
+  var app = calApps.find(function(a) { return a.id === id; });
   if (!app) return;
-  const modal = document.getElementById('calModal');
-  const dateFormatted = app.confirmed_date ? new Date(app.confirmed_date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) : '';
-  document.getElementById('modalTitle').textContent = (app.first_name||'') + ' ' + (app.last_name||'');
-
-  document.getElementById('modalContent').innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.2rem;">
-      <div class="detail-item"><div class="dl">Immobilie</div><div class="dv">${app.property||'–'}</div></div>
-      <div class="detail-item"><div class="dl">E-Mail</div><div class="dv">${app.email||'–'}</div></div>
-      <div class="detail-item"><div class="dl">Telefon</div><div class="dv">${app.phone||'–'}</div></div>
-      <div class="detail-item"><div class="dl">Status</div><div class="dv">${app.status==='confirmed'?'✓ Bestätigt':'Ausstehend'}</div></div>
-    </div>
-    <div style="background:rgba(201,169,110,0.08); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem;">
-      <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:6px;">Aktueller Termin</div>
-      <div style="font-size:1rem; color:var(--gold); font-weight:500;">${dateFormatted} · ${app.confirmed_time||'–'}</div>
-    </div>
-    <div style="border-top:1px solid var(--border); padding-top:1rem;">
-      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.08em;">Termin ändern</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem;">
-        <div class="edit-field">
-          <label>Neues Datum</label>
-          <input type="date" id="editDate_${id}" value="${app.confirmed_date||''}">
-        </div>
-        <div class="edit-field">
-          <label>Neue Uhrzeit</label>
-          <select id="editTime_${id}">
-            ${['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'].map(t => `<option${t===app.confirmed_time?' selected':''}>${t}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button onclick="saveTerminEdit('${id}','${app.first_name||''}','${app.last_name||''}','${app.email||''}','${app.property||''}')" class="btn-confirm">Termin speichern & E-Mail senden</button>
-        <button onclick="cancelTermin('${id}','${app.first_name||''}','${app.last_name||''}','${app.email||''}','${app.property||''}')" class="btn-reject">Termin absagen</button>
-      </div>
-      <div id="modalFeedback" style="margin-top:10px; font-size:0.82rem;"></div>
-    </div>
-  `;
-  modal.style.display = 'block';
-  modal.scrollIntoView({behavior:'smooth', block:'nearest'});
+  var fn = app.first_name || '';
+  var ln = app.last_name || '';
+  var dateFormatted = app.confirmed_date ? new Date(app.confirmed_date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '';
+  document.getElementById('modalTitle').textContent = fn + ' ' + ln;
+  var timeOptions = ['09:00 Uhr','09:30 Uhr','10:00 Uhr','10:30 Uhr','11:00 Uhr','11:30 Uhr','12:00 Uhr','13:00 Uhr','14:00 Uhr','14:30 Uhr','15:00 Uhr','15:30 Uhr','16:00 Uhr','16:30 Uhr','17:00 Uhr','17:30 Uhr','18:00 Uhr'];
+  var timeOpts = timeOptions.map(function(t) { return '<option' + (t === app.confirmed_time ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+  document.getElementById('modalContent').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">'
+    + '<div class="detail-item"><div class="dl">Immobilie</div><div class="dv">' + (app.property||'-') + '</div></div>'
+    + '<div class="detail-item"><div class="dl">E-Mail</div><div class="dv">' + (app.email||'-') + '</div></div>'
+    + '<div class="detail-item"><div class="dl">Telefon</div><div class="dv">' + (app.phone||'-') + '</div></div>'
+    + '<div class="detail-item"><div class="dl">Status</div><div class="dv">' + (app.status==='confirmed'?'\u2713 Best\u00e4tigt':'Ausstehend') + '</div></div>'
+    + '</div>'
+    + '<div style="background:rgba(201,169,110,0.08);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1.2rem;">'
+    + '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:6px;">Aktueller Termin</div>'
+    + '<div style="font-size:1rem;color:var(--gold);font-weight:500;">' + dateFormatted + ' \u00b7 ' + (app.confirmed_time||'-') + '</div>'
+    + '</div>'
+    + '<div style="border-top:1px solid var(--border);padding-top:1rem;">'
+    + '<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">Termin \u00e4ndern</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">'
+    + '<div class="edit-field"><label>Neues Datum</label><input type="date" id="editDate_' + id + '" value="' + (app.confirmed_date||'') + '"></div>'
+    + '<div class="edit-field"><label>Neue Uhrzeit</label><select id="editTime_' + id + '"><option value="">- w\u00e4hlen -</option>' + timeOpts + '</select></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+    + '<button onclick="saveTerminEdit(\'' + id + '\')" class="btn-confirm">Termin speichern &amp; E-Mail senden</button>'
+    + '<button onclick="cancelTermin(\'' + id + '\')" class="btn-reject">Termin absagen</button>'
+    + '</div>'
+    + '<div id="modalFeedback" style="margin-top:10px;font-size:0.82rem;"></div>'
+    + '</div>';
+  document.getElementById('calModal').style.display = 'block';
+  document.getElementById('calModal').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-async function saveTerminEdit(id, fn, ln, email, property) {
-  const date = document.getElementById('editDate_' + id).value;
-  const time = document.getElementById('editTime_' + id).value;
-  if (!date) { showModalFeedback('Bitte Datum auswählen.', 'err'); return; }
-
+async function saveTerminEdit(id) {
+  var app = calApps.find(function(a) { return a.id === id; });
+  if (!app) return;
+  var date = document.getElementById('editDate_' + id).value;
+  var time = document.getElementById('editTime_' + id).value;
+  if (!date) { showModalFeedback('Bitte Datum ausw\u00e4hlen.', 'err'); return; }
   try {
     await updateApplication(id, { confirmed_date: date, confirmed_time: time });
-    const dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
-
-    const cfg = getEJSConfig();
-    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
-      emailjs.init(cfg.publicKey);
-      emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_name: fn + ' ' + ln, to_email: email, property: property,
-        viewing_date: dateFormatted, viewing_time: time,
-        message: `Sehr geehrte/r ${fn} ${ln},
-
-Ihr Besichtigungstermin wurde geändert.
-
-────────────────────────
-NEUER BESICHTIGUNGSTERMIN
-────────────────────────
-Objekt:   ${property}
-Datum:    ${dateFormatted}
-Uhrzeit:  ${time}
-────────────────────────
-
-Bei Fragen erreichen Sie uns:
-📧  centralcitydo@gmail.com
-📞  +49 178 2687170
-
-Mit freundlichen Grüßen
-Central City Apartment Dortmund`
-      }).catch(()=>{});
-    }
-    showModalFeedback('✓ Termin gespeichert und E-Mail gesendet.', 'ok');
+    var cfg = getEJSConfig();
+    var fn = app.first_name||'', ln = app.last_name||'';
+    var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nIhr Besichtigungstermin wurde geaendert.\n\n---\nNEUER TERMIN\n---\nObjekt: ' + (app.property||'') + '\nDatum: ' + dateFormatted + '\nUhrzeit: ' + time + '\n---\n\ncentralcitydo@gmail.com\n+49 178 2687170\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: dateFormatted, viewing_time: time, message: msg });
+    showModalFeedback('\u2713 Termin gespeichert und E-Mail gesendet.', 'ok');
     renderCalendar();
-  } catch(e) {
-    showModalFeedback('Fehler: ' + e.message, 'err');
-  }
+  } catch(e) { showModalFeedback('Fehler: ' + e.message, 'err'); }
 }
 
-async function cancelTermin(id, fn, ln, email, property) {
-  if (!confirm('Termin wirklich absagen? Der Interessent wird per E-Mail informiert.')) return;
+async function cancelTermin(id) {
+  if (!confirm('Termin wirklich absagen?')) return;
+  var app = calApps.find(function(a) { return a.id === id; });
+  if (!app) return;
   try {
     await updateApplication(id, { status: 'pending', confirmed_date: null, confirmed_time: null });
-    const cfg = getEJSConfig();
-    if (cfg.publicKey && cfg.serviceId && cfg.templateId && email) {
-      emailjs.init(cfg.publicKey);
-      emailjs.send(cfg.serviceId, cfg.templateId, {
-        to_name: fn + ' ' + ln, to_email: email, property: property,
-        viewing_date: '', viewing_time: '',
-        message: `Sehr geehrte/r ${fn} ${ln},
-
-leider müssen wir Ihren Besichtigungstermin für ${property} absagen.
-
-Wir werden uns in Kürze mit einem neuen Terminvorschlag bei Ihnen melden.
-
-Bei Fragen erreichen Sie uns:
-📧  centralcitydo@gmail.com
-📞  +49 178 2687170
-
-Wir bitten um Entschuldigung für die Unannehmlichkeiten.
-
-Mit freundlichen Grüßen
-Central City Apartment Dortmund`
-      }).catch(()=>{});
-    }
-    showModalFeedback('✓ Termin abgesagt.', 'ok');
+    var cfg = getEJSConfig();
+    var fn = app.first_name||'', ln = app.last_name||'';
+    var msg = 'Sehr geehrte/r ' + fn + ' ' + ln + ',\n\nleider muessen wir Ihren Besichtigungstermin fuer ' + (app.property||'') + ' absagen.\n\nWir melden uns in Kuerze mit einem neuen Vorschlag.\n\ncentralcitydo@gmail.com\n+49 178 2687170\n\nMit freundlichen Gruessen\nCentral City Apartment Dortmund';
+    if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: app.property||'', viewing_date: '', viewing_time: '', message: msg });
+    showModalFeedback('\u2713 Termin abgesagt.', 'ok');
     closeModal();
     renderCalendar();
-  } catch(e) {
-    showModalFeedback('Fehler: ' + e.message, 'err');
-  }
+  } catch(e) { showModalFeedback('Fehler: ' + e.message, 'err'); }
 }
 
 function showModalFeedback(msg, type) {
-  const el = document.getElementById('modalFeedback');
+  var el = document.getElementById('modalFeedback');
   if (!el) return;
   el.style.color = type === 'ok' ? '#6DCEAA' : '#E8837F';
   el.textContent = msg;
@@ -1860,141 +1715,82 @@ function closeModal() {
   document.getElementById('calModal').style.display = 'none';
 }
 
-
-// ============================================================
 // CSV EXPORT
-// ============================================================
 async function exportCSV() {
-  let apps;
-  try { apps = await fetchApplications('all'); } catch(e) { alert('Fehler: ' + e.message); return; }
+  var apps;
+  try { apps = await fetchApplications(); } catch(e) { alert('Fehler: ' + e.message); return; }
   if (!apps.length) { alert('Keine Bewerbungen vorhanden.'); return; }
-
-  const cols = [
+  var cols = [
     ['Status','status'],['Eingegangen','created_at'],['Vorname','first_name'],['Nachname','last_name'],
-    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Staatsangehörigkeit','nationality'],
-    ['Straße','street'],['PLZ','zip'],['Ort','city'],['Immobilie','property'],
-    ['Beruf','occupation'],['Beschäftigung','employment_status'],['Arbeitgeber','employer'],
-    ['Nettoeinkommen','net_income'],['Bürgergeld','welfare'],
+    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Staatsangehoerigkeit','nationality'],
+    ['Strasse','street'],['PLZ','zip'],['Ort','city'],['Immobilie','property'],
+    ['Beruf','occupation'],['Beschaeftigung','employment_status'],['Arbeitgeber','employer'],
+    ['Nettoeinkommen','net_income'],['Buergergeld','welfare'],
     ['Personen','total_persons'],['Kinder','children'],['Haustiere','pets'],['Raucher','smoker'],
     ['Schufa','schufa_available'],['Schufa-Score','schufa_score'],['Schulden','debts'],
-    ['Bürge','guarantor_name'],['Wunscheinzug','move_in_date'],
-    ['Bestätigter Termin','confirmed_date'],['Bestätigte Uhrzeit','confirmed_time'],
-    ['Bemerkungen','remarks']
+    ['Buerge','guarantor_name'],['Wunscheinzug','move_in_date'],
+    ['Best. Termin','confirmed_date'],['Best. Uhrzeit','confirmed_time'],['Bemerkungen','remarks']
   ];
-
-  const escape = v => {
+  function esc(v) {
     if (v === null || v === undefined) return '';
-    const s = String(v).replace(/"/g, '""');
-    return (s.includes(',') || s.includes('"') || s.includes('\n')) ? ('"' + s + '"') : s;
-  };
-
-  const header = cols.map(([l]) => escape(l)).join(',');
-  const rows = apps.map(a => cols.map(([,k]) => {
-    if (k === 'created_at' && a[k]) return escape(new Date(a[k]).toLocaleDateString('de-DE'));
-    if (k === 'status') {
-      const m = {pending:'Ausstehend', confirmed:'Bestätigt', rejected:'Abgelehnt'};
-      return escape(m[a[k]] || a[k]);
-    }
-    return escape(a[k]);
-  }).join(','));
-
-  const bom = '﻿'; // UTF-8 BOM for Excel
-  const csv = bom + [header, ...rows].join('
-');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'CCA_Bewerbungen_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ============================================================
-// ICS CALENDAR EXPORT
-// ============================================================
-async function exportICS() {
-  let apps;
-  try { apps = await fetchApplications('all'); } catch(e) { alert('Fehler: ' + e.message); return; }
-
-  const confirmed = apps.filter(a => a.confirmed_date && a.status === 'confirmed');
-  if (!confirmed.length) { alert('Keine bestätigten Termine vorhanden.'); return; }
-
-  const pad = n => String(n).padStart(2,'0');
-  const toICSDate = (dateStr, timeStr) => {
-    // dateStr: YYYY-MM-DD, timeStr: "10:00 Uhr"
-    const [y,m,d] = dateStr.split('-');
-    const timeParts = timeStr ? timeStr.replace(' Uhr','').split(':') : ['10','00'];
-    const h = timeParts[0] || '10';
-    const min = timeParts[1] || '00';
-    return `${y}${m}${d}T${pad(h)}${pad(min)}00`;
-  };
-  const toICSDateEnd = (dateStr, timeStr) => {
-    const [y,m,d] = dateStr.split('-');
-    const timeParts = timeStr ? timeStr.replace(' Uhr','').split(':') : ['10','00'];
-    let h = parseInt(timeParts[0] || '10');
-    const min = timeParts[1] || '00';
-    h += 1; // 1 hour duration
-    return `${y}${m}${d}T${pad(h)}${pad(min)}00`;
-  };
-
-  let ics = 'BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Central City Apartment Dortmund//DE
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-';
-
-  confirmed.forEach(a => {
-    const name = ((a.first_name||'') + ' ' + (a.last_name||'')).trim();
-    const dtstart = toICSDate(a.confirmed_date, a.confirmed_time);
-    const dtend = toICSDateEnd(a.confirmed_date, a.confirmed_time);
-    const uid = a.id + '@centralcityapartment.de';
-    const now = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
-    const desc = [
-      'Mieter: ' + name,
-      'Objekt: ' + (a.property||''),
-      'Tel: ' + (a.phone||''),
-      'E-Mail: ' + (a.email||''),
-      'Einkommen: ' + (a.net_income||'') + ' EUR',
-      'Personen: ' + (a.total_persons||''),
-    ].join('\n');
-
-    ics += 'BEGIN:VEVENT
-';
-    ics += `UID:${uid}
-`;
-    ics += `DTSTAMP:${now}
-`;
-    ics += `DTSTART:${dtstart}
-`;
-    ics += `DTEND:${dtend}
-`;
-    ics += `SUMMARY:Besichtigung – ${name} – ${(a.property||'').split(',')[0]}
-`;
-    ics += `DESCRIPTION:${desc}
-`;
-    ics += `LOCATION:${(a.property||'').replace(',', '\,')}, Dortmund
-`;
-    ics += 'END:VEVENT
-';
+    var s = String(v).replace(/"/g, '""');
+    return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? ('"' + s + '"') : s;
+  }
+  var header = cols.map(function(c) { return esc(c[0]); }).join(',');
+  var rows = apps.map(function(a) {
+    return cols.map(function(c) {
+      var k = c[1], v = a[k];
+      if (k === 'created_at' && v) return esc(new Date(v).toLocaleDateString('de-DE'));
+      if (k === 'status') { var m = {pending:'Ausstehend',confirmed:'Bestaetigt',rejected:'Abgelehnt'}; return esc(m[v]||v); }
+      return esc(v);
+    }).join(',');
   });
-
-  ics += 'END:VCALENDAR';
-
-  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'CCA_Besichtigungstermine_' + new Date().toISOString().slice(0,10) + '.ics';
-  a.click();
-  URL.revokeObjectURL(url);
+  var csv = '\uFEFF' + [header].concat(rows).join('\n');
+  var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'CCA_Bewerbungen_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
 }
 
-// ============================================================
+// ICS EXPORT
+async function exportICS() {
+  var apps;
+  try { apps = await fetchApplications(); } catch(e) { alert('Fehler: ' + e.message); return; }
+  var confirmed = apps.filter(function(a) { return a.confirmed_date && a.status === 'confirmed'; });
+  if (!confirmed.length) { alert('Keine best\u00e4tigten Termine vorhanden.'); return; }
+  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Central City Apartment Dortmund//DE\r\nCALSCALE:GREGORIAN\r\n';
+  confirmed.forEach(function(a) {
+    var parts = a.confirmed_date.split('-');
+    var y = parts[0], m = parts[1], d = parts[2];
+    var tp = a.confirmed_time ? a.confirmed_time.replace(' Uhr','').split(':') : ['10','00'];
+    var h = tp[0]||'10', min = tp[1]||'00';
+    var hEnd = String(parseInt(h)+1).padStart(2,'0');
+    var dtstart = y+m+d+'T'+h+min+'00';
+    var dtend = y+m+d+'T'+hEnd+min+'00';
+    var name = ((a.first_name||'')+' '+(a.last_name||'')).trim();
+    var now = new Date().toISOString().replace(/[-:.]/g,'').slice(0,15)+'Z';
+    ics += 'BEGIN:VEVENT\r\n';
+    ics += 'UID:' + a.id + '@cca.de\r\n';
+    ics += 'DTSTAMP:' + now + '\r\n';
+    ics += 'DTSTART:' + dtstart + '\r\n';
+    ics += 'DTEND:' + dtend + '\r\n';
+    ics += 'SUMMARY:Besichtigung - ' + name + ' - ' + (a.property||'').split(',')[0] + '\r\n';
+    ics += 'DESCRIPTION:Mieter: ' + name + '\\nTel: ' + (a.phone||'') + '\\nEmail: ' + (a.email||'') + '\\nObjekt: ' + (a.property||'') + '\r\n';
+    ics += 'LOCATION:' + (a.property||'') + '\\, Dortmund\r\n';
+    ics += 'END:VEVENT\r\n';
+  });
+  ics += 'END:VCALENDAR';
+  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a2 = document.createElement('a');
+  a2.href = url; a2.download = 'CCA_Termine_' + new Date().toISOString().slice(0,10) + '.ics';
+  a2.click(); URL.revokeObjectURL(url);
+}
+
 // INIT
-// ============================================================
 buildPropertyGrid();
 </script>
+
 </body>
 </html>
