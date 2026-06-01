@@ -330,7 +330,8 @@ function addCoTenant(prefix) {
     + '<div class="field"><label>Vorname <span class="req">*</span></label><input type="text" data-co="first" placeholder="Vorname"></div>'
     + '<div class="field"><label>Nachname <span class="req">*</span></label><input type="text" data-co="last" placeholder="Nachname"></div>'
     + '<div class="field"><label>Alter <span class="req">*</span></label><input type="number" data-co="age" placeholder="z. B. 32" min="18" max="100"></div>'
-    + '<div class="field"><label>Beruf / Tätigkeit <span class="req">*</span></label><input type="text" data-co="job" placeholder="z. B. Monteur, Pflegekraft"></div>'
+    + '<div class="field"><label>Beschäftigungsart <span class="req">*</span></label><select data-co="employment"><option value="">Bitte wählen</option><option value="Unbefristet angestellt">Unbefristet angestellt</option><option value="Befristet angestellt">Befristet angestellt</option><option value="Selbstständig">Selbstständig</option><option value="Beamter">Beamter</option><option value="Student">Student</option><option value="Auszubildender">Auszubildender</option><option value="Rentner">Rentner</option><option value="Arbeitssuchend">Arbeitssuchend</option><option value="Bürgergeld / Sozialleistungen">Bürgergeld / Sozialleistungen</option><option value="Sonstiges">Sonstiges</option></select></div>'
+    + '<div class="field"><label>Beruf / Tätigkeit</label><input type="text" data-co="job" placeholder="z. B. Monteur, Pflegekraft"></div>'
     + '<div class="field"><label>Nettoeinkommen / Monat (€) <span class="req">*</span></label><input type="number" data-co="income" placeholder="z. B. 2200" min="0"></div>'
     + '<div class="field"><label>Raucherstatus</label><select data-co="smoker"><option value="">Keine Angabe</option><option value="Nichtraucher">Nichtraucher</option><option value="Raucher draußen">Raucher draußen</option><option value="Raucher in der Wohnung">Raucher in der Wohnung</option></select></div>'
     + '<div class="field span-2"><label>Dokumente anhängen</label><input type="file" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple><p class="upload-hint">Optional – PDF, JPG, PNG</p></div>'
@@ -347,11 +348,12 @@ function collectCoTenants(form, prefix) {
   var rows = [];
   container.querySelectorAll('.co-tenant-box').forEach(function(box, i) {
     var get = function(k) { var el = box.querySelector('[data-co="' + k + '"]'); return el ? cleanStr(el.value) : ''; };
-    var first = get('first'), last = get('last'), age = get('age'), job = get('job'), income = get('income'), smoker = get('smoker');
+    var first = get('first'), last = get('last'), age = get('age'), employment = get('employment'), job = get('job'), income = get('income'), smoker = get('smoker');
     var docsEl = box.querySelector('[data-co="docs"]');
     var docs = docsEl && docsEl.files && docsEl.files.length ? Array.from(docsEl.files).map(function(f){ return f.name; }).join(', ') : '';
-    if (first || last || age || job || income || smoker || docs) {
-      var line = 'Mitmieter ' + (i + 1) + ': ' + first + ' ' + last + ', Alter: ' + age + ', Beruf: ' + job + ', Nettoeinkommen: ' + income + ' €';
+    if (first || last || age || employment || job || income || smoker || docs) {
+      var line = 'Mitmieter ' + (i + 1) + ': ' + first + ' ' + last + ', Alter: ' + age + ', Beschäftigungsart: ' + employment + ', Nettoeinkommen: ' + income + ' €';
+      if (job) line += ', Beruf: ' + job;
       if (smoker) line += ', Raucherstatus: ' + smoker;
       if (docs) line += ', Dokumente: ' + docs;
       rows.push(line);
@@ -365,17 +367,17 @@ function validateCoTenantBoxes(form, prefix) {
   if (!container) return errors;
   container.querySelectorAll('.co-tenant-box').forEach(function(box, i) {
     var get = function(k) { var el = box.querySelector('[data-co="' + k + '"]'); return el ? cleanStr(el.value) : ''; };
-    var first = get('first'), last = get('last'), ageRaw = get('age'), job = get('job'), incomeRaw = get('income'), smoker = get('smoker');
+    var first = get('first'), last = get('last'), ageRaw = get('age'), employment = get('employment'), job = get('job'), incomeRaw = get('income'), smoker = get('smoker');
     var docsEl = box.querySelector('[data-co="docs"]');
     var hasDocs = !!(docsEl && docsEl.files && docsEl.files.length);
-    var hasAny = first || last || ageRaw || job || incomeRaw || smoker || hasDocs;
+    var hasAny = first || last || ageRaw || employment || job || incomeRaw || smoker || hasDocs;
     if (!hasAny) return;
     var label = 'Mitmieter ' + (i + 1) + ': ';
     if (!isValidName(first)) errors.push(label + 'Bitte gültigen Vornamen eingeben.');
     if (!isValidName(last)) errors.push(label + 'Bitte gültigen Nachnamen eingeben.');
     var age = toNumber(ageRaw);
     if (age === null || age < 18 || age > 100 || age % 1 !== 0) errors.push(label + 'Bitte ein plausibles Alter ab 18 Jahren eingeben.');
-    if (job.length < 2) errors.push(label + 'Bitte Beruf/Tätigkeit angeben.');
+    if (!employment) errors.push(label + 'Bitte Beschäftigungsart auswählen.');
     var income = toNumber(incomeRaw);
     if (income === null || income < 500 || income > 50000) errors.push(label + 'Bitte ein plausibles monatliches Nettoeinkommen angeben.');
   });
