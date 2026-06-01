@@ -1284,89 +1284,93 @@ function buildPropertyActions(app) {
   }).join('');
 }
 
+// ── Pro-Wohnung Bestätigen/Ablehnen ─────────────────────────────────────────
+// Logik:
+//   - Jede Wohnung bekommt ihren eigenen Status in application_properties
+//   - Hauptbewerbung bleibt 'pending' solange noch mind. eine Wohnung offen ist
+//   - Erst wenn ALLE Wohnungen bearbeitet sind:
+//       → mind. eine confirmed  → Hauptstatus = 'confirmed'
+//       → alle rejected         → Hauptstatus = 'rejected'
+
+async function syncMainAppStatus(appId) {
+  var props = [];
+  try { props = await fetchApplicationProperties(appId); } catch(e) { return; }
+  if (!props.length) return;
+  var allDone = props.every(function(p){ return p.status !== 'pending'; });
+  var anyConfirmed = props.some(function(p){ return p.status === 'confirmed'; });
+  if (allDone) {
+    await updateApplication(appId, { status: anyConfirmed ? 'confirmed' : 'rejected' });
+  } else {
+    await updateApplication(appId, { status: 'pending' });
+  }
+}
+
 async function confirmProperty(btn) {
   var appId = btn.dataset.appid;
-  var pid = btn.dataset.pid;
-  var prop = btn.dataset.prop;
-  var date = document.getElementById('pDate_' + pid) ? document.getElementById('pDate_' + pid).value : '';
-  var time = document.getElementById('pTime_' + pid) ? document.getElementById('pTime_' + pid).value : '';
-  if (!date) { alert('Bitte Datum ausw\u00e4hlen.'); return; }
-  if (!time) { alert('Bitte Uhrzeit ausw\u00e4hlen.'); return; }
-
+  var pid   = btn.dataset.pid;
+  var prop  = btn.dataset.prop;
+  var date  = document.getElementById('pDate_' + pid) ? document.getElementById('pDate_' + pid).value : '';
+  var time  = document.getElementById('pTime_' + pid) ? document.getElementById('pTime_' + pid).value : '';
+  if (!date) { alert('Bitte Datum auswählen.'); return; }
+  if (!time) { alert('Bitte Uhrzeit auswählen.'); return; }
   try {
     if (pid.startsWith('prop_')) {
-      // No DB entry yet - create one
-      try {
-        await sbFetch('application_properties', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ application_id: appId, property: prop, status: 'confirmed', viewing_date: date, viewing_time: time }) });
-      } catch(rls) { console.warn('RLS block on application_properties:', rls.message); }
+      await sbFetch('application_properties', {
+        method: 'POST', prefer: 'return=minimal',
+        body: JSON.stringify({ application_id: appId, property: prop, status: 'confirmed', viewing_date: date, viewing_time: time })
+      });
     } else {
       await updateApplicationProperty(pid, { status: 'confirmed', viewing_date: date, viewing_time: time });
     }
-
-    // Check if all properties confirmed/rejected -> update main app status
-    var props = await fetchApplicationProperties(appId);
-    var allDone = props.every(function(p){ return p.status !== 'pending'; });
-    var anyConfirmed = props.some(function(p){ return p.status === 'confirmed'; });
-    if (allDone) await updateApplication(appId, { status: anyConfirmed ? 'confirmed' : 'rejected' });
-
-    // Send confirmation email
+    await syncMainAppStatus(appId);
     var app = allApps.find(function(a){ return a.id === appId; });
     if (app) {
       var cfg = getEJSConfig();
       var fn = app.first_name||'', ln = app.last_name||'';
       var dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      var msg = 'Ihr Besichtigungstermin f\u00fcr ' + prop + ' am ' + dateFormatted + ' um ' + time + ' wurde best\u00e4tigt.\n\nBitte erscheinen Sie p\u00fcnktlich. Bei R\u00fcckfragen erreichen Sie uns unter info@centralcityapartments.de oder telefonisch unter +49 178 2687170.';
+      var msg = 'Ihr Besichtigungstermin für ' + prop + ' am ' + dateFormatted + ' um ' + time + ' wurde bestätigt.\n\nBitte erscheinen Sie pünktlich. Bei Rückfragen: info@centralcityapartments.de oder +49 178 2687170.';
       if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: prop, viewing_date: dateFormatted, viewing_time: time, message: msg }, 'template_o677qce');
     }
-
     renderDashboard();
-  } catch(e) { alert('Fehler: ' + e.message); }
+  } catch(e) { alert('Fehler beim Bestätigen: ' + e.message); }
 }
 
 async function rejectProperty(btn) {
   var appId = btn.dataset.appid;
-  var pid = btn.dataset.pid;
-  var prop = btn.dataset.prop;
-
+  var pid   = btn.dataset.pid;
+  var prop  = btn.dataset.prop;
   try {
     if (pid.startsWith('prop_')) {
-      try {
-        await sbFetch('application_properties', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ application_id: appId, property: prop, status: 'rejected' }) });
-      } catch(rls) { console.warn('RLS block on application_properties:', rls.message); }
+      await sbFetch('application_properties', {
+        method: 'POST', prefer: 'return=minimal',
+        body: JSON.stringify({ application_id: appId, property: prop, status: 'rejected' })
+      });
     } else {
       await updateApplicationProperty(pid, { status: 'rejected' });
     }
-
-    var props = await fetchApplicationProperties(appId);
-    var allDone = props.every(function(p){ return p.status !== 'pending'; });
-    var anyConfirmed = props.some(function(p){ return p.status === 'confirmed'; });
-    if (allDone) await updateApplication(appId, { status: anyConfirmed ? 'confirmed' : 'rejected' });
-
-    // Send rejection email
+    await syncMainAppStatus(appId);
     var app = allApps.find(function(a){ return a.id === appId; });
     if (app) {
       var cfg = getEJSConfig();
       var fn = app.first_name||'', ln = app.last_name||'';
-      var msg = 'Leider k\u00f6nnen wir Ihre Anfrage f\u00fcr ' + prop + ' nicht ber\u00fccksichtigen. Vielen Dank f\u00fcr Ihr Interesse.';
+      var msg = 'Leider können wir Ihre Anfrage für ' + prop + ' nicht berücksichtigen. Vielen Dank für Ihr Interesse an Central City Apartments Dortmund.';
       if (cfg.publicKey && app.email) sendEmail(cfg, { to_name: fn+' '+ln, to_email: app.email, property: prop, viewing_date: '', viewing_time: '', message: msg }, 'template_o677qce');
     }
-
     renderDashboard();
-  } catch(e) { alert('Fehler: ' + e.message); }
+  } catch(e) { alert('Fehler beim Ablehnen: ' + e.message); }
 }
 
 async function resetProperty(btn) {
   var appId = btn.dataset.appid;
-  var pid = btn.dataset.pid;
+  var pid   = btn.dataset.pid;
   try {
     if (!pid.startsWith('prop_')) {
       await updateApplicationProperty(pid, { status: 'pending', viewing_date: '', viewing_time: '' });
     }
-    await updateApplication(appId, { status: 'pending' });
+    await syncMainAppStatus(appId);
     renderDashboard();
   } catch(e) { alert('Fehler: ' + e.message); }
 }
-
 
 // INIT — alle DOM-abhängigen Initialisierungen nach dem Laden
 document.addEventListener('DOMContentLoaded', function() {
