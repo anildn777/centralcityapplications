@@ -47,38 +47,45 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   text-align: center; padding: 4rem 2rem;
   position: relative; overflow: hidden;
   background: var(--dark);
+  border-bottom: 1px solid var(--border);
 }
-.hero-bg {
+.hero-video-media {
   position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+  background: #141414;
 }
-.hero-bg img {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; opacity: 0; transition: opacity 1.2s ease;
+.hero-video-media video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.62;
+  filter: brightness(0.68) saturate(0.9);
   transform: scale(1.04);
-  animation: heroSoftZoom 22s ease-in-out infinite alternate;
 }
-@keyframes heroSoftZoom {
-  from { transform: scale(1.04); }
-  to { transform: scale(1.10); }
-}
-.hero-bg img.active { opacity: 1; }
-.hero-bg::after {
+.hero-video-media::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.42) 42%, rgba(20,20,20,0.93) 100%);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(201,169,110,0.12), transparent 34%),
+    linear-gradient(180deg, rgba(20,20,20,0.36) 0%, rgba(20,20,20,0.50) 45%, rgba(20,20,20,0.94) 100%);
   z-index: 1;
 }
-.hero > *:not(.hero-bg) { position: relative; z-index: 2; }
-.hero-eyebrow { font-size: 0.78rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; opacity: 0.8; }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(3.25rem, 6.6vw, 5.75rem); font-weight: 400; line-height: 1.08; margin-bottom: 1.5rem; max-width: 840px; letter-spacing: -0.018em; }
+.hero > *:not(.hero-video-media) { position: relative; z-index: 2; }
+.hero-eyebrow { font-size: 0.78rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; opacity: 0.9; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(3.15rem, 6.2vw, 5.45rem); font-weight: 400; line-height: 1.08; margin-bottom: 1.5rem; max-width: 840px; letter-spacing: -0.016em; }
 .hero h1 em { font-style: italic; color: var(--gold); }
-.hero p { color: var(--text-muted); max-width: 570px; font-size: clamp(1.05rem, 1.25vw, 1.14rem); line-height: 1.72; margin-bottom: 2.5rem; }
-.hero-line { width: 50px; height: 1px; background: var(--gold); margin: 0 auto 2.5rem; opacity: 0.4; }
-.hero-stats { display: flex; gap: 3rem; justify-content: center; margin-bottom: 3rem; }
+.hero p { color: rgba(232,224,208,0.84); max-width: 590px; font-size: clamp(1.04rem, 1.2vw, 1.13rem); line-height: 1.72; margin-bottom: 2.5rem; }
+.hero-line { width: 50px; height: 1px; background: var(--gold); margin: 0 auto 2.5rem; opacity: 0.45; }
+.hero-stats { display: flex; gap: 3rem; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap; }
 .hero-stat .num { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--gold); }
-.hero-stat .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 2px; }
+.hero-stat .lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(232,224,208,0.68); margin-top: 2px; }
 .scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .scroll-arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); }
+@media(max-width:700px) {
+  .hero { min-height: 84vh; padding: 4.5rem 1.25rem 3.5rem; }
+  .hero h1 { font-size: clamp(2.45rem, 11vw, 3.45rem); }
+  .hero-stats { gap: 1.5rem; }
+}
 
 /* SECTION */
 .section { padding: 5rem 2rem; }
@@ -578,9 +585,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg">
-    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=85" alt="Moderne möblierte Wohnung" class="active" id="heroBg0">
-    <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=2000&q=85" alt="Stilvolle Wohnung" id="heroBg1">
+  <div class="hero-video-media" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://a0.muscache.com/im/pictures/miso/Hosting-1405173820226056845/original/cd4507a2-5039-4589-8434-76197beb125a.jpeg?im_w=1200">
+      <source src="https://videos.pexels.com/video-files/11050698/11050698-uhd_2560_1440_25fps.mp4" type="video/mp4">
+      <source src="https://videos.pexels.com/video-files/11050698/11050698-hd_1920_1080_30fps.mp4" type="video/mp4">
+      <source src="https://videos.pexels.com/video-files/7578552/7578552-hd_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
   </div>
   <p class="hero-eyebrow">Herzlich Willkommen</p>
   <h1>Wohnen im Herzen<br>von <em>Dortmund</em></h1>
@@ -593,7 +603,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   </div>
   <a href="#wohnungen" class="btn-gold">Alle Inserate ansehen</a>
   <a href="https://centralcityapartments.de/kurzzeit" class="btn-outline" style="border-color:var(--gold);color:var(--gold);">Kurzzeitmiete & Airbnb →</a>
-  <div class="scroll-hint"><div class="scroll-arrow"></div>Scrollen</div>
+  <div class="scroll-hint"><div class="scroll-arrow"></div>Scroll</div>
 </section>
 
 <!-- LISTINGS -->
