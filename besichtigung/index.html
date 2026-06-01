@@ -280,7 +280,16 @@ function addCoTenant(prefix) {
     + '<div class="field"><label>Beruf / Tätigkeit</label><input type="text" data-co="job" placeholder="z. B. Monteur, Pflegekraft"></div>'
     + '<div class="field"><label>Nettoeinkommen / Monat (€) <span class="req">*</span></label><input type="number" data-co="income" placeholder="z. B. 2200"></div>'
     + '<div class="field"><label>Raucherstatus</label><select data-co="smoker"><option value="">Keine Angabe</option><option value="Nichtraucher">Nichtraucher</option><option value="Raucher draußen">Raucher draußen</option><option value="Raucher in der Wohnung">Raucher in der Wohnung</option></select></div>'
-    + '<div class="field span-2"><label>Dokumente anhängen</label><input type="file" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple><p class="upload-hint">Optional – PDF, JPG, PNG</p><p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p></div>'
+    + '<div class="field span-2"><label>Dokumente anhängen</label>'
+    + '<div class="doc-upload-box" data-upload-name="coDocs_' + idx + '">'
+    + '<div class="doc-file-list" id="list_coDocs_' + idx + '"></div>'
+    + '<button type="button" class="doc-add-btn" onclick="docAddFile(this)">'
+    + '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>'
+    + ' Datei hinzufügen</button>'
+    + '<input type="file" name="coDocs_' + idx + '" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)">'
+    + '<p class="upload-hint" style="margin-top:8px;">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>'
+    + '<p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p>'
+    + '</div></div>'
     + '</div>';
   container.appendChild(box);
 }
@@ -357,18 +366,95 @@ function getDocumentLabel(input) {
   if (label) return cleanStr(label.textContent).replace(/\*/g, '').trim();
   return input.name || input.getAttribute('data-co') || 'Dokument';
 }
+
+// ── Multi-Upload UI ───────────────────────────────────────────────────────
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function buildDocUploadBox(inputName, accept, hint) {
+  // Erstellt die HTML-Struktur für eine Upload-Box
+  // Wird beim Ersetzen der statischen inputs aufgerufen
+  return '<div class="doc-upload-box" data-upload-name="' + inputName + '">'
+    + '<div class="doc-file-list" id="list_' + inputName + '"></div>'
+    + '<button type="button" class="doc-add-btn" onclick="docAddFile(this)">'
+    + '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>'
+    + ' Datei hinzufügen</button>'
+    + '<input type="file" name="' + inputName + '" accept="' + accept + '" multiple style="display:none;" onchange="docFilesAdded(this)">'
+    + (hint ? '<p class="upload-hint" style="margin-top:8px;">' + hint + '</p>' : '')
+    + '</div>';
+}
+
+function docAddFile(btn) {
+  var box = btn.closest('.doc-upload-box');
+  if (box) box.querySelector('input[type="file"]').click();
+}
+
+function docFilesAdded(input) {
+  var box = input.closest('.doc-upload-box');
+  var listEl = box.querySelector('.doc-file-list');
+  var files = Array.from(input.files || []);
+  files.forEach(function(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      alert(file.name + ' ist größer als 10 MB und wurde nicht hinzugefügt.');
+      return;
+    }
+    // Duplikat prüfen
+    var existing = Array.from(listEl.querySelectorAll('.doc-name')).map(function(el){ return el.textContent; });
+    if (existing.indexOf(file.name) !== -1) return;
+    var item = document.createElement('div');
+    item.className = 'doc-file-item';
+    var ext = file.name.split('.').pop().toLowerCase();
+    var icon = (ext === 'pdf') ? '📄' : '🖼️';
+    item.innerHTML = '<span class="doc-icon">' + icon + '</span>'
+      + '<span class="doc-name" title="' + file.name + '">' + file.name + '</span>'
+      + '<span class="doc-size">' + formatFileSize(file.size) + '</span>'
+      + '<button type="button" class="doc-remove" onclick="docRemoveFile(this)" title="Entfernen">×</button>';
+    item._file = file; // Datei-Referenz am DOM-Element speichern
+    listEl.appendChild(item);
+  });
+  // Input leeren damit man dieselbe Datei nochmal auswählen kann (falls man sie erst entfernt hat)
+  input.value = '';
+}
+
+function docRemoveFile(btn) {
+  btn.closest('.doc-file-item').remove();
+}
+
+function getDocFilesFromBox(box) {
+  // Gibt alle File-Objekte einer Upload-Box zurück
+  return Array.from(box.querySelectorAll('.doc-file-item')).map(function(item){ return item._file; }).filter(Boolean);
+}
+
 async function uploadApplicationDocuments(appId, form) {
   if (!appId || !form) return [];
-  var fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
   var uploads = [];
   var errors = [];
-  for (var i = 0; i < fileInputs.length; i++) {
-    var input = fileInputs[i];
-    var files = Array.from(input.files || []);
-    if (!files.length) continue;
+
+  // Alle Dateien sammeln: aus neuen Upload-Boxen + klassischen file inputs
+  var allFiles = []; // { file, label }
+  // Neue UI: doc-upload-box
+  var boxes = Array.from(form.querySelectorAll('.doc-upload-box'));
+  boxes.forEach(function(box) {
+    var name = box.dataset.uploadName || 'docs';
+    var fakeInput = box.querySelector('input[type="file"]');
+    var label = fakeInput ? getDocumentLabel(fakeInput) : name;
+    getDocFilesFromBox(box).forEach(function(f){ allFiles.push({ file: f, label: label }); });
+  });
+  // Klassische file inputs (nicht in upload-box, Fallback)
+  var classicInputs = Array.from(form.querySelectorAll('input[type="file"]')).filter(function(inp){
+    return !inp.closest('.doc-upload-box');
+  });
+  classicInputs.forEach(function(input) {
     var label = getDocumentLabel(input);
-    for (var j = 0; j < files.length; j++) {
-      var file = files[j];
+    Array.from(input.files || []).forEach(function(f){ allFiles.push({ file: f, label: label }); });
+  });
+
+  for (var i = 0; i < allFiles.length; i++) {
+    var label = allFiles[i].label;
+    var file = allFiles[i].file;
       if (file.size > 10 * 1024 * 1024) {
         errors.push(file.name + ' ist größer als 10 MB.');
         continue;
@@ -390,8 +476,7 @@ async function uploadApplicationDocuments(appId, form) {
       } catch (e) {
         errors.push(file.name + ': ' + e.message);
       }
-    }
-  }
+  } // end allFiles loop
   if (uploads.length) {
     try {
       await updateApplication(appId, { documents: JSON.stringify(uploads) });
@@ -2139,6 +2224,20 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /* ===== UPLOAD HINTS ===== */
+
+  /* ── Multi-Upload UI ─────────────────────────────────────────── */
+  .doc-upload-box { border: 1px dashed var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; background: var(--dark2); }
+  .doc-file-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .doc-file-item { display: flex; align-items: center; gap: 8px; background: var(--dark3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; color: var(--text); }
+  .doc-file-item .doc-icon { font-size: 1rem; flex-shrink: 0; }
+  .doc-file-item .doc-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-file-item .doc-size { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+  .doc-file-item .doc-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0 2px; font-size: 1rem; line-height: 1; flex-shrink: 0; transition: color 0.2s; }
+  .doc-file-item .doc-remove:hover { color: #E8837F; }
+  .doc-add-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid rgba(201,169,110,0.35); color: var(--gold); font-size: 0.8rem; padding: 5px 12px; border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .doc-add-btn:hover { border-color: var(--gold); background: rgba(201,169,110,0.08); }
+  .doc-add-btn svg { width: 13px; height: 13px; }
+
   .upload-hint {
     font-size: 0.72rem;
     color: var(--text-muted);
@@ -3054,9 +3153,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="field mt-2">
           <label>Dokumente anhängen</label>
-          <input type="file" name="shortDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
-          <p class="upload-hint">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>
-          <p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p>
+          <div class="doc-upload-box" data-upload-name="shortDocs">
+            <div class="doc-file-list" id="list_shortDocs"></div>
+            <button type="button" class="doc-add-btn" onclick="docAddFile(this)">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>
+              Datei hinzufügen
+            </button>
+            <input type="file" name="shortDocs" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)">
+            <p class="upload-hint" style="margin-top:8px;">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>
+            <p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p>
+          </div>
         </div>
 
         <div class="field mt-2">
@@ -3434,35 +3540,31 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="grid-2">
           <div class="field">
             <label>Einkommensnachweise (letzte 3 Monate)</label>
-            <input type="file" name="incomeProof" accept=".pdf,.jpg,.jpeg,.png" multiple>
-            <p class="upload-hint">Gehaltsabrechnungen, Rentenbescheid, etc.</p>
+            <div class="doc-upload-box" data-upload-name="incomeProof"><div class="doc-file-list" id="list_incomeProof"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="incomeProof" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"><p class="upload-hint" style="margin-top:8px;">Gehaltsabrechnungen, Rentenbescheid, etc.</p></div>
           </div>
           <div class="field">
             <label>Schufa-Auskunft</label>
-            <input type="file" name="schufaDoc" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Nicht älter als 3 Monate</p>
+            <div class="doc-upload-box" data-upload-name="schufaDoc"><div class="doc-file-list" id="list_schufaDoc"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="schufaDoc" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"><p class="upload-hint" style="margin-top:8px;">Nicht älter als 3 Monate</p></div>
           </div>
           <div class="field">
             <label>Personalausweis / Reisepass (Vorder- & Rückseite)</label>
-            <input type="file" name="idDoc" accept=".pdf,.jpg,.jpeg,.png" multiple>
+            <div class="doc-upload-box" data-upload-name="idDoc"><div class="doc-file-list" id="list_idDoc"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="idDoc" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"></div>
           </div>
           <div class="field">
             <label>Bürgschaftserklärung</label>
-            <input type="file" name="guarantorDoc" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Nur falls Bürge vorhanden</p>
+            <div class="doc-upload-box" data-upload-name="guarantorDoc"><div class="doc-file-list" id="list_guarantorDoc"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="guarantorDoc" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"><p class="upload-hint" style="margin-top:8px;">Nur falls Bürge vorhanden</p></div>
           </div>
           <div class="field">
             <label>Jobcenter-Bescheid / Bürgergeld-Bewilligung</label>
-            <input type="file" name="welfareLetter" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="doc-upload-box" data-upload-name="welfareLetter"><div class="doc-file-list" id="list_welfareLetter"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="welfareLetter" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"></div>
           </div>
           <div class="field">
             <label>Mietschuldenfreiheitsbescheinigung</label>
-            <input type="file" name="noDebtCert" accept=".pdf,.jpg,.jpeg,.png">
-            <p class="upload-hint">Vom aktuellen Vermieter ausgestellt</p>
+            <div class="doc-upload-box" data-upload-name="noDebtCert"><div class="doc-file-list" id="list_noDebtCert"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="noDebtCert" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"><p class="upload-hint" style="margin-top:8px;">Vom aktuellen Vermieter ausgestellt</p></div>
           </div>
           <div class="field">
             <label>Sonstige Unterlagen</label>
-            <input type="file" name="otherDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
+            <div class="doc-upload-box" data-upload-name="otherDocs"><div class="doc-file-list" id="list_otherDocs"></div><button type="button" class="doc-add-btn" onclick="docAddFile(this)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Datei hinzufügen</button><input type="file" name="otherDocs" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="docFilesAdded(this)"></div>
           </div>
         </div>
         <p class="small mt-2">⚠ Die Datei-Anhänge werden nur lokal gespeichert und nicht auf externe Server übertragen. Für die spätere Weiterleitung per E-Mail empfehlen wir, Dokumente bei Bedarf nachzureichen.</p>
