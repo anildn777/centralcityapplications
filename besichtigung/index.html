@@ -154,14 +154,33 @@ function sendEmail(cfg, params, templateOverride) {
 }
 
 // PROPERTY GRID
-function buildPropertyGrid() {
+async function buildPropertyGrid() {
   var grid = document.getElementById('propertyGrid');
   if (!grid) return;
+  grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:1rem 0;">Lade...</div>';
+  var statusMap = {};
+  try {
+    var listings = await fetch(SUPABASE_URL + '/rest/v1/listings?select=id,status', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    }).then(function(r){ return r.json(); });
+    listings.forEach(function(l){ statusMap[l.id] = l.status; });
+  } catch(e) {}
   grid.innerHTML = PROPERTIES.map(function(p) {
-    return '<div class="property-card" id="card_' + p.id + '" onclick="toggleProperty(\'' + p.id + '\', this)">'
+    var status = statusMap[p.id] || 'frei';
+    var isDemnachst = status === 'demnachst';
+    var isVergeben = status === 'vergeben';
+    var isUnavailable = isDemnachst || isVergeben;
+    var cardStyle = isUnavailable ? 'opacity:0.5;pointer-events:none;' : '';
+    var statusBadge = isDemnachst
+      ? '<div style="margin-top:6px;font-size:0.7rem;color:#C9A96E;letter-spacing:0.05em;">Demnächst verfügbar</div>'
+      : isVergeben
+      ? '<div style="margin-top:6px;font-size:0.7rem;color:#E8837F;letter-spacing:0.05em;">Bereits vergeben</div>'
+      : '';
+    return '<div class="property-card" id="card_' + p.id + '" style="' + cardStyle + '" onclick="toggleProperty(\'' + p.id + '\', this)">'
       + '<div class="prop-check" id="check_' + p.id + '">\u2713</div>'
       + '<div class="prop-street">' + p.street + '</div>'
       + '<div class="prop-city">' + p.city + '</div>'
+      + statusBadge
       + '</div>';
   }).join('');
 }
@@ -180,6 +199,121 @@ function updateSelectedProperties() {
     }
   });
   document.getElementById('selectedProperty').value = selected.join(' | ');
+}
+
+
+// PLAUSIBILITY VALIDATION
+function cleanStr(v) { return String(v || '').trim(); }
+function digitsOnly(v) { return String(v || '').replace(/\D/g, ''); }
+function toNumber(v) {
+  var cleaned = String(v || '').replace(/\./g, '').replace(',', '.').replace(/[^0-9.\-]/g, '');
+  if (cleaned === '' || cleaned === '-' || cleaned === '.') return null;
+  var n = Number(cleaned);
+  return isNaN(n) ? null : n;
+}
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanStr(v)); }
+function isValidPhone(v) {
+  var s = cleanStr(v);
+  var d = digitsOnly(s);
+  return /^\+?[0-9][0-9\s()\/\-.]{6,24}$/.test(s) && d.length >= 7 && d.length <= 15;
+}
+function isValidName(v) { return /^[A-Za-zÄÖÜäöüßÀ-ž'\-\s]{2,60}$/.test(cleanStr(v)); }
+function isValidZip(v) { return /^\d{5}$/.test(cleanStr(v)); }
+function isPastDate(v) {
+  if (!v) return false;
+  var d = new Date(v + 'T12:00:00');
+  var today = new Date(); today.setHours(0,0,0,0);
+  return d < today;
+}
+function getAge(v) {
+  if (!v) return null;
+  var b = new Date(v + 'T12:00:00');
+  if (isNaN(b.getTime())) return null;
+  var t = new Date();
+  var age = t.getFullYear() - b.getFullYear();
+  var m = t.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
+  return age;
+}
+function selectedUnavailableProperty(propertyText, prefix) {
+  var props = cleanStr(propertyText).split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+  for (var i = 0; i < props.length; i++) {
+    var found = PROPERTIES.find(function(p){ return props[i] === p.street + ', ' + p.city; });
+    if (!found) continue;
+    var card = document.getElementById(prefix + found.id);
+    if (card && card.style.pointerEvents === 'none') return props[i];
+  }
+  return '';
+}
+function validateCommonFields(raw, mode) {
+  var errors = [];
+  if (!cleanStr(raw.property)) errors.push(mode === 'short' ? 'Bitte wählen Sie mindestens eine Wohnung aus.' : 'Bitte wählen Sie eine Immobilie aus.');
+  var blocked = selectedUnavailableProperty(raw.property, mode === 'short' ? 'cardS_' : 'card_');
+  if (blocked) errors.push('Die Wohnung "' + blocked + '" ist aktuell nicht verfügbar und kann nicht ausgewählt werden.');
+
+  if (!isValidName(raw.firstName)) errors.push('Bitte geben Sie einen gültigen Vornamen ein.');
+  if (!isValidName(raw.lastName)) errors.push('Bitte geben Sie einen gültigen Nachnamen ein.');
+  if (!isValidEmail(raw.email)) errors.push('Bitte geben Sie eine gültige E-Mail-Adresse ein.');
+  if (!isValidPhone(raw.phone)) errors.push('Bitte geben Sie eine gültige Telefonnummer ein, z. B. +49 178 2687170.');
+
+  if (raw.netIncome) {
+    var income = toNumber(raw.netIncome);
+    if (income === null || income < 500 || income > 50000) errors.push('Bitte geben Sie ein plausibles monatliches Nettoeinkommen ein. Werte unter 500 € oder unrealistisch hohe Werte werden nicht akzeptiert.');
+  }
+  if (raw.additionalIncome) {
+    var addIncome = toNumber(raw.additionalIncome);
+    if (addIncome === null || addIncome < 0 || addIncome > 50000) errors.push('Bitte geben Sie ein plausibles zusätzliches Einkommen ein.');
+  }
+  if (raw.currentRent) {
+    var rent = toNumber(raw.currentRent);
+    if (rent === null || rent < 0 || rent > 10000) errors.push('Bitte geben Sie eine plausible aktuelle Miete ein.');
+  }
+  if (raw.viewingDate && isPastDate(raw.viewingDate)) errors.push('Der gewünschte Besichtigungstermin darf nicht in der Vergangenheit liegen.');
+  if (raw.viewingDateAlt && isPastDate(raw.viewingDateAlt)) errors.push('Der Alternativtermin darf nicht in der Vergangenheit liegen.');
+  if (raw.moveInDate && isPastDate(raw.moveInDate)) errors.push('Das gewünschte Einzugsdatum darf nicht in der Vergangenheit liegen.');
+
+  return errors;
+}
+function validateFullForm(raw) {
+  var errors = validateCommonFields(raw, 'full');
+  if (raw.birthdate) {
+    var age = getAge(raw.birthdate);
+    if (age === null || age < 18 || age > 100) errors.push('Die Hauptmietperson muss mindestens 18 Jahre alt sein. Bitte prüfen Sie das Geburtsdatum.');
+  }
+  if (raw.zip && !isValidZip(raw.zip)) errors.push('Bitte geben Sie eine gültige 5-stellige PLZ ein.');
+  if (raw.street && cleanStr(raw.street).length < 4) errors.push('Bitte geben Sie eine plausible Straße mit Hausnummer ein.');
+  if (raw.city && cleanStr(raw.city).length < 2) errors.push('Bitte geben Sie einen gültigen Wohnort ein.');
+  if (raw.idNumber && cleanStr(raw.idNumber).length < 5) errors.push('Bitte prüfen Sie die Ausweisnummer.');
+  if (raw.totalPersons) {
+    var persons = toNumber(raw.totalPersons);
+    if (persons === null || persons < 1 || persons > 10 || persons % 1 !== 0) errors.push('Bitte geben Sie eine plausible Personenanzahl ein.');
+  }
+  if (raw.children) {
+    var children = toNumber(raw.children);
+    var persons2 = toNumber(raw.totalPersons);
+    if (children === null || children < 0 || children > 10 || children % 1 !== 0) errors.push('Bitte geben Sie eine plausible Kinderanzahl ein.');
+    if (persons2 !== null && children !== null && children > persons2) errors.push('Die Kinderanzahl darf nicht höher sein als die Gesamtpersonenzahl.');
+  }
+  if (raw.schufaScore) {
+    var score = toNumber(raw.schufaScore);
+    if (score === null || score < 0 || score > 100) errors.push('Bitte geben Sie einen Schufa-Score zwischen 0 und 100 ein.');
+  }
+  if (raw.employedSince && isPastDate(raw.employedSince) === false) {
+    var d = new Date(raw.employedSince + 'T12:00:00');
+    var max = new Date(); max.setMonth(max.getMonth() + 1);
+    if (d > max) errors.push('Das Beschäftigungsdatum liegt zu weit in der Zukunft. Bitte prüfen Sie die Angabe.');
+  }
+  if (raw.guarantorIncome) {
+    var gi = toNumber(raw.guarantorIncome);
+    if (gi === null || gi < 500 || gi > 50000) errors.push('Bitte geben Sie ein plausibles Einkommen des Bürgen ein.');
+  }
+  return errors;
+}
+function validateShortForm(raw) {
+  return validateCommonFields(raw, 'short');
+}
+function showValidationErrors(alertId, errors) {
+  showAlert(alertId, 'error', errors.slice(0, 6).join(' '));
 }
 
 
@@ -209,9 +343,11 @@ async function submitForm(e) {
   var raw = {};
   for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
 
-  if (!raw.property) {
-    showAlert('formAlert', 'error', 'Bitte w\u00e4hlen Sie eine Immobilie aus.');
-    document.querySelector('.property-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  var validationErrors = validateFullForm(raw);
+  if (validationErrors.length) {
+    showValidationErrors('formAlert', validationErrors);
+    var firstGrid = document.querySelector('.property-grid');
+    if (firstGrid) firstGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
@@ -831,9 +967,11 @@ async function submitShortForm(e) {
   var raw = {};
   for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
 
-  if (!raw.property) {
-    showAlert('shortFormAlert', 'error', 'Bitte wählen Sie mindestens eine Wohnung aus.');
-    document.getElementById('propertyGridShort').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  var validationErrors = validateShortForm(raw);
+  if (validationErrors.length) {
+    showValidationErrors('shortFormAlert', validationErrors);
+    var shortGrid = document.getElementById('propertyGridShort');
+    if (shortGrid) shortGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
@@ -2663,7 +2801,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;gap:10px;align-items:flex-start;">
             <input type="checkbox" id="shortAccuracy" required style="margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;">
             <label for="shortAccuracy" style="font-size:0.85rem;color:var(--text-muted);cursor:pointer;line-height:1.6;">
-              Ich bestätige, dass alle gemachten Angaben der Wahrheit entsprechen. Mir ist bekannt, dass falsche Angaben zur sofortigen Ablehnung oder Kündigung des Mietvertrages führen können. <span class="req">*</span>
+              Ich bestätige, dass alle gemachten Angaben der Wahrheit entsprechen. Mir ist bekannt, dass falsche Angaben zur sofortigen Ablehnung führen können. <span class="req">*</span>
             </label>
           </div>
         </div>
