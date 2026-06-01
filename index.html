@@ -539,7 +539,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
     <a href="#wohnungen" class="btn-outline">Wohnungen</a>
     <a href="#lage" class="btn-outline">Lage</a>
     <a href="https://centralcityapartments.de/besichtigung" class="btn-gold">Besichtigung anfragen</a>
-    <button class="btn-outline" onclick="openAdmin()">Admin</button>
+    <button class="btn-outline" id="adminBtn" onclick="openAdmin()" style="display:none;">Admin</button>
   </nav>
   <button class="hamburger-btn" id="hambBtn" aria-label="Menü öffnen" aria-controls="mobDropdown" aria-expanded="false" type="button">
     <span></span><span></span><span></span>
@@ -704,7 +704,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   <a href="#wohnungen" class="btn-outline">Wohnungen</a>
   <a href="#lage" class="btn-outline">Lage</a>
   <a href="https://centralcityapartments.de/besichtigung" class="btn-gold">Besichtigung anfragen</a>
-  <button class="btn-outline" onclick="openAdmin();closeMobMenu();">Admin</button>
+  <button class="btn-outline" id="adminBtnMob" onclick="openAdmin();closeMobMenu();" style="display:none;">Admin</button>
 </div>
 
 <script>
@@ -1200,6 +1200,17 @@ function closeMobMenu() {
     el.addEventListener('click', closeMobMenu);
   });
 })();
+
+// ── Admin-Button nur bei #adminad sichtbar ──────────────────────────
+function checkAdminHash() {
+  var show = window.location.hash === '#adminad';
+  var b1 = document.getElementById('adminBtn');
+  var b2 = document.getElementById('adminBtnMob');
+  if (b1) b1.style.display = show ? '' : 'none';
+  if (b2) b2.style.display = show ? '' : 'none';
+}
+checkAdminHash();
+window.addEventListener('hashchange', checkAdminHash);
 
 </script>
 
