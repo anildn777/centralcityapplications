@@ -97,7 +97,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 .listing-card.vergeben { opacity: 0.5; pointer-events: none; }
 
 /* PHOTO SLIDER */
-.photo-slider { position: relative; height: 240px; overflow: hidden; background: var(--dark3); }
+.photo-slider { position: relative; height: 320px; overflow: hidden; background: var(--dark3); }
 .photo-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s; }
 .photo-slider img.active { opacity: 1; }
 .slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 10; }
@@ -210,7 +210,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   animation: modalIn 0.25s ease;
 }
 @keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-.modal-gallery { position: relative; height: 420px; background: var(--dark3); }
+.modal-gallery { position: relative; height: 520px; background: var(--dark3); }
 .modal-gallery img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; opacity: 0; transition: opacity 0.4s;
@@ -262,7 +262,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 .modal-thumb.active { border-color: var(--gold); }
 .modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 640px) {
-  .modal-gallery { height: 260px; }
+  .modal-gallery { height: 300px; }
   .modal-body { padding: 1.2rem; }
   .modal-title { font-size: 1.2rem; }
 }
@@ -313,7 +313,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
   .agrid2, .agrid3 { grid-template-columns: 1fr; }
 
   /* LISTING MODAL */
-  .modal-gallery { height: 220px; }
+  .modal-gallery { height: 250px; }
   .modal-specs { gap: 1rem; }
   .modal-price-block { flex-direction: column; gap: 0.5rem; }
 }
@@ -795,7 +795,7 @@ function buildCard(l) {
     : '<span style="font-size:0.78rem;color:#E8837F;">Bereits vergeben</span>';
 
   return '<div class="listing-card' + (isFrei ? '' : ' vergeben') + '" style="cursor:pointer;" data-lid="' + l.id + '">'
-    + '<div class="photo-slider" style="position:relative;height:240px;overflow:hidden;background:var(--dark3);" data-current="0">'
+    + '<div class="photo-slider" style="position:relative;height:320px;overflow:hidden;background:var(--dark3);" data-current="0">'
     + '<div style="position:absolute;top:14px;left:14px;background:rgba(0,0,0,0.8);color:' + badgeColor + ';border:1px solid ' + badgeBorder + ';padding:4px 12px;border-radius:20px;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;z-index:10;">' + badgeTxt + '</div>'
     + imgHtml + unavailableBanner + dots + sliderBtns
     + '</div>'
