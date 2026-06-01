@@ -1417,6 +1417,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   })();
 
+  // ── Admin-Button nur bei #adminad sichtbar ──────────────────────────
+  function checkAdminHash() {
+    var show = window.location.hash === '#adminad';
+    var btn1 = document.getElementById('adminToggleBtn');
+    var btn2 = document.getElementById('adminToggleBtnMob');
+    if (btn1) btn1.style.display = show ? '' : 'none';
+    if (btn2) btn2.style.display = show ? '' : 'none';
+  }
+  checkAdminHash();
+  window.addEventListener('hashchange', checkAdminHash);
+
 });
 </script>
 <style>
@@ -2424,14 +2435,14 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="bes-nav" id="desktopNav">
     <a href="https://centralcityapartments.de" class="nav-btn" style="text-decoration:none;">← Zur Übersicht</a>
-    <button class="nav-btn" id="adminToggleBtn" onclick="toggleAdminView()">Admin-Bereich</button>
+    <button class="nav-btn" id="adminToggleBtn" onclick="toggleAdminView()" style="display:none;">Admin-Bereich</button>
   </div>
   <button class="hamburger-btn" id="hambBtn" aria-label="Menu" style="display:none;">
     <span></span><span></span><span></span>
   </button>
   <div class="mob-nav" id="mobNav">
     <a href="https://centralcityapartments.de" class="nav-btn" style="text-decoration:none;">← Zur Übersicht</a>
-    <button class="nav-btn" onclick="toggleAdminView()">Admin-Bereich</button>
+    <button class="nav-btn" id="adminToggleBtnMob" onclick="toggleAdminView()" style="display:none;">Admin-Bereich</button>
   </div>
 </header>
 
