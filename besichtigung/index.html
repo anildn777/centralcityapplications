@@ -516,7 +516,15 @@ async function createDocumentSignedUrl(path) {
     if (!res.ok) throw new Error(await res.text());
     var data = await res.json();
     var url = data.signedURL || data.signedUrl || data.url || '';
-    if (url && url.charAt(0) === '/') return SUPABASE_URL + url;
+    // Supabase gibt manchmal einen relativen Pfad zurück (/object/sign/...)
+    // der bereits /storage/v1 weglässt — deshalb storage/v1 ergänzen
+    if (url && url.charAt(0) === '/') {
+      // Falls der Pfad nicht schon /storage/v1 enthält
+      if (url.indexOf('/storage/v1') !== 0) {
+        return SUPABASE_URL + '/storage/v1' + url;
+      }
+      return SUPABASE_URL + url;
+    }
     return url;
   } catch(e) {
     console.warn('Sign URL Fehler:', e.message);
