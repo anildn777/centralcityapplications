@@ -2516,6 +2516,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 }
 
+
+
+/* ===== ONLY REQUESTED INSERAT MODAL DESKTOP FIX =====
+   Besichtigungsseite: desktop popup no longer cramped.
+   Mobile modal rules above remain unchanged. */
+@media (min-width: 769px) {
+  .ins-box { max-width: 980px; }
+  .ins-gallery { height: 430px; }
+  .ins-gallery img { object-fit: cover !important; }
+}
+
 </style>
 </head>
 <body>
