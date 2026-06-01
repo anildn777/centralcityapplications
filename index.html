@@ -564,6 +564,47 @@ body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(-
 .reviews-cta a { color: var(--gold); text-decoration: none; }
 @media(max-width:900px) { .reviews-grid { grid-template-columns: 1fr 1fr; } }
 @media(max-width:600px) { .reviews-grid { grid-template-columns: 1fr; } }
+
+
+/* === FINAL FIX: Inserat-Modal Bilder wieder groß anzeigen === */
+.modal-box {
+  max-width: 1080px !important;
+}
+
+.modal-gallery {
+  height: clamp(460px, 62vh, 680px) !important;
+}
+
+.modal-gallery img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.modal-thumbnails {
+  padding-top: 1rem !important;
+}
+
+@media (max-width: 900px) {
+  .modal-box {
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .modal-gallery {
+    height: clamp(320px, 52vh, 520px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.75rem !important;
+  }
+
+  .modal-gallery {
+    height: 340px !important;
+  }
+}
+
 </style>
 </head>
 <body>
