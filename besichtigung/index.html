@@ -316,6 +316,142 @@ function showValidationErrors(alertId, errors) {
   showAlert(alertId, 'error', errors.slice(0, 6).join(' '));
 }
 
+var coTenantCounters = { short: 0, full: 0 };
+function addCoTenant(prefix) {
+  var container = document.getElementById(prefix + 'CoTenants');
+  if (!container) return;
+  coTenantCounters[prefix] = (coTenantCounters[prefix] || 0) + 1;
+  var idx = coTenantCounters[prefix];
+  var box = document.createElement('div');
+  box.className = 'co-tenant-box';
+  box.innerHTML = ''
+    + '<div class="co-tenant-head"><span>Mitmieter ' + idx + '</span><button type="button" class="btn-remove-small" onclick="removeCoTenant(this)">Entfernen</button></div>'
+    + '<div class="grid-2">'
+    + '<div class="field"><label>Vorname <span class="req">*</span></label><input type="text" data-co="first" placeholder="Vorname"></div>'
+    + '<div class="field"><label>Nachname <span class="req">*</span></label><input type="text" data-co="last" placeholder="Nachname"></div>'
+    + '<div class="field"><label>Alter <span class="req">*</span></label><input type="number" data-co="age" placeholder="z. B. 32" min="18" max="100"></div>'
+    + '<div class="field"><label>Beruf / Tätigkeit <span class="req">*</span></label><input type="text" data-co="job" placeholder="z. B. Monteur, Pflegekraft"></div>'
+    + '<div class="field"><label>Nettoeinkommen / Monat (€) <span class="req">*</span></label><input type="number" data-co="income" placeholder="z. B. 2200" min="0"></div>'
+    + '<div class="field"><label>Raucherstatus</label><select data-co="smoker"><option value="">Keine Angabe</option><option value="Nichtraucher">Nichtraucher</option><option value="Raucher draußen">Raucher draußen</option><option value="Raucher in der Wohnung">Raucher in der Wohnung</option></select></div>'
+    + '<div class="field span-2"><label>Dokumente anhängen</label><input type="file" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple><p class="upload-hint">Optional – PDF, JPG, PNG</p></div>'
+    + '</div>';
+  container.appendChild(box);
+}
+function removeCoTenant(btn) {
+  var box = btn.closest('.co-tenant-box');
+  if (box) box.remove();
+}
+function collectCoTenants(form, prefix) {
+  var container = form.querySelector('#' + prefix + 'CoTenants');
+  if (!container) return '';
+  var rows = [];
+  container.querySelectorAll('.co-tenant-box').forEach(function(box, i) {
+    var get = function(k) { var el = box.querySelector('[data-co="' + k + '"]'); return el ? cleanStr(el.value) : ''; };
+    var first = get('first'), last = get('last'), age = get('age'), job = get('job'), income = get('income'), smoker = get('smoker');
+    var docsEl = box.querySelector('[data-co="docs"]');
+    var docs = docsEl && docsEl.files && docsEl.files.length ? Array.from(docsEl.files).map(function(f){ return f.name; }).join(', ') : '';
+    if (first || last || age || job || income || smoker || docs) {
+      var line = 'Mitmieter ' + (i + 1) + ': ' + first + ' ' + last + ', Alter: ' + age + ', Beruf: ' + job + ', Nettoeinkommen: ' + income + ' €';
+      if (smoker) line += ', Raucherstatus: ' + smoker;
+      if (docs) line += ', Dokumente: ' + docs;
+      rows.push(line);
+    }
+  });
+  return rows.join('\n');
+}
+function validateCoTenantBoxes(form, prefix) {
+  var errors = [];
+  var container = form.querySelector('#' + prefix + 'CoTenants');
+  if (!container) return errors;
+  container.querySelectorAll('.co-tenant-box').forEach(function(box, i) {
+    var get = function(k) { var el = box.querySelector('[data-co="' + k + '"]'); return el ? cleanStr(el.value) : ''; };
+    var first = get('first'), last = get('last'), ageRaw = get('age'), job = get('job'), incomeRaw = get('income'), smoker = get('smoker');
+    var docsEl = box.querySelector('[data-co="docs"]');
+    var hasDocs = !!(docsEl && docsEl.files && docsEl.files.length);
+    var hasAny = first || last || ageRaw || job || incomeRaw || smoker || hasDocs;
+    if (!hasAny) return;
+    var label = 'Mitmieter ' + (i + 1) + ': ';
+    if (!isValidName(first)) errors.push(label + 'Bitte gültigen Vornamen eingeben.');
+    if (!isValidName(last)) errors.push(label + 'Bitte gültigen Nachnamen eingeben.');
+    var age = toNumber(ageRaw);
+    if (age === null || age < 18 || age > 100 || age % 1 !== 0) errors.push(label + 'Bitte ein plausibles Alter ab 18 Jahren eingeben.');
+    if (job.length < 2) errors.push(label + 'Bitte Beruf/Tätigkeit angeben.');
+    var income = toNumber(incomeRaw);
+    if (income === null || income < 500 || income > 50000) errors.push(label + 'Bitte ein plausibles monatliches Nettoeinkommen angeben.');
+  });
+  return errors;
+}
+function countCoTenantBoxes(form, prefix) {
+  var container = form.querySelector('#' + prefix + 'CoTenants');
+  if (!container) return 0;
+  var count = 0;
+  container.querySelectorAll('.co-tenant-box').forEach(function(box) {
+    var hasAny = false;
+    box.querySelectorAll('[data-co]').forEach(function(el) { if (cleanStr(el.value)) hasAny = true; });
+    if (hasAny) count++;
+  });
+  return count;
+}
+
+
+function safeFileName(name) {
+  return String(name || 'datei')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .replace(/_+/g, '_')
+    .slice(0, 120);
+}
+function getDocumentLabel(input) {
+  var label = input.closest('.field') ? input.closest('.field').querySelector('label') : null;
+  if (label) return cleanStr(label.textContent).replace(/\*/g, '').trim();
+  return input.name || input.getAttribute('data-co') || 'Dokument';
+}
+async function uploadApplicationDocuments(appId, form) {
+  if (!appId || !form) return [];
+  var fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
+  var uploads = [];
+  var errors = [];
+  for (var i = 0; i < fileInputs.length; i++) {
+    var input = fileInputs[i];
+    var files = Array.from(input.files || []);
+    if (!files.length) continue;
+    var label = getDocumentLabel(input);
+    for (var j = 0; j < files.length; j++) {
+      var file = files[j];
+      if (file.size > 10 * 1024 * 1024) {
+        errors.push(file.name + ' ist größer als 10 MB.');
+        continue;
+      }
+      var path = 'applications/' + appId + '/' + Date.now() + '_' + safeFileName(file.name);
+      try {
+        var res = await fetch(SUPABASE_URL + '/storage/v1/object/documents/' + path, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': file.type || 'application/octet-stream',
+            'x-upsert': 'true'
+          },
+          body: file
+        });
+        if (!res.ok) throw new Error(await res.text());
+        uploads.push({ label: label, file_name: file.name, path: path, size: file.size, type: file.type || '' });
+      } catch (e) {
+        errors.push(file.name + ': ' + e.message);
+      }
+    }
+  }
+  if (uploads.length) {
+    try {
+      await updateApplication(appId, { documents: JSON.stringify(uploads) });
+    } catch(e2) {
+      console.warn('Dokumenten-Metadaten konnten nicht gespeichert werden:', e2.message);
+    }
+  }
+  if (errors.length) console.warn('Dokumenten-Upload Fehler:', errors.join(' | '));
+  return uploads;
+}
+
 
 // RADIO STYLE
 document.addEventListener('change', function(e) {
@@ -342,8 +478,9 @@ async function submitForm(e) {
   var fd = new FormData(form);
   var raw = {};
   for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
+  raw.coResidents = collectCoTenants(form, 'full') || raw.coResidents || '';
 
-  var validationErrors = validateFullForm(raw);
+  var validationErrors = validateFullForm(raw).concat(validateCoTenantBoxes(form, 'full'));
   if (validationErrors.length) {
     showValidationErrors('formAlert', validationErrors);
     var firstGrid = document.querySelector('.property-grid');
@@ -379,11 +516,14 @@ async function submitForm(e) {
     guarantor: raw.guarantor || '', guarantor_name: raw.guarantorName || '',
     guarantor_contact: raw.guarantorContact || '', guarantor_income: raw.guarantorIncome || '',
     parking_needed: raw.parkingNeeded || '', home_office: raw.homeOffice || '',
-    instrument: raw.instrument || '', heard_from: raw.heardFrom || '', remarks: raw.remarks || ''
+    instrument: raw.instrument || '', heard_from: raw.heardFrom || '', remarks: raw.remarks || '',
+    documents: ''
   };
 
   try {
-    await insertApplication(payload);
+    var inserted = await insertApplication(payload);
+    var appId = inserted && inserted[0] && inserted[0].id ? inserted[0].id : null;
+    if (appId) await uploadApplicationDocuments(appId, form);
     showAlert('formAlert', 'success', '\u2713 Vielen Dank, ' + (raw.firstName || 'lieber Interessent') + '! Ihre Bewerbung ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
     form.reset();
     document.querySelectorAll('.property-card').forEach(function(c) { c.classList.remove('selected'); });
@@ -966,8 +1106,9 @@ async function submitShortForm(e) {
   var fd = new FormData(form);
   var raw = {};
   for (var pair of fd.entries()) { raw[pair[0]] = pair[1]; }
+  raw.coResidents = collectCoTenants(form, 'short');
 
-  var validationErrors = validateShortForm(raw);
+  var validationErrors = validateShortForm(raw).concat(validateCoTenantBoxes(form, 'short'));
   if (validationErrors.length) {
     showValidationErrors('shortFormAlert', validationErrors);
     var shortGrid = document.getElementById('propertyGridShort');
@@ -986,16 +1127,25 @@ async function submitShortForm(e) {
     email: raw.email || '',
     phone: raw.phone || '',
     property: raw.property || '',
+    total_persons: raw.totalPersons || '',
+    children: raw.children || '',
+    co_residents: raw.coResidents || '',
+    pets: raw.pets || '',
+    pet_details: raw.petDetails || '',
+    smoker: raw.smoker || '',
     employment_status: raw.employmentStatus || '',
     net_income: raw.netIncome || '',
     viewing_date: raw.viewingDate || '',
     viewing_time: raw.viewingTime || '',
     viewing_type: raw.viewingType || '',
-    remarks: raw.remarks || ''
+    remarks: raw.remarks || '',
+    documents: ''
   };
 
   try {
-    await insertApplication(payload);
+    var inserted = await insertApplication(payload);
+    var appId = inserted && inserted[0] && inserted[0].id ? inserted[0].id : null;
+    if (appId) await uploadApplicationDocuments(appId, form);
     showAlert('shortFormAlert', 'success', '✓ Vielen Dank, ' + (raw.firstName||'') + '! Ihre Anfrage ist eingegangen. Wir melden uns zeitnah bei Ihnen.');
     form.reset();
     document.querySelectorAll('#propertyGridShort .property-card').forEach(function(c){ c.classList.remove('selected'); });
@@ -2665,6 +2815,45 @@ document.addEventListener('DOMContentLoaded', function() {
   .ins-gallery img { object-fit: cover !important; }
 }
 
+
+/* ===== CO-TENANT MINI FORMS ===== */
+.co-tenant-box {
+  background: rgba(201,169,110,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-top: 0.8rem;
+}
+.co-tenant-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.8rem;
+  color: var(--gold);
+  font-size: 0.85rem;
+}
+.btn-small-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--gold);
+  padding: 8px 13px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+}
+.btn-small-outline:hover { border-color: var(--gold); background: rgba(201,169,110,0.06); }
+.btn-remove-small {
+  background: transparent;
+  border: 1px solid rgba(224,82,82,0.35);
+  color: #E8837F;
+  padding: 5px 9px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
 </style>
 </head>
 <body>
@@ -2777,6 +2966,62 @@ document.addEventListener('DOMContentLoaded', function() {
             <label class="radio-label"><input type="radio" name="viewingType" value="Online (Video-Call)"><span>Online (Video-Call)</span></label>
             <label class="radio-label"><input type="radio" name="viewingType" value="Beides möglich"><span>Beides möglich</span></label>
           </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:1.5rem;">
+          <div class="field">
+            <label>Personen gesamt <span class="req">*</span></label>
+            <select name="totalPersons" required>
+              <option value="">– bitte wählen –</option>
+              <option value="1">1 Person</option>
+              <option value="2">2 Personen</option>
+              <option value="3">3 Personen</option>
+              <option value="4">4 Personen</option>
+              <option value="5">5 Personen</option>
+              <option value="6">6 oder mehr</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Davon Kinder</label>
+            <select name="children">
+              <option value="0">Keine</option>
+              <option value="1">1 Kind</option>
+              <option value="2">2 Kinder</option>
+              <option value="3">3 Kinder</option>
+              <option value="4">4 oder mehr</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Haustiere</label>
+            <select name="pets">
+              <option value="Keine">Keine Haustiere</option>
+              <option value="Hund">Hund</option>
+              <option value="Katze">Katze</option>
+              <option value="Kleintiere">Kleintiere</option>
+              <option value="Mehrere">Mehrere Tiere</option>
+              <option value="Sonstige">Sonstige</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Details zu Haustieren</label>
+            <input type="text" name="petDetails" placeholder="z. B. Katze, Hund, Rasse">
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:block;margin-bottom:8px;">Raucher?</label>
+          <div class="toggle-group">
+            <label class="radio-label"><input type="radio" name="smoker" value="Nichtraucher"><span>Nichtraucher</span></label>
+            <label class="radio-label"><input type="radio" name="smoker" value="Raucher (draußen)"><span>Raucher (nur draußen)</span></label>
+            <label class="radio-label"><input type="radio" name="smoker" value="Raucher"><span>Raucher (in der Wohnung)</span></label>
+          </div>
+        </div>
+
+        <div class="form-section" style="border:none;padding:0;background:transparent;margin-top:1.5rem;">
+          <h2 class="section-title">Mitmieter</h2>
+          <p class="section-sub">Nur weitere erwachsene Mietpersonen eintragen. Kinder bitte oben bei Personen/Kinder berücksichtigen.</p>
+          <div id="shortCoTenants"></div>
+          <button type="button" class="btn-small-outline" onclick="addCoTenant('short')" style="margin-top:0.8rem;">+ Mitmieter hinzufügen</button>
         </div>
 
         <div class="field mt-2">
@@ -2995,15 +3240,15 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
         <div class="mt-2">
-          <div class="field">
-            <label>Namen & Geburtsdaten weiterer einziehender Personen (Erwachsene)</label>
-            <textarea name="coResidents" placeholder="z.B. Anna Mustermann, 12.05.1990&#10;Weitere Personen..."></textarea>
-          </div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--gold);margin-bottom:0.4rem;">Mitmieter</h3>
+          <p class="section-sub" style="margin-bottom:0.8rem;">Nur weitere erwachsene Mietpersonen eintragen. Kinder bitte oben bei Personen/Kinder berücksichtigen.</p>
+          <div id="fullCoTenants"></div>
+          <button type="button" class="btn-small-outline" onclick="addCoTenant('full')">+ Mitmieter hinzufügen</button>
         </div>
         <div class="mt-2 grid-2">
           <div class="field">
-            <label>Haustiere <span class="req">*</span></label>
-            <select name="pets" required>
+            <label>Haustiere</label>
+            <select name="pets">
               <option value="Keine">Keine Haustiere</option>
               <option value="Hund">Hund</option>
               <option value="Katze">Katze</option>
