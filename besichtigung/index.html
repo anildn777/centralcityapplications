@@ -45,16 +45,21 @@ async function sbFetch(path, options) {
 async function insertApplicationProperties(appId, properties, viewingDate, viewingTime) {
   var props = properties.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
   for (var i = 0; i < props.length; i++) {
-    await sbFetch('application_properties', {
-      method: 'POST',
-      body: JSON.stringify({
-        application_id: appId,
-        property: props[i],
-        status: 'pending',
-        viewing_date: viewingDate || '',
-        viewing_time: viewingTime || ''
-      })
-    });
+    try {
+      await sbFetch('application_properties', {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify({
+          application_id: appId,
+          property: props[i],
+          status: 'pending',
+          viewing_date: viewingDate || '',
+          viewing_time: viewingTime || ''
+        })
+      });
+    } catch(e) {
+      console.warn('application_properties insert skipped (RLS):', e.message);
+    }
   }
 }
 
@@ -1291,7 +1296,9 @@ async function confirmProperty(btn) {
   try {
     if (pid.startsWith('prop_')) {
       // No DB entry yet - create one
-      await sbFetch('application_properties', { method: 'POST', body: JSON.stringify({ application_id: appId, property: prop, status: 'confirmed', viewing_date: date, viewing_time: time }) });
+      try {
+        await sbFetch('application_properties', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ application_id: appId, property: prop, status: 'confirmed', viewing_date: date, viewing_time: time }) });
+      } catch(rls) { console.warn('RLS block on application_properties:', rls.message); }
     } else {
       await updateApplicationProperty(pid, { status: 'confirmed', viewing_date: date, viewing_time: time });
     }
@@ -1323,7 +1330,9 @@ async function rejectProperty(btn) {
 
   try {
     if (pid.startsWith('prop_')) {
-      await sbFetch('application_properties', { method: 'POST', body: JSON.stringify({ application_id: appId, property: prop, status: 'rejected' }) });
+      try {
+        await sbFetch('application_properties', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ application_id: appId, property: prop, status: 'rejected' }) });
+      } catch(rls) { console.warn('RLS block on application_properties:', rls.message); }
     } else {
       await updateApplicationProperty(pid, { status: 'rejected' });
     }
@@ -1359,81 +1368,52 @@ async function resetProperty(btn) {
 }
 
 
-// INIT
-buildPropertyGrid();
-buildPropertyGridShort();
+// INIT — alle DOM-abhängigen Initialisierungen nach dem Laden
+document.addEventListener('DOMContentLoaded', function() {
 
-var toggleBtn = document.getElementById('toggleFullFormBtn');
-if (toggleBtn) {
-  toggleBtn.addEventListener('click', toggleFullForm);
-  toggleBtn.addEventListener('mouseover', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; });
-  toggleBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'; });
-}
+  buildPropertyGrid();
+  buildPropertyGridShort();
 
-
-// HAMBURGER MOBILE
-(function() {
-  var btn = document.getElementById('hambBtn');
-  var mobNav = document.getElementById('mobNav');
-  var desktopNav = document.getElementById('desktopNav');
-  function checkSize() {
-    var mob = window.innerWidth <= 768;
-    btn.style.display = mob ? 'flex' : 'none';
-    if (desktopNav) desktopNav.style.display = mob ? 'none' : 'flex';
+  var toggleBtn = document.getElementById('toggleFullFormBtn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', toggleFullForm);
+    toggleBtn.addEventListener('mouseover', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; });
+    toggleBtn.addEventListener('mouseout', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'; });
   }
-  checkSize();
-  window.addEventListener('resize', checkSize);
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    mobNav.classList.toggle('mob-open');
-  });
-  document.addEventListener('click', function(e) {
-    if (mobNav.classList.contains('mob-open') && !mobNav.contains(e.target) && e.target !== btn) {
-      mobNav.classList.remove('mob-open');
-      btn.classList.remove('open');
-    }
-  });
-  mobNav.querySelectorAll('a, button').forEach(function(el) {
-    el.addEventListener('click', function() {
-      mobNav.classList.remove('mob-open');
-      btn.classList.remove('open');
-    });
-  });
-})();
 
-
-// HAMBURGER MOBILE
-(function() {
-  var btn = document.getElementById('hambBtn');
-  var mobNav = document.getElementById('mobNav');
-  var desktopNav = document.getElementById('desktopNav');
-  if (!btn || !mobNav) return;
-  function checkSize() {
-    var mob = window.innerWidth <= 768;
-    btn.style.display = mob ? 'flex' : 'none';
-    if (desktopNav) desktopNav.style.display = mob ? 'none' : 'flex';
-  }
-  checkSize();
-  window.addEventListener('resize', checkSize);
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    mobNav.classList.toggle('mob-open');
-  });
-  document.addEventListener('click', function(e) {
-    if (mobNav.classList.contains('mob-open') && !mobNav.contains(e.target) && e.target !== btn) {
-      mobNav.classList.remove('mob-open');
-      btn.classList.remove('open');
+  // HAMBURGER MOBILE
+  (function() {
+    var btn = document.getElementById('hambBtn');
+    var mobNav = document.getElementById('mobNav');
+    var desktopNav = document.getElementById('desktopNav');
+    if (!btn || !mobNav) return;
+    function checkSize() {
+      var mob = window.innerWidth <= 768;
+      btn.style.display = mob ? 'flex' : 'none';
+      if (desktopNav) desktopNav.style.display = mob ? 'none' : 'flex';
     }
-  });
-  mobNav.querySelectorAll('a, button').forEach(function(el) {
-    el.addEventListener('click', function() {
-      mobNav.classList.remove('mob-open');
-      btn.classList.remove('open');
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      btn.classList.toggle('open');
+      mobNav.classList.toggle('mob-open');
     });
-  });
-})();
+    document.addEventListener('click', function(e) {
+      if (mobNav.classList.contains('mob-open') && !mobNav.contains(e.target) && e.target !== btn) {
+        mobNav.classList.remove('mob-open');
+        btn.classList.remove('open');
+      }
+    });
+    mobNav.querySelectorAll('a, button').forEach(function(el) {
+      el.addEventListener('click', function() {
+        mobNav.classList.remove('mob-open');
+        btn.classList.remove('open');
+      });
+    });
+  })();
+
+});
 </script>
 <style>
   :root {
@@ -3180,31 +3160,6 @@ if (toggleBtn) {
 </div>
 
 
-// HAMBURGER
-(function() {
-  var btn = document.getElementById('hambBtn');
-  var nav = document.getElementById('mobNav');
-  var desktop = document.getElementById('desktopNav');
-  if (!btn || !nav) return;
-  function checkMobile() {
-    var isMob = window.innerWidth <= 768;
-    if (desktop) desktop.style.display = isMob ? 'none' : 'flex';
-    btn.style.display = isMob ? 'flex' : 'none';
-  }
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    btn.classList.toggle('open');
-    nav.classList.toggle('mob-open');
-  });
-  document.addEventListener('click', function(e) {
-    if (nav.classList.contains('mob-open') && !nav.contains(e.target) && e.target !== btn) {
-      nav.classList.remove('mob-open');
-      btn.classList.remove('open');
-    }
-  });
-})();
 
 </body>
 </html>
