@@ -250,64 +250,10 @@ function validateCommonFields(raw, mode) {
   if (!cleanStr(raw.property)) errors.push(mode === 'short' ? 'Bitte wählen Sie mindestens eine Wohnung aus.' : 'Bitte wählen Sie eine Immobilie aus.');
   var blocked = selectedUnavailableProperty(raw.property, mode === 'short' ? 'cardS_' : 'card_');
   if (blocked) errors.push('Die Wohnung "' + blocked + '" ist aktuell nicht verfügbar und kann nicht ausgewählt werden.');
-
-  if (!isValidName(raw.firstName)) errors.push('Bitte geben Sie einen gültigen Vornamen ein.');
-  if (!isValidName(raw.lastName)) errors.push('Bitte geben Sie einen gültigen Nachnamen ein.');
-  if (!isValidEmail(raw.email)) errors.push('Bitte geben Sie eine gültige E-Mail-Adresse ein.');
-  if (!isValidPhone(raw.phone)) errors.push('Bitte geben Sie eine gültige Telefonnummer ein, z. B. +49 178 2687170.');
-
-  if (raw.netIncome) {
-    var income = toNumber(raw.netIncome);
-    if (income === null || income < 500 || income > 50000) errors.push('Bitte geben Sie ein plausibles monatliches Nettoeinkommen ein. Werte unter 500 € oder unrealistisch hohe Werte werden nicht akzeptiert.');
-  }
-  if (raw.additionalIncome) {
-    var addIncome = toNumber(raw.additionalIncome);
-    if (addIncome === null || addIncome < 0 || addIncome > 50000) errors.push('Bitte geben Sie ein plausibles zusätzliches Einkommen ein.');
-  }
-  if (raw.currentRent) {
-    var rent = toNumber(raw.currentRent);
-    if (rent === null || rent < 0 || rent > 10000) errors.push('Bitte geben Sie eine plausible aktuelle Miete ein.');
-  }
-  if (raw.viewingDate && isPastDate(raw.viewingDate)) errors.push('Der gewünschte Besichtigungstermin darf nicht in der Vergangenheit liegen.');
-  if (raw.viewingDateAlt && isPastDate(raw.viewingDateAlt)) errors.push('Der Alternativtermin darf nicht in der Vergangenheit liegen.');
-  if (raw.moveInDate && isPastDate(raw.moveInDate)) errors.push('Das gewünschte Einzugsdatum darf nicht in der Vergangenheit liegen.');
-
   return errors;
 }
 function validateFullForm(raw) {
-  var errors = validateCommonFields(raw, 'full');
-  if (raw.birthdate) {
-    var age = getAge(raw.birthdate);
-    if (age === null || age < 18 || age > 100) errors.push('Die Hauptmietperson muss mindestens 18 Jahre alt sein. Bitte prüfen Sie das Geburtsdatum.');
-  }
-  if (raw.zip && !isValidZip(raw.zip)) errors.push('Bitte geben Sie eine gültige 5-stellige PLZ ein.');
-  if (raw.street && cleanStr(raw.street).length < 4) errors.push('Bitte geben Sie eine plausible Straße mit Hausnummer ein.');
-  if (raw.city && cleanStr(raw.city).length < 2) errors.push('Bitte geben Sie einen gültigen Wohnort ein.');
-  if (raw.idNumber && cleanStr(raw.idNumber).length < 5) errors.push('Bitte prüfen Sie die Ausweisnummer.');
-  if (raw.totalPersons) {
-    var persons = toNumber(raw.totalPersons);
-    if (persons === null || persons < 1 || persons > 10 || persons % 1 !== 0) errors.push('Bitte geben Sie eine plausible Personenanzahl ein.');
-  }
-  if (raw.children) {
-    var children = toNumber(raw.children);
-    var persons2 = toNumber(raw.totalPersons);
-    if (children === null || children < 0 || children > 10 || children % 1 !== 0) errors.push('Bitte geben Sie eine plausible Kinderanzahl ein.');
-    if (persons2 !== null && children !== null && children > persons2) errors.push('Die Kinderanzahl darf nicht höher sein als die Gesamtpersonenzahl.');
-  }
-  if (raw.schufaScore) {
-    var score = toNumber(raw.schufaScore);
-    if (score === null || score < 0 || score > 100) errors.push('Bitte geben Sie einen Schufa-Score zwischen 0 und 100 ein.');
-  }
-  if (raw.employedSince && isPastDate(raw.employedSince) === false) {
-    var d = new Date(raw.employedSince + 'T12:00:00');
-    var max = new Date(); max.setMonth(max.getMonth() + 1);
-    if (d > max) errors.push('Das Beschäftigungsdatum liegt zu weit in der Zukunft. Bitte prüfen Sie die Angabe.');
-  }
-  if (raw.guarantorIncome) {
-    var gi = toNumber(raw.guarantorIncome);
-    if (gi === null || gi < 500 || gi > 50000) errors.push('Bitte geben Sie ein plausibles Einkommen des Bürgen ein.');
-  }
-  return errors;
+  return validateCommonFields(raw, 'full');
 }
 function validateShortForm(raw) {
   return validateCommonFields(raw, 'short');
@@ -329,12 +275,12 @@ function addCoTenant(prefix) {
     + '<div class="grid-2">'
     + '<div class="field"><label>Vorname <span class="req">*</span></label><input type="text" data-co="first" placeholder="Vorname"></div>'
     + '<div class="field"><label>Nachname <span class="req">*</span></label><input type="text" data-co="last" placeholder="Nachname"></div>'
-    + '<div class="field"><label>Alter <span class="req">*</span></label><input type="number" data-co="age" placeholder="z. B. 32" min="18" max="100"></div>'
+    + '<div class="field"><label>Alter <span class="req">*</span></label><input type="number" data-co="age" placeholder="z. B. 32"></div>'
     + '<div class="field"><label>Beschäftigungsart <span class="req">*</span></label><select data-co="employment"><option value="">Bitte wählen</option><option value="Unbefristet angestellt">Unbefristet angestellt</option><option value="Befristet angestellt">Befristet angestellt</option><option value="Selbstständig">Selbstständig</option><option value="Beamter">Beamter</option><option value="Student">Student</option><option value="Auszubildender">Auszubildender</option><option value="Rentner">Rentner</option><option value="Arbeitssuchend">Arbeitssuchend</option><option value="Bürgergeld / Sozialleistungen">Bürgergeld / Sozialleistungen</option><option value="Sonstiges">Sonstiges</option></select></div>'
     + '<div class="field"><label>Beruf / Tätigkeit</label><input type="text" data-co="job" placeholder="z. B. Monteur, Pflegekraft"></div>'
-    + '<div class="field"><label>Nettoeinkommen / Monat (€) <span class="req">*</span></label><input type="number" data-co="income" placeholder="z. B. 2200" min="0"></div>'
+    + '<div class="field"><label>Nettoeinkommen / Monat (€) <span class="req">*</span></label><input type="number" data-co="income" placeholder="z. B. 2200"></div>'
     + '<div class="field"><label>Raucherstatus</label><select data-co="smoker"><option value="">Keine Angabe</option><option value="Nichtraucher">Nichtraucher</option><option value="Raucher draußen">Raucher draußen</option><option value="Raucher in der Wohnung">Raucher in der Wohnung</option></select></div>'
-    + '<div class="field span-2"><label>Dokumente anhängen</label><input type="file" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple><p class="upload-hint">Optional – PDF, JPG, PNG</p></div>'
+    + '<div class="field span-2"><label>Dokumente anhängen</label><input type="file" data-co="docs" accept=".pdf,.jpg,.jpeg,.png" multiple><p class="upload-hint">Optional – PDF, JPG, PNG</p><p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p></div>'
     + '</div>';
   container.appendChild(box);
 }
@@ -367,19 +313,17 @@ function validateCoTenantBoxes(form, prefix) {
   if (!container) return errors;
   container.querySelectorAll('.co-tenant-box').forEach(function(box, i) {
     var get = function(k) { var el = box.querySelector('[data-co="' + k + '"]'); return el ? cleanStr(el.value) : ''; };
-    var first = get('first'), last = get('last'), ageRaw = get('age'), employment = get('employment'), job = get('job'), incomeRaw = get('income'), smoker = get('smoker');
+    var first = get('first'), last = get('last'), ageRaw = get('age'), employment = get('employment'), incomeRaw = get('income'), smoker = get('smoker'), job = get('job');
     var docsEl = box.querySelector('[data-co="docs"]');
     var hasDocs = !!(docsEl && docsEl.files && docsEl.files.length);
-    var hasAny = first || last || ageRaw || employment || job || incomeRaw || smoker || hasDocs;
+    var hasAny = first || last || ageRaw || employment || incomeRaw || smoker || job || hasDocs;
     if (!hasAny) return;
     var label = 'Mitmieter ' + (i + 1) + ': ';
-    if (!isValidName(first)) errors.push(label + 'Bitte gültigen Vornamen eingeben.');
-    if (!isValidName(last)) errors.push(label + 'Bitte gültigen Nachnamen eingeben.');
-    var age = toNumber(ageRaw);
-    if (age === null || age < 18 || age > 100 || age % 1 !== 0) errors.push(label + 'Bitte ein plausibles Alter ab 18 Jahren eingeben.');
+    if (!first) errors.push(label + 'Bitte Vornamen eingeben.');
+    if (!last) errors.push(label + 'Bitte Nachnamen eingeben.');
+    if (!ageRaw) errors.push(label + 'Bitte Alter eingeben.');
     if (!employment) errors.push(label + 'Bitte Beschäftigungsart auswählen.');
-    var income = toNumber(incomeRaw);
-    if (income === null || income < 500 || income > 50000) errors.push(label + 'Bitte ein plausibles monatliches Nettoeinkommen angeben.');
+    if (!incomeRaw) errors.push(label + 'Bitte Nettoeinkommen angeben.');
   });
   return errors;
 }
@@ -404,6 +348,11 @@ function safeFileName(name) {
     .slice(0, 120);
 }
 function getDocumentLabel(input) {
+  var coBox = input.closest('.co-tenant-box');
+  if (coBox) {
+    var head = coBox.querySelector('.co-tenant-head span');
+    if (head) return cleanStr(head.textContent) + ' - Dokumente anhängen';
+  }
   var label = input.closest('.field') ? input.closest('.field').querySelector('label') : null;
   if (label) return cleanStr(label.textContent).replace(/\*/g, '').trim();
   return input.name || input.getAttribute('data-co') || 'Dokument';
@@ -455,6 +404,75 @@ async function uploadApplicationDocuments(appId, form) {
 }
 
 
+
+function parseApplicationDocuments(documents) {
+  if (!documents) return [];
+  try {
+    if (Array.isArray(documents)) return documents;
+    var parsed = JSON.parse(documents);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch(e) {
+    return [];
+  }
+}
+
+async function createDocumentSignedUrl(path) {
+  if (!path) return '';
+  try {
+    var res = await fetch(SUPABASE_URL + '/storage/v1/object/sign/documents/' + path, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ expiresIn: 60 * 60 })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    var data = await res.json();
+    var url = data.signedURL || data.signedUrl || data.url || '';
+    if (url && url.charAt(0) === '/') return SUPABASE_URL + url;
+    return url;
+  } catch(e) {
+    console.warn('Sign URL Fehler:', e.message);
+    return '';
+  }
+}
+
+async function enrichApplicationDocuments(apps) {
+  await Promise.all((apps || []).map(async function(app) {
+    var docs = parseApplicationDocuments(app.documents);
+    app._documents = docs;
+    app._documentLinks = [];
+    for (var i = 0; i < docs.length; i++) {
+      var d = docs[i] || {};
+      var url = await createDocumentSignedUrl(d.path);
+      app._documentLinks.push({
+        label: d.label || 'Dokument',
+        file_name: d.file_name || d.path || 'Datei',
+        url: url,
+        path: d.path || ''
+      });
+    }
+  }));
+}
+
+function buildDocumentsHtml(app) {
+  var links = app._documentLinks || [];
+  if (!links.length) return '';
+  return '<div class="detail-documents" style="margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:rgba(201,169,110,0.04);">'
+    + '<div class="dl" style="margin-bottom:0.6rem;">Hochgeladene Dokumente</div>'
+    + links.map(function(d) {
+        var name = (d.label ? d.label + ': ' : '') + (d.file_name || 'Datei');
+        if (d.url) {
+          return '<a href="' + d.url + '" target="_blank" rel="noopener" download style="display:inline-block;margin:0 8px 8px 0;padding:7px 10px;border:1px solid rgba(201,169,110,0.35);border-radius:8px;color:var(--gold);text-decoration:none;font-size:0.78rem;">📎 ' + name + '</a>';
+        }
+        return '<span style="display:inline-block;margin:0 8px 8px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:0.78rem;">📎 ' + name + '</span>';
+      }).join('')
+    + '</div>';
+}
+
+
 // RADIO STYLE
 document.addEventListener('change', function(e) {
   if (e.target.type === 'radio') {
@@ -498,6 +516,7 @@ async function submitForm(e) {
     status: 'pending',
     first_name: raw.firstName || '', last_name: raw.lastName || '',
     email: raw.email || '', phone: raw.phone || '',
+    age: raw.age || '',
     birthdate: raw.birthdate || '', birthplace: raw.birthplace || '',
     nationality: raw.nationality || '', id_number: raw.idNumber || '',
     street: raw.street || '', zip: raw.zip || '', city: raw.city || '',
@@ -632,6 +651,7 @@ async function renderDashboard() {
   list.innerHTML = '<div class="empty-state"><div style="opacity:0.4;margin-bottom:0.5rem;">Laedt...</div></div>';
   try {
     allApps = await fetchApplications();
+    await enrichApplicationDocuments(allApps);
 
     // Wohnungs-Einträge für alle Bewerbungen laden + fehlende auto-anlegen
     await Promise.all(allApps.map(async function(app) {
@@ -738,7 +758,7 @@ function buildAppCard(app) {
 
   var fields = [
     ['Immobilie', app.property], ['E-Mail', app.email], ['Telefon', app.phone],
-    ['Geburtsdatum', app.birthdate], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
+    ['Geburtsdatum', app.birthdate], ['Alter', app.age], ['Adresse', [app.street, app.zip, app.city].filter(Boolean).join(', ')],
     ['Beruf', app.occupation], ['Besch\u00e4ftigung', app.employment_status],
     ['Nettoeinkommen', app.net_income ? app.net_income + ' \u20ac' : ''], ['B\u00fcrgergeld', app.welfare],
     ['Personen', app.total_persons], ['Kinder', app.children], ['Haustiere', app.pets],
@@ -768,6 +788,7 @@ function buildAppCard(app) {
     + '</div>'
     + '<div class="app-card-body">'
     + '<div class="detail-grid">' + fields.map(function(f) { return '<div class="detail-item"><div class="dl">' + f[0] + '</div><div class="dv">' + f[1] + '</div></div>'; }).join('') + '</div>'
+    + buildDocumentsHtml(app)
     + actionHtml
     + '<div style="padding:0.5rem 0 0;border-top:1px solid var(--border);margin-top:0.8rem;"><button data-appid="' + app.id + '" onclick="deleteApplication(this.dataset.appid)" style="background:transparent;border:none;color:rgba(224,82,82,0.6);font-size:0.75rem;cursor:pointer;padding:0;font-family:sans-serif;">&#128465; Bewerbung l\u00f6schen</button></div>'
     + '</div></div>';
@@ -991,7 +1012,7 @@ async function exportCSV() {
   if (!apps.length) { alert('Keine Bewerbungen vorhanden.'); return; }
   var cols = [
     ['Status','status'],['Eingegangen','created_at'],['Vorname','first_name'],['Nachname','last_name'],
-    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Staatsangehoerigkeit','nationality'],
+    ['E-Mail','email'],['Telefon','phone'],['Geburtsdatum','birthdate'],['Alter','age'],['Staatsangehoerigkeit','nationality'],
     ['Strasse','street'],['PLZ','zip'],['Ort','city'],['Immobilie','property'],
     ['Beruf','occupation'],['Beschaeftigung','employment_status'],['Arbeitgeber','employer'],
     ['Nettoeinkommen','net_income'],['Buergergeld','welfare'],
@@ -1128,6 +1149,7 @@ async function submitShortForm(e) {
     last_name: raw.lastName || '',
     email: raw.email || '',
     phone: raw.phone || '',
+    age: raw.age || '',
     property: raw.property || '',
     total_persons: raw.totalPersons || '',
     children: raw.children || '',
@@ -2926,6 +2948,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="tel" name="phone" required placeholder="+49 231 123456">
           </div>
           <div class="field">
+            <label>Alter</label>
+            <input type="number" name="age" placeholder="z. B. 32">
+          </div>
+          <div class="field">
             <label>Beschäftigungsart <span class="req">*</span></label>
             <select name="employmentStatus" required>
               <option value="">– bitte wählen –</option>
@@ -3027,9 +3053,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="field mt-2">
-          <label>Dokumente anhängen (Schufa, Einkommensnachweis etc.)</label>
+          <label>Dokumente anhängen</label>
           <input type="file" name="shortDocs" accept=".pdf,.jpg,.jpeg,.png" multiple>
           <p class="upload-hint">Optional – PDF, JPG, PNG – max. 10 MB je Datei</p>
+          <p class="upload-hint" style="margin-top:4px;">z.B. Einkommensnachweise, Schufa-Auskunft, Mietschuldenfreiheitsbescheinigung, Personalausweis</p>
         </div>
 
         <div class="field mt-2">
@@ -3100,6 +3127,10 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="field">
             <label>Geburtsdatum <span class="req">*</span></label>
             <input type="date" onclick="try{this.showPicker()}catch(e){}" name="birthdate" required>
+          </div>
+          <div class="field">
+            <label>Alter</label>
+            <input type="number" name="age" placeholder="z. B. 32">
           </div>
           <div class="field">
             <label>Geburtsort</label>
